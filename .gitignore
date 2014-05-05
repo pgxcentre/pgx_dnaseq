@@ -1,0 +1,11 @@
+*.swp
+*.pyc
+dist
+*.egg-info
+
+test/data
+test/output
+test/reference
+test/.ruffus_history.sqlite
+test/flowchart*
+test/TMP
