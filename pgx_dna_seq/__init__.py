@@ -1,3 +1,6 @@
+import ConfigParser
+
+
 class ProgramError(Exception):
     """An :py:class:`Exception` raised in case of a problem.
     
@@ -16,3 +19,23 @@ class ProgramError(Exception):
 
     def __str__(self):
         return self.message
+
+
+def read_config_file(filename):
+    """Reads a configuration file."""
+    # Creating the configuration file parser (we want to read as string, so that
+    # it is case sensitive)
+    parser = ConfigParser.RawConfigParser()
+    parser.optionxform = str
+    parser.read(filename)
+
+    # Reading the configuration for each section and save it in a dict
+    configuration = {}
+    for section in parser.sections():
+        options = {}
+        for name, value in parser.items(section):
+            options[name] = value
+        configuration[section] = options
+
+    # Returning the configuration
+    return(configuration)
