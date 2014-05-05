@@ -236,5 +236,5 @@ for curr_job, job in enumerate(what_to_run):
 
 print("Runing the pipeline...")
 pipeline_printout_graph("flowchart.svg", "svg", job_order)
-pipeline_run(verbose=0, multiprocess=2, checksum_level=1)
+pipeline_run(verbose=0, multiprocess=1, checksum_level=1)
 pipeline_printout_graph("flowchart_after.svg", "svg", job_order)
