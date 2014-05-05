@@ -220,7 +220,7 @@ for curr_job, job in enumerate(what_to_run):
 
         # Running the task
         job.execute(options, drmaa_options=drmaa_options, out_dir=out_dir,
-                    locally=False)
+                    locally=True)
 
     # Setting the attribute for the new function so that it can be pickled
     setattr(__main__, func_name, curr_step)
