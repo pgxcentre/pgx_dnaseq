@@ -119,7 +119,7 @@ class MarkDuplicates(PicardTools):
        """Initialize a MarkDuplicates instance."""
        pass
 
-    def execute(self, options, drmaa_options={}, out_dir=None, locally=True):
+    def execute(self, options, out_dir=None, locally=True):
         """Mark duplicates."""
         # The metrics file
         if "output" not in options:
@@ -127,5 +127,4 @@ class MarkDuplicates(PicardTools):
             raise ProgramError(m)
         metrics_file = re.sub(r"\.[sb]am$", ".dedup", options["output"])
         options["metrics"] = metrics_file
-        super(MarkDuplicates, self).execute(options, drmaa_options, out_dir,
-                                            locally)
+        super(MarkDuplicates, self).execute(options, out_dir, locally)

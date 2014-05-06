@@ -53,7 +53,7 @@ class FastQC_FastQ(FastQC):
         """Initialize a FastQC_FastQ instance."""
         pass
 
-    def execute(self, options, drmaa_options={}, out_dir=None, locally=True):
+    def execute(self, options, out_dir=None, locally=True):
         """Execute FastQC on both input files."""
         # First, we run on the first file
         try:
@@ -62,8 +62,7 @@ class FastQC_FastQ(FastQC):
         except KeyError as e:
             m = "{}: missing option {}".format(self.__class__.__name__, e)
             raise ProgramError(m)
-        super(FastQC_FastQ, self).execute(options, drmaa_options, out_dir,
-                                          locally)
+        super(FastQC_FastQ, self).execute(options, out_dir, locally)
 
         # We need to move the files... FastQC renames the original file so that
         # the directory is the same, but ".fastq(.gz)?" is replaced to "_fastqc"
@@ -83,8 +82,7 @@ class FastQC_FastQ(FastQC):
         except KeyError as e:
             m = "{}: missing option {}".format(self.__class__.__name__, e)
             raise ProgramError(m)
-        super(FastQC_FastQ, self).execute(options, drmaa_options, out_dir,
-                                          locally)
+        super(FastQC_FastQ, self).execute(options, out_dir, locally)
 
         # We need to move the files... FastQC renames the original file so that
         # the directory is the same, but ".fastq(.gz)?" is replaced to "_fastqc"

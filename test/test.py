@@ -6,6 +6,7 @@ import __main__
 
 from ruffus import *
 from pgx_dna_seq import read_config_file
+from pgx_dna_seq.tool import GenericTool as Tool
 
 from pgx_dna_seq.tool.bwa import SAMPE
 from pgx_dna_seq.tool.fastq_mcf import ClipTrim
@@ -32,6 +33,10 @@ starting_files = [["data/NA12877_R1.fastq.gz", "data/NA12877_R2.fastq.gz"],
 def start(o_files):
     print(o_files)
     pass
+
+# The options for DRMAA
+drmaa_options = read_config_file("tool.conf")
+Tool.set_tools_drmaa_options(drmaa_options)
 
 # What to run
 what_to_run = [FastQC_FastQ(), ClipTrim(), FastQC_FastQ(), SAMPE(), Sam2Bam(),
@@ -76,9 +81,6 @@ options = [{},                                      # FastQC
             "dbSNP_known_sites": "reference/dbSNP_138.GRCh37_p10.vcf.gz"},
 
            {"java_memory": "10g"}]                  # Mark duplicate
-
-# The options for DRMAA
-drmaa_options = read_config_file("tool.conf")
 
 # The job order
 job_order = []
@@ -128,10 +130,10 @@ for curr_job, job in enumerate(what_to_run):
     # Dynamically creating the pipeline
     @curr_decorator(in_job, formatter(*curr_formatter), curr_output,
                     "{SAMPLE[0]}", job, len(input_type), len(output_type),
-                    output_dir, options[curr_job], drmaa_options)
+                    output_dir, options[curr_job])
     @rename_func(func_name)
     def curr_step(i_files, o_files, sample_id, job, nb_in, nb_out, out_dir,
-                  options, drmaa_options):
+                  options):
         print("\n###########################")
         print(job.get_tool_name())
         # The i_files variable is a tuple of lists
@@ -163,8 +165,7 @@ for curr_job, job in enumerate(what_to_run):
             options["sample_id"] = sample_id
 
         # Running the task
-        job.execute(options, drmaa_options=drmaa_options, out_dir=out_dir,
-                    locally=True)
+        job.execute(options, out_dir=out_dir, locally=False)
 
     # Setting the attribute for the new function so that it can be pickled
     setattr(__main__, func_name, curr_step)
@@ -180,5 +181,5 @@ for curr_job, job in enumerate(what_to_run):
 
 print("Runing the pipeline...")
 pipeline_printout_graph("flowchart.svg", "svg", job_order)
-pipeline_run(verbose=0, multiprocess=1, checksum_level=1)
+pipeline_run(verbose=0, multiprocess=2, checksum_level=1)
 pipeline_printout_graph("flowchart_after.svg", "svg", job_order)

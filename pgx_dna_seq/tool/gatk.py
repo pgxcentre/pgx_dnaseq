@@ -89,14 +89,13 @@ class IndelRealigner(GATK):
         """Initialize a IndelRealigner instance."""
         pass
 
-    def execute(self, options, drmaa_options={}, out_dir=None, locally=True):
+    def execute(self, options, out_dir=None, locally=True):
         """Indexes a BAM and realign it."""
         # First we index the input file
         if "input" not in options:
             m = "{}: no input file".format(self.__class__.__name__)
             raise ProgramError(m)
-        IndexBam().execute({"input": options["input"]}, drmaa_options, out_dir,
-                           locally)
+        IndexBam().execute({"input": options["input"]}, out_dir, locally)
 
         # Then we create the intervals for realigning
         intervals_opt = {}
@@ -118,12 +117,10 @@ class IndelRealigner(GATK):
             raise ProgramError(m)
 
         # Executing the intervals
-        RealignerTargetCreator().execute(intervals_opt, drmaa_options, out_dir,
-                                         locally)
+        RealignerTargetCreator().execute(intervals_opt, out_dir, locally)
 
         # Executing the realignment
-        super(IndelRealigner, self).execute(options, drmaa_options, out_dir,
-                                            locally)
+        super(IndelRealigner, self).execute(options, out_dir, locally)
 
 
 class PrintReads(GATK):
@@ -195,14 +192,13 @@ class BaseRecalibrator(GATK):
         """Initialize a BaseRecalibrator instance."""
         pass
 
-    def execute(self, options, drmaa_options={}, out_dir=None, locally=True):
+    def execute(self, options, out_dir=None, locally=True):
         """Indexes a BAM and recalibrate it."""
         # First we index the input file
         if "input" not in options:
             m = "{}: no input file".format(self.__class__.__name__)
             raise ProgramError(m)
-        IndexBam().execute({"input": options["input"]}, drmaa_options, out_dir,
-                           locally)
+        IndexBam().execute({"input": options["input"]}, out_dir, locally)
 
         # Then we create the groups for recalibration
         if "output" not in options:
@@ -210,8 +206,7 @@ class BaseRecalibrator(GATK):
             raise ProgramError(m)
         groups_file = re.sub(r"\.[sb]am$", ".grp", options["output"])
         options["groups"] = groups_file
-        super(BaseRecalibrator, self).execute(options, drmaa_options, out_dir,
-                                              locally)
+        super(BaseRecalibrator, self).execute(options, out_dir, locally)
 
         # Printing the reads
-        PrintReads().execute(options, drmaa_options, out_dir, locally)
+        PrintReads().execute(options, out_dir, locally)

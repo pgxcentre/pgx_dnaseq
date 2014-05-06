@@ -17,6 +17,9 @@ class GenericTool(object):
 
     # By default, a tool produces usable data
     _produce_data = True
+
+    # The DRMAA options of all the available tools
+    __drmaa_options = {}
     
     def __init__(self):
         """Initialize an new GeneticTool object."""
@@ -26,6 +29,16 @@ class GenericTool(object):
     def produce_usable_data(self):
         """Returns True if the tool produces data. False otherwise."""
         return self._produce_data
+
+    @staticmethod
+    def set_tools_drmaa_options(drmaa_options):
+        """Sets the DRMAA options for all the tools."""
+        GenericTool.__drmaa_options = drmaa_options
+
+    @staticmethod
+    def get_tools_drmaa_options():
+        """Get the DRMAA options for all the tools."""
+        return GenericTool.__drmaa_options
 
     def get_tool_name(self):
         """Returns the tool name."""
@@ -106,8 +119,7 @@ class GenericTool(object):
             m = "{}: suffix is None".format(self.__class__.__name__)
             raise NotImplementedError(m)
 
-    def execute(self, tool_options, drmaa_options={}, out_dir=None,
-                locally=True):
+    def execute(self, tool_options, out_dir=None, locally=True):
         """Executes the tool."""
         # Checks the options
         checked_options = self.check_options(tool_options)
@@ -125,9 +137,13 @@ class GenericTool(object):
             GenericTool.__execute_command_locally(job_command, job_stdout,
                                                   job_stderr)
         else:
+            # Getting the tool name
             tool_name = self.get_tool_name()
-            walltime, nodes = GenericTool.__create_drmaa_var(drmaa_options,
-                                                             tool_name)
+
+            # Getting the tool walltime and nodes variable (for DRMAA)
+            walltime, nodes = GenericTool.__create_drmaa_var(
+                                          GenericTool.get_tools_drmaa_options(),
+                                          tool_name)
             GenericTool.__execute_command_drmaa(job_command, job_stdout,
                                                 job_stderr, out_dir, tool_name,
                                                 walltime, nodes)
@@ -230,6 +246,8 @@ class GenericTool(object):
                 nodes = "-l nodes={}:ppn={}".format(job_options["nb_node"],
                                                     job_options["nb_proc"])
                 nodes = bytes(nodes, encoding="ascii")
+
+        # Returns the walltime and the nodes information
         return walltime, nodes
 
     def check_options(self, options):
