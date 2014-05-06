@@ -101,17 +101,17 @@ class KeepMapped(Samtools):
         """Initialize a KeepMapped instance."""
         pass
 
-    def execute(self, options, out_dir=None, locally=True):
+    def execute(self, options, out_dir=None):
         """Extract mapped reads (keeping the unmapped ones)."""
         # First, we extract the mapped reads
         options["mapped_opt"] = "-F 4"
-        super(KeepMapped, self).execute(options, out_dir, locally)
+        super(KeepMapped, self).execute(options, out_dir)
 
         # Then, we extract the unmapped reads
         options["mapped_opt"] = "-f 4"
         options["output"] = re.sub("{}$".format(self._output_type[0]),
                                    ".unmapped.bam", options["output"])
-        super(KeepMapped, self).execute(options, out_dir, locally)
+        super(KeepMapped, self).execute(options, out_dir)
 
 
 class FlagStat(Samtools):

@@ -37,6 +37,7 @@ def start(o_files):
 # The options for DRMAA
 drmaa_options = read_config_file("tool.conf")
 Tool.set_tools_drmaa_options(drmaa_options)
+Tool.do_not_run_locally()
 
 # What to run
 what_to_run = [FastQC_FastQ(), ClipTrim(), FastQC_FastQ(), SAMPE(), Sam2Bam(),
@@ -165,7 +166,7 @@ for curr_job, job in enumerate(what_to_run):
             options["sample_id"] = sample_id
 
         # Running the task
-        job.execute(options, out_dir=out_dir, locally=False)
+        job.execute(options, out_dir=out_dir)
 
     # Setting the attribute for the new function so that it can be pickled
     setattr(__main__, func_name, curr_step)

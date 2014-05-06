@@ -83,7 +83,7 @@ class JAR(Java):
             m = "{}: no command".format(self.__class__.__name__)
             raise NotImplementedError(m)
 
-    def execute(self, options, out_dir=None, locally=True):
+    def execute(self, options, out_dir=None):
         """Executes a java JAR application."""
         # First we check if the jar file exists
         jar_file = self.get_jar_file()
@@ -111,4 +111,4 @@ class JAR(Java):
         options["jar_file"] = jar_file
 
         # Executing the jar file
-        super(JAR, self).execute(options, out_dir, locally)
+        super(JAR, self).execute(options, out_dir)

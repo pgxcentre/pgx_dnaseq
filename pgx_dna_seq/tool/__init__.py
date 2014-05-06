@@ -20,6 +20,9 @@ class GenericTool(object):
 
     # The DRMAA options of all the available tools
     __drmaa_options = {}
+
+    # By default, we run locally
+    __locally = True
     
     def __init__(self):
         """Initialize an new GeneticTool object."""
@@ -39,6 +42,16 @@ class GenericTool(object):
     def get_tools_drmaa_options():
         """Get the DRMAA options for all the tools."""
         return GenericTool.__drmaa_options
+
+    @staticmethod
+    def do_not_run_locally():
+        """Do not run the tools locally (sets __locally to False)."""
+        GenericTool.__locally = False
+
+    @staticmethod
+    def run_locally():
+        """Do the tools need to be run locally or not."""
+        return GenericTool.__locally
 
     def get_tool_name(self):
         """Returns the tool name."""
@@ -119,7 +132,7 @@ class GenericTool(object):
             m = "{}: suffix is None".format(self.__class__.__name__)
             raise NotImplementedError(m)
 
-    def execute(self, tool_options, out_dir=None, locally=True):
+    def execute(self, tool_options, out_dir=None):
         """Executes the tool."""
         # Checks the options
         checked_options = self.check_options(tool_options)
@@ -133,7 +146,7 @@ class GenericTool(object):
         job_stderr = self.get_stderr().format(**checked_options)
 
         # Execute it
-        if locally:
+        if GenericTool.run_locally():
             GenericTool.__execute_command_locally(job_command, job_stdout,
                                                   job_stderr)
         else:
