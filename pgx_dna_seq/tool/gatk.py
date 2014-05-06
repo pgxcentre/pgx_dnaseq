@@ -14,6 +14,9 @@ class GATK(JAR):
     # The version of the tool
     _version = "3.1-1"
 
+    # The jar file default location
+    _jar_location = "/opt/GenomeAnalysisTK-3.1-1"
+
     def __init__(self):
         """Initialize a PicardTools instance."""
         pass
@@ -24,8 +27,8 @@ class RealignerTargetCreator(GATK):
     # The name of the tool
     _tool_name = "RealignerTargetCreator"
 
-    # The jar location
-    _jar = "/opt/GenomeAnalysisTK-3.1-1/GenomeAnalysisTK.jar"
+    # The jar file
+    _jar = "GenomeAnalysisTK.jar"
 
     # The options
     _command = ("-T RealignerTargetCreator -I {input} -R {reference} "
@@ -58,8 +61,8 @@ class IndelRealigner(GATK):
     # The name of the tool
     _tool_name = "IndelRealigner"
 
-    # The jar location
-    _jar = "/opt/GenomeAnalysisTK-3.1-1/GenomeAnalysisTK.jar"
+    # The jar file
+    _jar = "GenomeAnalysisTK.jar"
 
     # The options
     _command = ("-T IndelRealigner -R {reference} -I {input} "
@@ -128,8 +131,8 @@ class PrintReads(GATK):
     # The name of the tool
     _tool_name = "PrintReads"
 
-    # The jar location
-    _jar = "/opt/GenomeAnalysisTK-3.1-1/GenomeAnalysisTK.jar"
+    # The jar file
+    _jar = "GenomeAnalysisTK.jar"
 
     # The options
     _command = ("-T PrintReads -I {input} -R {reference} -BQSR {groups} "
@@ -163,8 +166,8 @@ class BaseRecalibrator(GATK):
     # The name of the tool
     _tool_name = "BaseRecalibrator"
 
-    # The jar location
-    _jar = "/opt/GenomeAnalysisTK-3.1-1/GenomeAnalysisTK.jar"
+    # The jar file
+    _jar = "GenomeAnalysisTK.jar"
 
     # The options
     _command = ("-T BaseRecalibrator -R {reference} -I {input} "

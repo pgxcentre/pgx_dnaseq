@@ -34,10 +34,30 @@ class JAR(Java):
         """Initialize a _SAM2BAM instance."""
         pass
 
+    @staticmethod
+    def get_tool_jar_dir(tool_name):
+        """Returns the JAR directory (empty string if none specified)."""
+        # Getting all the tool configuration
+        tool_conf = GenericTool.get_tool_configuration()
+
+        # By default, the JAR directory is None (meaning that the default
+        # tool's JAR directory should be used)
+        jar_dir = None
+        if (tool_name in tool_conf) and ("jar_dir" in tool_conf[tool_name]):
+            jar_dir = tool_conf[tool_name]["jar_dir"]
+
+        # Returning the JAR directory
+        return jar_dir
+
     def get_jar_file(self):
         """Returns the tool's jar file."""
+        # Getting the optional jar directory
+        jar_location = JAR.get_tool_jar_dir(self.get_tool_name())
+        if jar_location is None:
+            jar_location = self.get_jar_location()
+
         try:
-            return self._jar
+            return os.path.join(jar_location, self._jar)
         except AttributeError:
             m = "{}: no jar".format(self.__class__.__name__)
             raise NotImplementedError(m)
@@ -45,6 +65,15 @@ class JAR(Java):
     def get_jar_required_options(self):
         """Returns the jar required options."""
         return self._jar_required_options
+
+    def get_jar_location(self):
+        """Gets the directory where the JAR is located."""
+        try:
+            return self._jar_location
+        except AttributeError:
+            m = ("{}: default jar location was not "
+                 "set".format(self.__class__.__name__))
+            raise ProgramError(m)
 
     def get_required_options(self):
         """Returns the required options."""

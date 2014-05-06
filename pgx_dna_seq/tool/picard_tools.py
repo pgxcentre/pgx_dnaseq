@@ -11,6 +11,9 @@ class PicardTools(JAR):
     # The version of the tool
     _version = "1.113"
 
+    # The jar file default location
+    _jar_location = "/opt/picard-tools-1.113"
+
     def __init__(self):
         """Initialize a PicardTools instance."""
         pass
@@ -21,8 +24,8 @@ class SortSam(PicardTools):
     # The name of the tool
     _tool_name = "SortSam"
 
-    # The jar location
-    _jar = "/opt/picard-tools-1.113/SortSam.jar"
+    # The jar file
+    _jar = "SortSam.jar"
 
     # The options
     _command = ("INPUT={input} OUTPUT={output} SORT_ORDER={sort_order} "
@@ -55,8 +58,8 @@ class AddRG(PicardTools):
     # The name of the tool
     _tool_name = "AddRG"
 
-    # The jar location
-    _jar = "/opt/picard-tools-1.113/AddOrReplaceReadGroups.jar"
+    # The jar file
+    _jar = "AddOrReplaceReadGroups.jar"
 
     # The options
     _command = ("I={input} O={output} RGDS={rgds} RGPL={rgpl} RGPU={rgpu} "
@@ -93,8 +96,8 @@ class MarkDuplicates(PicardTools):
     # The name of the tool
     _tool_name = "MarkDuplicates"
 
-    # The jar location
-    _jar = "/opt/picard-tools-1.113/MarkDuplicates.jar"
+    # The jar file
+    _jar = "MarkDuplicates.jar"
 
     # The options
     _command = ("INPUT={input} O={output} METRICS_FILE={metrics}")
