@@ -5,6 +5,8 @@ import sys
 import __main__
 
 from ruffus import *
+from pgx_dna_seq import read_config_file
+
 from pgx_dna_seq.tool.bwa import SAMPE
 from pgx_dna_seq.tool.fastq_mcf import ClipTrim
 from pgx_dna_seq.tool.fastqc import FastQC_FastQ
@@ -76,65 +78,7 @@ options = [{},                                      # FastQC
            {"java_memory": "10g"}]                  # Mark duplicate
 
 # The options for DRMAA
-drmaa_options = {"ALN":                    {"walltime": "00:15:00",
-                                            "nb_node":  1,
-                                            "nb_proc":  4},
-
-                 "SAMPE":                  {"walltime": "00:15:00",
-                                            "nb_node":  1,
-                                            "nb_proc":  4},
-
-                 "ClipTrim":               {"walltime": "00:06:00",
-                                            "nb_node":  1,
-                                            "nb_proc":  1},
-
-                 "FastQC_FastQ":           {"walltime": "00:06:00",
-                                            "nb_node":  1,
-                                            "nb_proc":  1},
-
-                 "RealignerTargetCreator": {"walltime": "00:60:00",
-                                            "nb_node":  1,
-                                            "nb_proc":  8},
-
-                 "IndelRealigner":         {"walltime": "00:60:00",
-                                            "nb_node":  1,
-                                            "nb_proc":  8},
-
-                 "PrintReads":             {"walltime": "00:60:00",
-                                            "nb_node":  1,
-                                            "nb_proc":  4},
-
-                 "BaseRecalibrator":       {"walltime": "00:60:00",
-                                            "nb_node":  1,
-                                            "nb_proc":  4},
-
-                 "SortSam":                {"walltime": "00:15:00",
-                                            "nb_node":  1,
-                                            "nb_proc":  4},
-
-                 "AddRG":                  {"walltime": "00:06:00",
-                                            "nb_node":  1,
-                                            "nb_proc":  1},
-
-                 "MarkDuplicates":         {"walltime": "00:15:00",
-                                            "nb_node":  1,
-                                            "nb_proc":  8},
-
-                 "Sam2Bam":                {"walltime": "00:06:00",
-                                            "nb_node":  1,
-                                            "nb_proc":  1},
-
-                 "IndexBam":               {"walltime": "00:06:00",
-                                            "nb_node":  1,
-                                            "nb_proc":  1},
-
-                 "KeepMapped":             {"walltime": "00:06:00",
-                                            "nb_node":  1,
-                                            "nb_proc":  1},
-
-                 "FlagStat":               {"walltime": "00:06:00",
-                                            "nb_node":  1,
-                                            "nb_proc":  1},}
+drmaa_options = read_config_file("tool.conf")
 
 # The job order
 job_order = []
