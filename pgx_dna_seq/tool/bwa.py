@@ -74,7 +74,7 @@ class SAMPE(BWA):
         """Initialize a SAMPE instance."""
         pass
 
-    def execute(self, options, drmaa_options={}, out_dir=None, locally=True):
+    def execute(self, options, out_dir=None):
         """Execute ALN and SAMPE."""
         # The ALN options for the first file
         aln_options = {}
@@ -98,7 +98,7 @@ class SAMPE(BWA):
             raise ProgramError(m)
 
         # Execution for the first file
-        ALN().execute(aln_options, drmaa_options, out_dir, locally)
+        ALN().execute(aln_options, out_dir)
 
         # The ALN options for the second file
         try:
@@ -116,7 +116,7 @@ class SAMPE(BWA):
             raise ProgramError(m)
 
         # Executing for the second file
-        ALN().execute(aln_options, drmaa_options, out_dir, locally)
+        ALN().execute(aln_options, out_dir)
 
         # Executing SAMPE
-        super(SAMPE, self).execute(options, drmaa_options, out_dir, locally)
+        super(SAMPE, self).execute(options, out_dir)

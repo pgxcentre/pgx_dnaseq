@@ -14,6 +14,9 @@ class GATK(JAR):
     # The version of the tool
     _version = "3.1-1"
 
+    # The jar file default location
+    _jar_location = "/opt/GenomeAnalysisTK-3.1-1"
+
     def __init__(self):
         """Initialize a PicardTools instance."""
         pass
@@ -24,8 +27,8 @@ class RealignerTargetCreator(GATK):
     # The name of the tool
     _tool_name = "RealignerTargetCreator"
 
-    # The jar location
-    _jar = "/opt/GenomeAnalysisTK-3.1-1/GenomeAnalysisTK.jar"
+    # The jar file
+    _jar = "GenomeAnalysisTK.jar"
 
     # The options
     _command = ("-T RealignerTargetCreator -I {input} -R {reference} "
@@ -58,8 +61,8 @@ class IndelRealigner(GATK):
     # The name of the tool
     _tool_name = "IndelRealigner"
 
-    # The jar location
-    _jar = "/opt/GenomeAnalysisTK-3.1-1/GenomeAnalysisTK.jar"
+    # The jar file
+    _jar = "GenomeAnalysisTK.jar"
 
     # The options
     _command = ("-T IndelRealigner -R {reference} -I {input} "
@@ -89,14 +92,13 @@ class IndelRealigner(GATK):
         """Initialize a IndelRealigner instance."""
         pass
 
-    def execute(self, options, drmaa_options={}, out_dir=None, locally=True):
+    def execute(self, options, out_dir=None):
         """Indexes a BAM and realign it."""
         # First we index the input file
         if "input" not in options:
             m = "{}: no input file".format(self.__class__.__name__)
             raise ProgramError(m)
-        IndexBam().execute({"input": options["input"]}, drmaa_options, out_dir,
-                           locally)
+        IndexBam().execute({"input": options["input"]}, out_dir)
 
         # Then we create the intervals for realigning
         intervals_opt = {}
@@ -118,12 +120,10 @@ class IndelRealigner(GATK):
             raise ProgramError(m)
 
         # Executing the intervals
-        RealignerTargetCreator().execute(intervals_opt, drmaa_options, out_dir,
-                                         locally)
+        RealignerTargetCreator().execute(intervals_opt, out_dir)
 
         # Executing the realignment
-        super(IndelRealigner, self).execute(options, drmaa_options, out_dir,
-                                            locally)
+        super(IndelRealigner, self).execute(options, out_dir)
 
 
 class PrintReads(GATK):
@@ -131,8 +131,8 @@ class PrintReads(GATK):
     # The name of the tool
     _tool_name = "PrintReads"
 
-    # The jar location
-    _jar = "/opt/GenomeAnalysisTK-3.1-1/GenomeAnalysisTK.jar"
+    # The jar file
+    _jar = "GenomeAnalysisTK.jar"
 
     # The options
     _command = ("-T PrintReads -I {input} -R {reference} -BQSR {groups} "
@@ -166,8 +166,8 @@ class BaseRecalibrator(GATK):
     # The name of the tool
     _tool_name = "BaseRecalibrator"
 
-    # The jar location
-    _jar = "/opt/GenomeAnalysisTK-3.1-1/GenomeAnalysisTK.jar"
+    # The jar file
+    _jar = "GenomeAnalysisTK.jar"
 
     # The options
     _command = ("-T BaseRecalibrator -R {reference} -I {input} "
@@ -195,14 +195,13 @@ class BaseRecalibrator(GATK):
         """Initialize a BaseRecalibrator instance."""
         pass
 
-    def execute(self, options, drmaa_options={}, out_dir=None, locally=True):
+    def execute(self, options, out_dir=None):
         """Indexes a BAM and recalibrate it."""
         # First we index the input file
         if "input" not in options:
             m = "{}: no input file".format(self.__class__.__name__)
             raise ProgramError(m)
-        IndexBam().execute({"input": options["input"]}, drmaa_options, out_dir,
-                           locally)
+        IndexBam().execute({"input": options["input"]}, out_dir)
 
         # Then we create the groups for recalibration
         if "output" not in options:
@@ -210,8 +209,7 @@ class BaseRecalibrator(GATK):
             raise ProgramError(m)
         groups_file = re.sub(r"\.[sb]am$", ".grp", options["output"])
         options["groups"] = groups_file
-        super(BaseRecalibrator, self).execute(options, drmaa_options, out_dir,
-                                              locally)
+        super(BaseRecalibrator, self).execute(options, out_dir)
 
         # Printing the reads
-        PrintReads().execute(options, drmaa_options, out_dir, locally)
+        PrintReads().execute(options, out_dir)

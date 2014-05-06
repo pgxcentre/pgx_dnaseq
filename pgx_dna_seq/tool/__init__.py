@@ -17,6 +17,12 @@ class GenericTool(object):
 
     # By default, a tool produces usable data
     _produce_data = True
+
+    # The local tool configuration
+    __tool_configuration = {}
+
+    # By default, we run locally
+    __locally = True
     
     def __init__(self):
         """Initialize an new GeneticTool object."""
@@ -26,6 +32,41 @@ class GenericTool(object):
     def produce_usable_data(self):
         """Returns True if the tool produces data. False otherwise."""
         return self._produce_data
+
+    @staticmethod
+    def set_tool_configuration(drmaa_options):
+        """Sets the configuration for all the tools."""
+        GenericTool.__tool_configuration = drmaa_options
+
+    @staticmethod
+    def get_tool_configuration():
+        """Get the configuration for all the tools."""
+        return GenericTool.__tool_configuration
+
+    @staticmethod
+    def do_not_run_locally():
+        """Do not run the tools locally (sets __locally to False)."""
+        GenericTool.__locally = False
+
+    @staticmethod
+    def run_locally():
+        """Do the tools need to be run locally or not."""
+        return GenericTool.__locally
+
+    @staticmethod
+    def get_tool_bin_dir(tool_name):
+        """Returns the binary directory (empty string if none specified)."""
+        # Getting all the tool configuration
+        tool_conf = GenericTool.get_tool_configuration()
+
+        # By default, the binary directory is an empty string (meaning that the
+        # tool's binary directory is in the PATH variable)
+        bin_dir = ""
+        if (tool_name in tool_conf) and ("bin_dir" in tool_conf[tool_name]):
+            bin_dir = tool_conf[tool_name]["bin_dir"]
+
+        # Returning the binary directory
+        return bin_dir
 
     def get_tool_name(self):
         """Returns the tool name."""
@@ -106,14 +147,17 @@ class GenericTool(object):
             m = "{}: suffix is None".format(self.__class__.__name__)
             raise NotImplementedError(m)
 
-    def execute(self, tool_options, drmaa_options={}, out_dir=None,
-                locally=True):
+    def execute(self, tool_options, out_dir=None):
         """Executes the tool."""
+        # The name of the job
+        tool_name = self.get_tool_name()
+
         # Checks the options
         checked_options = self.check_options(tool_options)
 
         # Create the command
-        job_command = [self.get_executable()]
+        bin_dir = GenericTool.get_tool_bin_dir(tool_name)
+        job_command = [os.path.join(bin_dir, self.get_executable())]
         job_command += self.get_command().format(**checked_options).split()
 
         # The STDOUT and STDERR files
@@ -121,13 +165,14 @@ class GenericTool(object):
         job_stderr = self.get_stderr().format(**checked_options)
 
         # Execute it
-        if locally:
+        if GenericTool.run_locally():
             GenericTool.__execute_command_locally(job_command, job_stdout,
                                                   job_stderr)
         else:
-            tool_name = self.get_tool_name()
-            walltime, nodes = GenericTool.__create_drmaa_var(drmaa_options,
-                                                             tool_name)
+            # Getting the tool walltime and nodes variable (for DRMAA)
+            walltime, nodes = GenericTool.__create_drmaa_var(
+                                          GenericTool.get_tool_configuration(),
+                                          tool_name)
             GenericTool.__execute_command_drmaa(job_command, job_stdout,
                                                 job_stderr, out_dir, tool_name,
                                                 walltime, nodes)
@@ -230,6 +275,8 @@ class GenericTool(object):
                 nodes = "-l nodes={}:ppn={}".format(job_options["nb_node"],
                                                     job_options["nb_proc"])
                 nodes = bytes(nodes, encoding="ascii")
+
+        # Returns the walltime and the nodes information
         return walltime, nodes
 
     def check_options(self, options):
