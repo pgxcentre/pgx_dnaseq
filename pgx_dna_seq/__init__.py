@@ -1,4 +1,4 @@
-import ConfigParser
+import configparser
 
 
 class ProgramError(Exception):
@@ -25,7 +25,7 @@ def read_config_file(filename):
     """Reads a configuration file."""
     # Creating the configuration file parser (we want to read as string, so that
     # it is case sensitive)
-    parser = ConfigParser.RawConfigParser()
+    parser = configparser.RawConfigParser()
     parser.optionxform = str
     parser.read(filename)
 
