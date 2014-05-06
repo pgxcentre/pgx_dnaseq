@@ -28,8 +28,8 @@ def start(o_files):
     pass
 
 # The options for DRMAA
-drmaa_options = read_config_file("tool.conf")
-Tool.set_tools_drmaa_options(drmaa_options)
+tool_configuration = read_config_file("tool.conf")
+Tool.set_tool_configuration(tool_configuration)
 Tool.do_not_run_locally()
 
 # Getting the pipeline steps

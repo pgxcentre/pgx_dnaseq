@@ -18,8 +18,8 @@ class GenericTool(object):
     # By default, a tool produces usable data
     _produce_data = True
 
-    # The DRMAA options of all the available tools
-    __drmaa_options = {}
+    # The local tool configuration
+    __tool_configuration = {}
 
     # By default, we run locally
     __locally = True
@@ -34,14 +34,14 @@ class GenericTool(object):
         return self._produce_data
 
     @staticmethod
-    def set_tools_drmaa_options(drmaa_options):
-        """Sets the DRMAA options for all the tools."""
-        GenericTool.__drmaa_options = drmaa_options
+    def set_tool_configuration(drmaa_options):
+        """Sets the configuration for all the tools."""
+        GenericTool.__tool_configuration = drmaa_options
 
     @staticmethod
-    def get_tools_drmaa_options():
-        """Get the DRMAA options for all the tools."""
-        return GenericTool.__drmaa_options
+    def get_tool_configuration():
+        """Get the configuration for all the tools."""
+        return GenericTool.__tool_configuration
 
     @staticmethod
     def do_not_run_locally():
@@ -52,6 +52,21 @@ class GenericTool(object):
     def run_locally():
         """Do the tools need to be run locally or not."""
         return GenericTool.__locally
+
+    @staticmethod
+    def get_tool_bin_dir(tool_name):
+        """Returns the binary directory (empty string if none specified)."""
+        # Getting all the tool configuration
+        tool_conf = GenericTool.get_tool_configuration()
+
+        # By default, the binary directory is an empty string (meaning that the
+        # tool's binary directory is in the PATH variable)
+        bin_dir = ""
+        if (tool_name in tool_conf) and ("bin_dir" in tool_conf[tool_name]):
+            bin_dir = tool_conf[tool_name]["bin_dir"]
+
+        # Returning the binary directory
+        return bin_dir
 
     def get_tool_name(self):
         """Returns the tool name."""
@@ -134,11 +149,15 @@ class GenericTool(object):
 
     def execute(self, tool_options, out_dir=None):
         """Executes the tool."""
+        # The name of the job
+        tool_name = self.get_tool_name()
+
         # Checks the options
         checked_options = self.check_options(tool_options)
 
         # Create the command
-        job_command = [self.get_executable()]
+        bin_dir = GenericTool.get_tool_bin_dir(tool_name)
+        job_command = [os.path.join(bin_dir, self.get_executable())]
         job_command += self.get_command().format(**checked_options).split()
 
         # The STDOUT and STDERR files
@@ -150,12 +169,9 @@ class GenericTool(object):
             GenericTool.__execute_command_locally(job_command, job_stdout,
                                                   job_stderr)
         else:
-            # Getting the tool name
-            tool_name = self.get_tool_name()
-
             # Getting the tool walltime and nodes variable (for DRMAA)
             walltime, nodes = GenericTool.__create_drmaa_var(
-                                          GenericTool.get_tools_drmaa_options(),
+                                          GenericTool.get_tool_configuration(),
                                           tool_name)
             GenericTool.__execute_command_drmaa(job_command, job_stdout,
                                                 job_stderr, out_dir, tool_name,
