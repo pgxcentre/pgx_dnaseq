@@ -1,22 +1,16 @@
 import configparser
 
+from pgx_dna_seq import tool
 from pgx_dna_seq.tool import *
 from pgx_dna_seq import ProgramError
 
 
-__possible_tools = {
-    "SAMPE":            bwa.SAMPE,
-    "ClipTrim":         fastq_mcf.ClipTrim,
-    "FastQC_FastQ":     fastqc.FastQC_FastQ,
-    "BaseRecalibrator": gatk.BaseRecalibrator,
-    "IndelRealigner":   gatk.IndelRealigner,
-    "Sam2Bam":          samtools.Sam2Bam,
-    "FlagStat":         samtools.FlagStat,
-    "KeepMapped":       samtools.KeepMapped,
-    "AddRG":            picard_tools.AddRG,
-    "SortSam":          picard_tools.SortSam,
-    "MarkDuplicates":   picard_tools.MarkDuplicates,
-}
+# Getting all the possible tools
+__possible_tools = {}
+for module_name in tool.__all__:
+    for tool_name in eval(module_name).__all__:
+        __possible_tools[tool_name] = eval("{}.{}".format(module_name,
+                                                          tool_name))
 
 def read_config_file(filename):
     """Reads a configuration file."""
