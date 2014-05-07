@@ -3,6 +3,7 @@
 import os
 import sys
 import __main__
+from copy import copy
 
 from ruffus import *
 from pgx_dna_seq.tool import GenericTool as Tool
@@ -43,7 +44,7 @@ in_job = start
 last_suffix = ""
 curr_formatter = None
 curr_output = None
-for job_index, (job, options) in enumerate(what_to_run):
+for job_index, (job, job_options) in enumerate(what_to_run):
     # Getting the input and output file type
     input_type = job.get_input_type()
     output_type = job.get_output_type()
@@ -83,7 +84,7 @@ for job_index, (job, options) in enumerate(what_to_run):
     # Dynamically creating the pipeline
     @curr_decorator(in_job, formatter(*curr_formatter), curr_output,
                     "{SAMPLE[0]}", job, len(input_type), len(output_type),
-                    output_dir, options)
+                    output_dir, job_options)
     @rename_func(func_name)
     def curr_step(i_files, o_files, sample_id, job, nb_in, nb_out, out_dir,
                   options):
@@ -97,28 +98,31 @@ for job_index, (job, options) in enumerate(what_to_run):
         print(o_files)
         print()
 
+        # We want to work on a copy of the options
+        curr_options = copy(options)
+
         # Adding the input to the tool option
         if nb_in == 1:
-            options["input"] = i_files
+            curr_options["input"] = i_files
         else:
             for i in range(nb_in):
-                options["input{}".format(i + 1)] = i_files[i]
+                curr_options["input{}".format(i + 1)] = i_files[i]
 
         # Adding the output files
         if nb_out == 1:
-            options["output"] = o_files
+            curr_options["output"] = o_files
         else:
             for i in range(nb_out):
-                options["output{}".format(i + 1)] = o_files[i]
+                curr_options["output{}".format(i + 1)] = o_files[i]
 
         # Adding the prefix and sample id
-        if "prefix" not in options:
-            options["prefix"] = os.path.join(out_dir, sample_id)
-        if "sample_id" not in options:
-            options["sample_id"] = sample_id
+        if "prefix" not in curr_options:
+            curr_options["prefix"] = os.path.join(out_dir, sample_id)
+        if "sample_id" not in curr_options:
+            curr_options["sample_id"] = sample_id
 
         # Running the task
-        job.execute(options, out_dir=out_dir)
+        job.execute(curr_options, out_dir=out_dir)
 
     # Setting the attribute for the new function so that it can be pickled
     setattr(__main__, func_name, curr_step)
@@ -134,5 +138,5 @@ for job_index, (job, options) in enumerate(what_to_run):
 
 print("Runing the pipeline...")
 pipeline_printout_graph("flowchart.svg", "svg", job_order)
-pipeline_run(verbose=0, multiprocess=2, checksum_level=1)
+pipeline_run(verbose=0, multiprocess=1, checksum_level=1)
 pipeline_printout_graph("flowchart_after.svg", "svg", job_order)
