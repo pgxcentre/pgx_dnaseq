@@ -1,4 +1,4 @@
-__all__ = ["ALN", "SAMPE"]
+__all__ = ["ALN", "SAMPE", "MEM"]
 
 import os
 
@@ -39,6 +39,38 @@ class ALN(BWA):
 
     def __init__(self):
         """Initialize a ALN instance."""
+        pass
+
+
+class MEM(BWA):
+
+    # The name of the tool
+    _tool_name = "MEM"
+
+    # The options
+    _command = "mem {reference} {input1} {input2} {other_aln_opt} "
+
+    # The STDOUT and STDERR
+    _stdout = "{output}"
+    _stderr = "{output}.err"
+
+    # The description of the required options
+    _required_options = {"reference":     GenericTool.INPUT,
+                         "other_aln_opt": GenericTool.OPTIONAL,
+                         "input1":        GenericTool.INPUT,
+                         "input2":        GenericTool.INPUT,
+                         "output":        GenericTool.OUTPUT}
+
+    # The suffix that will be added just before the extension of the output file
+    _suffix = "mem"
+
+    # The input and output type
+    _input_type = (r"_R1\.(\S+\.)?fastq(\.gz)?$",
+                   r"_R2\.(\S+\.)?fastq(\.gz)?$")
+    _output_type = (".{}.sam".format(_suffix),)
+
+    def __init__(self):
+        """Initialize a MEM instance."""
         pass
 
 
