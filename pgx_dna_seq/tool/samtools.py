@@ -1,4 +1,4 @@
-__all__ = ["Sam2Bam", "IndexBam", "KeepMapped", "FlagStat"]
+__all__ = ["Sam2Bam", "IndexBam", "KeepMapped", "FlagStat", "MPILEUP"]
 
 import re
 
@@ -143,3 +143,44 @@ class FlagStat(Samtools):
     def __init__(self):
         """Initialize a FlagStat instance."""
         pass
+
+
+class MPILEUP(Samtools):
+
+    # The name of the tool
+    _tool_name = "mpileup"
+
+    # The options
+    _command = "mpileup {other_opt} -f {reference} {input}"
+
+    # The STDOUT and STDERR
+    _stdout = "{output}"
+    _stderr = "{output}.err"
+
+    # The description of the required options
+    _required_options = {"input": GenericTool.INPUT,
+                         "reference": GenericTool.INPUT,
+                         "other_opt": GenericTool.OPTIONAL,
+                         "output": GenericTool.OUTPUT}
+
+    # The suffix that will be added just before the extension of the output file
+    _suffix = "mpileup"
+
+    # The input and output type
+    _input_type = (r"\.(\S+\.)?[sb]am$", )
+    _output_type = (".{}".format(_suffix), )
+
+    def __init__(self):
+        """Initialize a MPILEUP instance."""
+        pass
+
+    def execute(self, options, out_dir=None):
+        """Indexes a BAM and create the MPILEUP file."""
+        # First we index the input file
+        if "input" not in options:
+            m = "{}: no input file".format(self.__class__.__name__)
+            raise ProgramError(m)
+        IndexBam().execute({"input": options["input"]}, out_dir)
+
+        # Then we create the MPILEUP file
+        super(MPILEUP, self).execute(options, out_dir)
