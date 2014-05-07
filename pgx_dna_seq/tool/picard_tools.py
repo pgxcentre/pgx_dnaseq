@@ -1,10 +1,9 @@
-__all__ = ["SortSam", "AddRG", "MarkDuplicates"]
+__all__ = ["SortSam", "AddRG", "MarkDuplicates", "CalculateHsMetrics"]
 
 import re
 
 from pgx_dna_seq.tool.java import JAR
 from pgx_dna_seq.tool import GenericTool
-
 
 class PicardTools(JAR):
 
@@ -52,6 +51,45 @@ class SortSam(PicardTools):
        """Initialize a SortSam instance."""
        pass
 
+class CalculateHsMetrics(PicardTools):
+
+    # The name of the tool
+    _tool_name = "CalculateHsMetrics"
+
+    # The jar file
+    _jar = "CalculateHsMetrics.jar"
+
+    # The options
+    _command = ("INPUT={input} OUTPUT={output} "
+                "REFERENCE_SEQUENCE={reference_sequence} "
+                "BAIT_INTERVALS={bait_intervals} "
+                "TARGET_INTERVALS={target_intervals} {other_options}")
+
+    # The STDOUT and STDERR
+    _stdout = "{output}.out"
+    _stderr = "{output}.err"
+
+    # The description of the required options
+    _required_options = {"input":                 GenericTool.INPUT,
+                         "output":                GenericTool.OUTPUT,
+                         "reference_sequence":    GenericTool.REQUIREMENT,
+                         "bait_intervals":        GenericTool.REQUIREMENT,
+                         "target_intervals":      GenericTool.REQUIREMENT,
+                         "other_options":         GenericTool.OPTIONAL}
+
+    # The suffix that will be added just before the extension of the output file
+    _suffix = "hsmetrics"
+
+    # The input and output type
+    _input_type = (r"\.(\S+\.)?[sb]am$", )
+    _output_type = (".{}".format(_suffix), )
+
+    # This tool does not produce usable data...
+    _produce_data = False
+    
+    def __init__(self):
+       """Initialize a HSmetrics instance."""
+       pass
 
 class AddRG(PicardTools):
 
