@@ -15,6 +15,7 @@ class Bowtie2(GenericTool):
         """Initialize a Bowtie2  instance."""
         pass
 
+
 class Bowtie2_align(Bowtie2):
 
     # The name of the tool
