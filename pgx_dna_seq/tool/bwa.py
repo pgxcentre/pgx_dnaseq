@@ -48,7 +48,7 @@ class MEM(BWA):
     _tool_name = "MEM"
 
     # The options
-    _command = "mem {reference} {input1} {input2} {other_aln_opt} "
+    _command = "mem {reference} {input1} {input2} {other_opt} "
 
     # The STDOUT and STDERR
     _stdout = "{output}"
@@ -56,7 +56,7 @@ class MEM(BWA):
 
     # The description of the required options
     _required_options = {"reference":     GenericTool.INPUT,
-                         "other_aln_opt": GenericTool.OPTIONAL,
+                         "other_opt":     GenericTool.OPTIONAL,
                          "input1":        GenericTool.INPUT,
                          "input2":        GenericTool.INPUT,
                          "output":        GenericTool.OUTPUT}
