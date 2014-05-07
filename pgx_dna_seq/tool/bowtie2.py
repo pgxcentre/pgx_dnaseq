@@ -44,5 +44,5 @@ class Bowtie2_align(Bowtie2):
     _output_type = (".{}.sam".format(_suffix),)
 
     def __init__(self):
-        """Initialize a Bowtie2 instance."""
+        """Initialize a Bowtie2_align instance."""
         pass
