@@ -63,20 +63,19 @@ class HsMetrics(PicardTools):
 
     # The options
     _command = ("INPUT={input} OUTPUT={output} REFERENCE_SEQUENCE={reference} "
-                "BAIT_INTERVALS={baits} TARGET_INTERVALS={targets} "
-                "{other_options}")
+                "BAIT_INTERVALS={baits} TARGET_INTERVALS={targets} {other_opt}")
 
     # The STDOUT and STDERR
     _stdout = "{output}.out"
     _stderr = "{output}.err"
 
     # The description of the required options
-    _required_options = {"input":         GenericTool.INPUT,
-                         "output":        GenericTool.OUTPUT,
-                         "reference":     GenericTool.INPUT,
-                         "baits":         GenericTool.INPUT,
-                         "targets":       GenericTool.INPUT,
-                         "other_options": GenericTool.OPTIONAL}
+    _required_options = {"input":     GenericTool.INPUT,
+                         "output":    GenericTool.OUTPUT,
+                         "reference": GenericTool.INPUT,
+                         "baits":     GenericTool.INPUT,
+                         "targets":   GenericTool.INPUT,
+                         "other_opt": GenericTool.OPTIONAL}
 
     # The suffix that will be added just before the extension of the output file
     _suffix = "hsmetrics"
