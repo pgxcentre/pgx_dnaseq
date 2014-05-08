@@ -1,9 +1,10 @@
-__all__ = ["SortSam", "AddRG", "MarkDuplicates", "CalculateHsMetrics"]
+__all__ = ["SortSam", "AddRG", "MarkDuplicates", "HsMetrics"]
 
 import re
 
 from pgx_dna_seq.tool.java import JAR
 from pgx_dna_seq.tool import GenericTool
+
 
 class PicardTools(JAR):
 
@@ -51,10 +52,11 @@ class SortSam(PicardTools):
        """Initialize a SortSam instance."""
        pass
 
-class CalculateHsMetrics(PicardTools):
+
+class HsMetrics(PicardTools):
 
     # The name of the tool
-    _tool_name = "CalculateHsMetrics"
+    _tool_name = "HsMetrics"
 
     # The jar file
     _jar = "CalculateHsMetrics.jar"
@@ -90,6 +92,7 @@ class CalculateHsMetrics(PicardTools):
     def __init__(self):
        """Initialize a HSmetrics instance."""
        pass
+
 
 class AddRG(PicardTools):
 
