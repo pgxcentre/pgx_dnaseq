@@ -171,18 +171,18 @@ class BaseRecalibrator(GATK):
 
     # The options
     _command = ("-T BaseRecalibrator -R {reference} -I {input} "
-                "-knownSites {dbSNP_known_sites} -o {groups} -dt {dt}")
+                "-knownSites {dbsnp} -o {groups} -dt {dt}")
 
     # The STDOUT and STDERR
     _stdout = "{groups}.out"
     _stderr = "{groups}.err"
 
     # The description of the required options
-    _required_options = {"input":             GenericTool.INPUT,
-                         "groups":            GenericTool.OUTPUT,
-                         "reference":         GenericTool.INPUT,
-                         "dbSNP_known_sites": GenericTool.INPUT,
-                         "dt":                GenericTool.REQUIREMENT}
+    _required_options = {"input":     GenericTool.INPUT,
+                         "groups":    GenericTool.OUTPUT,
+                         "reference": GenericTool.INPUT,
+                         "dbsnp":     GenericTool.INPUT,
+                         "dt":        GenericTool.REQUIREMENT}
 
     # The suffix that will be added just before the extension of the output file
     _suffix = "base_recal"
@@ -224,19 +224,19 @@ class UnifiedGenotyper(GATK):
     _jar = "GenomeAnalysisTK.jar"
 
     # The options
-    _command = ("-T UnifiedGenotyper -R {reference} -I {input} "
-                "--dbsnp {dbSNP_known_sites} -o {output} {other_opt}")
+    _command = ("-T UnifiedGenotyper -R {reference} -I {input} --dbsnp {dbsnp} "
+                "-o {output} {other_opt}")
 
     # The STDOUT and STDERR
     _stdout = "{output}.out"
     _stderr = "{output}.err"
 
     # The description of the required options
-    _required_options = {"input":             GenericTool.INPUT,
-                         "output":            GenericTool.OUTPUT,
-                         "reference":         GenericTool.INPUT,
-                         "other_opt":         GenericTool.OPTIONAL,
-                         "dbSNP_known_sites": GenericTool.INPUT}
+    _required_options = {"input":     GenericTool.INPUT,
+                         "output":    GenericTool.OUTPUT,
+                         "reference": GenericTool.INPUT,
+                         "other_opt": GenericTool.OPTIONAL,
+                         "dbsnp":     GenericTool.INPUT}
 
     # The suffix that will be added just before the extension of the output file
     _suffix = "unified_genotyper"
@@ -259,19 +259,19 @@ class HaplotypeCaller(GATK):
     _jar = "GenomeAnalysisTK.jar"
 
     # The options
-    _command = ("-T HaplotypeCaller -R {reference} -I {input} "
-                "--dbsnp {dbSNP_known_sites} -o {output} {other_opt}")
+    _command = ("-T HaplotypeCaller -R {reference} -I {input} --dbsnp {dbsnp} "
+                "-o {output} {other_opt}")
 
     # The STDOUT and STDERR
     _stdout = "{output}.out"
     _stderr = "{output}.err"
 
     # The description of the required options
-    _required_options = {"input":             GenericTool.INPUT,
-                         "output":            GenericTool.OUTPUT,
-                         "reference":         GenericTool.INPUT,
-                         "other_opt":         GenericTool.OPTIONAL,
-                         "dbSNP_known_sites": GenericTool.INPUT}
+    _required_options = {"input":     GenericTool.INPUT,
+                         "output":    GenericTool.OUTPUT,
+                         "reference": GenericTool.INPUT,
+                         "other_opt": GenericTool.OPTIONAL,
+                         "dbsnp":     GenericTool.INPUT}
 
     # The suffix that will be added just before the extension of the output file
     _suffix = "haplotype_caller"
