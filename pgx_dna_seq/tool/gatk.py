@@ -32,7 +32,7 @@ class RealignerTargetCreator(GATK):
 
     # The options
     _command = ("-T RealignerTargetCreator -I {input} -R {reference} "
-                "-o {output} -dt {dt}")
+                "-o {output} {other_opt}")
 
     # The STDOUT and STDERR
     _stdout = "{output}.out"
@@ -42,7 +42,7 @@ class RealignerTargetCreator(GATK):
     _required_options = {"input":     GenericTool.INPUT,
                          "output":    GenericTool.OUTPUT,
                          "reference": GenericTool.INPUT,
-                         "dt":        GenericTool.REQUIREMENT}
+                         "other_opt": GenericTool.OPTIONAL}
 
     # The suffix that will be added just before the extension of the output file
     _suffix = None
@@ -66,8 +66,7 @@ class IndelRealigner(GATK):
 
     # The options
     _command = ("-T IndelRealigner -R {reference} -I {input} "
-                "-targetIntervals {interval_file} -o {output} -dt {dt} "
-                "{other_opt}")
+                "-targetIntervals {interval_file} -o {output} {other_opt}")
 
     # The STDOUT and STDERR
     _stdout = "{output}.out"
@@ -78,7 +77,6 @@ class IndelRealigner(GATK):
                          "output":        GenericTool.OUTPUT,
                          "reference":     GenericTool.INPUT,
                          "interval_file": GenericTool.INPUT,
-                         "dt":            GenericTool.REQUIREMENT,
                          "other_opt":     GenericTool.OPTIONAL}
 
     # The suffix that will be added just before the extension of the output file
@@ -136,7 +134,7 @@ class PrintReads(GATK):
 
     # The options
     _command = ("-T PrintReads -I {input} -R {reference} -BQSR {groups} "
-                "-o {output} -dt {dt}")
+                "-o {output} {other_opt}")
 
     # The STDOUT and STDERR
     _stdout = "{output}.out"
@@ -147,7 +145,7 @@ class PrintReads(GATK):
                          "output":    GenericTool.OUTPUT,
                          "reference": GenericTool.INPUT,
                          "groups":    GenericTool.INPUT,
-                         "dt":        GenericTool.REQUIREMENT}
+                         "other_opt": GenericTool.OPTIONAL}
 
     # The suffix that will be added just before the extension of the output file
     _suffix = None
@@ -171,7 +169,7 @@ class BaseRecalibrator(GATK):
 
     # The options
     _command = ("-T BaseRecalibrator -R {reference} -I {input} "
-                "-knownSites {dbsnp} -o {groups} -dt {dt}")
+                "-knownSites {dbsnp} -o {groups} {other_opt}")
 
     # The STDOUT and STDERR
     _stdout = "{groups}.out"
@@ -182,7 +180,7 @@ class BaseRecalibrator(GATK):
                          "groups":    GenericTool.OUTPUT,
                          "reference": GenericTool.INPUT,
                          "dbsnp":     GenericTool.INPUT,
-                         "dt":        GenericTool.REQUIREMENT}
+                         "other_opt": GenericTool.OPTIONAL}
 
     # The suffix that will be added just before the extension of the output file
     _suffix = "base_recal"
