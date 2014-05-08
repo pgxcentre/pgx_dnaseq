@@ -55,11 +55,11 @@ class MEM(BWA):
     _stderr = "{output}.err"
 
     # The description of the required options
-    _required_options = {"reference":     GenericTool.INPUT,
-                         "other_opt":     GenericTool.OPTIONAL,
-                         "input1":        GenericTool.INPUT,
-                         "input2":        GenericTool.INPUT,
-                         "output":        GenericTool.OUTPUT}
+    _required_options = {"reference": GenericTool.INPUT,
+                         "other_opt": GenericTool.OPTIONAL,
+                         "input1":    GenericTool.INPUT,
+                         "input2":    GenericTool.INPUT,
+                         "output":    GenericTool.OUTPUT}
 
     # The suffix that will be added just before the extension of the output file
     _suffix = "mem"
