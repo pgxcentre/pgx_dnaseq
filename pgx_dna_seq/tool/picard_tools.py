@@ -62,22 +62,21 @@ class HsMetrics(PicardTools):
     _jar = "CalculateHsMetrics.jar"
 
     # The options
-    _command = ("INPUT={input} OUTPUT={output} "
-                "REFERENCE_SEQUENCE={reference_sequence} "
-                "BAIT_INTERVALS={bait_intervals} "
-                "TARGET_INTERVALS={target_intervals} {other_options}")
+    _command = ("INPUT={input} OUTPUT={output} REFERENCE_SEQUENCE={reference} "
+                "BAIT_INTERVALS={baits} TARGET_INTERVALS={targets} "
+                "{other_options}")
 
     # The STDOUT and STDERR
     _stdout = "{output}.out"
     _stderr = "{output}.err"
 
     # The description of the required options
-    _required_options = {"input":                 GenericTool.INPUT,
-                         "output":                GenericTool.OUTPUT,
-                         "reference_sequence":    GenericTool.REQUIREMENT,
-                         "bait_intervals":        GenericTool.REQUIREMENT,
-                         "target_intervals":      GenericTool.REQUIREMENT,
-                         "other_options":         GenericTool.OPTIONAL}
+    _required_options = {"input":         GenericTool.INPUT,
+                         "output":        GenericTool.OUTPUT,
+                         "reference":     GenericTool.INPUT,
+                         "baits":         GenericTool.INPUT,
+                         "targets":       GenericTool.INPUT,
+                         "other_options": GenericTool.OPTIONAL}
 
     # The suffix that will be added just before the extension of the output file
     _suffix = "hsmetrics"
