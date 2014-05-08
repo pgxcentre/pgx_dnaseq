@@ -94,5 +94,3 @@ class FastQC_FastQ(FastQC):
         file_to_move = "{}.zip".format(dir_to_move)
         if os.path.isfile(file_to_move):
             shutil.move(file_to_move, options["output2"])
-
-

@@ -15,6 +15,7 @@ class FastQMCF(GenericTool):
         """Initialize a FastQMCF instance."""
         pass
 
+
 class ClipTrim(FastQMCF):
 
     # The name of the tool
