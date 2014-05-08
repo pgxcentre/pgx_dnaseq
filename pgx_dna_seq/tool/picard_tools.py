@@ -29,17 +29,17 @@ class SortSam(PicardTools):
 
     # The options
     _command = ("INPUT={input} OUTPUT={output} SORT_ORDER={sort_order} "
-                "{other_options}")
+                "{other_opt}")
 
     # The STDOUT and STDERR
     _stdout = "{output}.out"
     _stderr = "{output}.err"
 
     # The description of the required options
-    _required_options = {"input":         GenericTool.INPUT,
-                         "output":        GenericTool.OUTPUT,
-                         "sort_order":    GenericTool.REQUIREMENT,
-                         "other_options": GenericTool.OPTIONAL}
+    _required_options = {"input":      GenericTool.INPUT,
+                         "output":     GenericTool.OUTPUT,
+                         "sort_order": GenericTool.REQUIREMENT,
+                         "other_opt":  GenericTool.OPTIONAL}
 
     # The suffix that will be added just before the extension of the output file
     _suffix = "sorted"
