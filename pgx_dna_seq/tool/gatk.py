@@ -1,5 +1,5 @@
 __all__ = ["RealignerTargetCreator", "IndelRealigner", "PrintReads",
-           "BaseRecalibrator", "UnifiedGenotyper"]
+           "BaseRecalibrator", "UnifiedGenotyper", "HaplotypeCaller"]
 
 import re
 
@@ -250,3 +250,36 @@ class UnifiedGenotyper(GATK):
         pass
 
 
+class HaplotypeCaller(GATK):
+
+    # The name of the tool
+    _tool_name = "HaplotypeCaller"
+
+    # The jar file
+    _jar = "GenomeAnalysisTK.jar"
+
+    # The options
+    _command = ("-T HaplotypeCaller -R {reference} -I {input} "
+                "--dbsnp {dbSNP_known_sites} -o {output} {other_opt}")
+
+    # The STDOUT and STDERR
+    _stdout = "{output}.out"
+    _stderr = "{output}.err"
+
+    # The description of the required options
+    _required_options = {"input":             GenericTool.INPUT,
+                         "output":            GenericTool.OUTPUT,
+                         "reference":         GenericTool.INPUT,
+                         "other_opt":         GenericTool.OPTIONAL,
+                         "dbSNP_known_sites": GenericTool.INPUT}
+
+    # The suffix that will be added just before the extension of the output file
+    _suffix = "haplotype_caller"
+
+    # The input and output type
+    _input_type = (r"\.(\S+\.)?[sb]am$", )
+    _output_type = (".{}.vcf".format(_suffix), )
+
+    def __init__(self):
+        """Initialize a HaplotypeCaller instance."""
+        pass
