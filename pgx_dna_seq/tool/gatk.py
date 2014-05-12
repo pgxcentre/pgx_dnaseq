@@ -249,6 +249,17 @@ class UnifiedGenotyper(GATK):
         """Initialize a UnifiedGenotyper instance."""
         pass
 
+    def execute(self, options, out_dir=None):
+        """Indexes a BAM and calls."""
+        # First we index the input file
+        if "input" not in options:
+            m = "{}: no input file".format(self.__class__.__name__)
+            raise ProgramError(m)
+        IndexBam().execute({"input": options["input"]}, out_dir)
+
+        # Then we create the MPILEUP file
+        super(UnifiedGenotyper, self).execute(options, out_dir)
+
 
 class UnifiedGenotyper_Multi(GATK):
 
@@ -341,3 +352,14 @@ class HaplotypeCaller(GATK):
     def __init__(self):
         """Initialize a HaplotypeCaller instance."""
         pass
+
+    def execute(self, options, out_dir=None):
+        """Indexes a BAM and calls."""
+        # First we index the input file
+        if "input" not in options:
+            m = "{}: no input file".format(self.__class__.__name__)
+            raise ProgramError(m)
+        IndexBam().execute({"input": options["input"]}, out_dir)
+
+        # Then we create the MPILEUP file
+        super(HaplotypeCaller, self).execute(options, out_dir)
