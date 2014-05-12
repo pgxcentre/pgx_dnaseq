@@ -1,6 +1,8 @@
 __all__ = ["RealignerTargetCreator", "IndelRealigner", "PrintReads",
-           "BaseRecalibrator", "UnifiedGenotyper", "HaplotypeCaller"]
+           "BaseRecalibrator", "UnifiedGenotyper", "UnifiedGenotyper_Multi",
+           "HaplotypeCaller"]
 
+import os
 import re
 
 from pgx_dna_seq import ProgramError
@@ -246,6 +248,64 @@ class UnifiedGenotyper(GATK):
     def __init__(self):
         """Initialize a UnifiedGenotyper instance."""
         pass
+
+
+class UnifiedGenotyper_Multi(GATK):
+
+    # The name of the tool
+    _tool_name = "UnifiedGenotyper_Multi"
+
+    # The jar file
+    _jar = "GenomeAnalysisTK.jar"
+
+    # The options
+    _command = ("-T UnifiedGenotyper -R {reference} --input_file {input} "
+                "--dbsnp {dbsnp} -o {output} {other_opt}")
+
+    # The STDOUT and STDERR
+    _stdout = "{output}.out"
+    _stderr = "{output}.err"
+
+    # The description of the required options
+    _required_options = {"input":     GenericTool.INPUT,
+                         "output":    GenericTool.OUTPUT,
+                         "reference": GenericTool.INPUT,
+                         "other_opt": GenericTool.OPTIONAL,
+                         "dbsnp":     GenericTool.INPUT}
+
+    # The suffix that will be added just before the extension of the output file
+    _suffix = "unified_genotyper"
+
+    # The input and output type
+    _input_type = (r"\.(\S+\.)?[sb]am$", )
+    _output_type = (".{}.vcf".format(_suffix), )
+
+    # This tool needs multiple input
+    _merge_all_inputs = True
+
+    def __init__(self):
+        """Initialize a UnifiedGenotyper_Multi instance."""
+        pass
+
+    def execute(self, options, out_dir=None):
+        """Indexes all the BAM files and calls."""
+        # First we index all the input files
+        if "inputs" not in options:
+            m = "{}: no input files".format(self.__class__.__name__)
+            raise ProgramError(m)
+        for filename in options["inputs"]:
+            IndexBam().execute({"input": filename}, out_dir)
+
+        # We need to create the list of bam files
+        list_filename = os.path.join(out_dir, "input_files.list")
+        with open(list_filename, "w") as o_file:
+            print("\n".join(options["inputs"]), file=o_file)
+
+        # The input file is now the file containing the list
+        options["input"] = list_filename
+
+        # Then we call
+        super(UnifiedGenotyper_Multi, self).execute(options, out_dir)
 
 
 class HaplotypeCaller(GATK):
