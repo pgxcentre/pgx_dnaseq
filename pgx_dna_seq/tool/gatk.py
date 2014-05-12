@@ -1,6 +1,7 @@
 __all__ = ["RealignerTargetCreator", "IndelRealigner", "PrintReads",
            "BaseRecalibrator", "UnifiedGenotyper", "UnifiedGenotyper_Multi",
-           "HaplotypeCaller", "HaplotypeCaller_Multi"]
+           "HaplotypeCaller", "HaplotypeCaller_Multi", "VariantRecalibrator",
+           "ApplyRecalibration"]
 
 import os
 import re
@@ -421,3 +422,121 @@ class HaplotypeCaller_Multi(GATK):
 
         # Then we call
         super(HaplotypeCaller_Multi, self).execute(options, out_dir)
+
+
+class VariantRecalibrator(GATK):
+
+    # The name of the tool
+    _tool_name = "VariantRecalibrator"
+
+    # The jar file
+    _jar = "GenomeAnalysisTK.jar"
+
+    # The options
+    _command = ("-T VariantRecalibrator -R {reference} --input {input} "
+                "--recal_file {output_recal} --tranches_file {output_tranches} "
+                "-an QD -an HaplotypeScore -an MQRankSum -an ReadPosRankSum "
+                "-an FS -an MQ -an InbreedingCoeff "
+                "--resource:hapmap,{hapmap_config} {hapmap_sites} "
+                "--resource:omni,{omni_config} {omni_sites} "
+                "--resource:dbsnp,{dbsnp_config} {dbsnp_sites} {other_opt}")
+
+    # The STDOUT and STDERR
+    _stdout = "{output_recal}.out"
+    _stderr = "{output_recal}.err"
+
+    # The description of the required options
+    _required_options = {"input":           GenericTool.INPUT,
+                         "output_recal":    GenericTool.OUTPUT,
+                         "output_tranches": GenericTool.OUTPUT,
+                         "reference":       GenericTool.INPUT,
+                         "hapmap_config":   GenericTool.REQUIREMENT,
+                         "hapmap_sites":    GenericTool.INPUT,
+                         "omni_config":     GenericTool.REQUIREMENT,
+                         "omni_sites":      GenericTool.INPUT,
+                         "dbsnp_config":    GenericTool.REQUIREMENT,
+                         "dbsnp_sites":     GenericTool.INPUT,
+                         "other_opt":       GenericTool.OPTIONAL}
+
+    # The suffix that will be added just before the extension of the output file
+    _suffix = None
+
+    # The input and output type
+    _input_type = (r"\.(\S+\.)?vcf$", )
+    _output_type = (".recal", )
+
+    def __init__(self):
+       """Initialize a VariantRecalibrator instance."""
+       pass
+
+
+class ApplyRecalibration(GATK):
+
+    # The name of the tool
+    _tool_name = "ApplyRecalibration"
+
+    # The jar file
+    _jar = "GenomeAnalysisTK.jar"
+
+    # The options
+    _command = ("-T ApplyRecalibration -R {reference} --input {input} "
+                "--out {output} --recal_file {recal_file} "
+                "--tranches_file {tranches_file} {other_opt}")
+
+    # The STDOUT and STDERR
+    _stdout = "{output}.out"
+    _stderr = "{output}.err"
+
+    # The description of the required options
+    _required_options = {"input":         GenericTool.INPUT,
+                         "output":        GenericTool.OUTPUT,
+                         "reference":     GenericTool.INPUT,
+                         "recal_file":    GenericTool.INPUT,
+                         "tranches_file": GenericTool.INPUT,
+                         "other_opt":     GenericTool.OPTIONAL}
+
+    # The suffix that will be added just before the extension of the output file
+    _suffix = "variant_recal"
+
+    # The input and output type
+    _input_type = (r"\.(\S+\.)?vcf$", )
+    _output_type = (".{}.vcf".format(_suffix), )
+
+    def __init__(self):
+       """Initialize a ApplyRecalibration instance."""
+       pass
+
+    def execute(self, options, out_dir=None):
+        """Computes and applies the recalibration."""
+        # Creating the new options and updating the old ones
+        recal_opts = {}
+        try:
+            out_prefix = re.sub("\.vcf$", "", options["output"])
+            recal_opts["input"] = options["input"]
+            recal_opts["output_recal"] = "{}.recal".format(out_prefix)
+            recal_opts["output_tranches"] = "{}.tranches".format(out_prefix)
+            recal_opts["reference"] = options["reference"]
+            recal_opts["hapmap_config"] = options["hapmap_config"]
+            recal_opts["hapmap_sites"] = options["hapmap_sites"]
+            recal_opts["omni_config"] = options["omni_config"]
+            recal_opts["omni_sites"] = options["omni_sites"]
+            recal_opts["dbsnp_config"] = options["dbsnp_config"]
+            recal_opts["dbsnp_sites"] = options["dbsnp_sites"]
+
+            # Updating the recal and tranches input files
+            options["recal_file"] = "{}.recal".format(out_prefix)
+            options["tranches_file"] = "{}.tranches".format(out_prefix)
+        except KeyError as e:
+            m = ("{}: {}: missing required "
+                 "options".format(self.__class__.__name__, e))
+            raise ProgramError(m)
+
+        # Are there other options for recal?
+        if "other_recal_opt" in options:
+            recal_opts["other_opt"] = options["other_recal_opt"]
+
+        # Executing the recalibration
+        VariantRecalibrator().execute(recal_opts, out_dir)
+
+        # Applying the recalibration
+        super(ApplyRecalibration, self).execute(options, out_dir)
