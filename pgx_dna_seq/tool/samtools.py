@@ -150,7 +150,7 @@ class FlagStat(Samtools):
 class MPILEUP(Samtools):
 
     # The name of the tool
-    _tool_name = "mpileup"
+    _tool_name = "MPILEUP"
 
     # The options
     _command = "mpileup {other_opt} -f {reference} {input}"
@@ -191,7 +191,7 @@ class MPILEUP(Samtools):
 class MPILEUP_Multi(Samtools):
 
     # The name of the tool
-    _tool_name = "mpileup_multi"
+    _tool_name = "MPILEUP_Multi"
 
     # The options
     _command = "mpileup {other_opt} -f {reference} {inputs}"
