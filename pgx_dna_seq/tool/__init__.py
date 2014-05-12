@@ -199,13 +199,23 @@ class GenericTool(object):
         try:
             check_call(command, stdout=stdout, stderr=stderr)
         except SubprocessError:
+            # Constructing the error message
             m = "The following command failed:\n\n"
             m += "    {}\n\n".format(" ".join(command))
-            m += "Check {} for more detail".format(stderr.name)
+
+            # The name of the log file
+            log_filename = "log file"
+            if stderr is not None:
+                log_filename = stderr.name
+            m += "Check {} for more detail".format(log_filename)
+
+            # Raising the exception
             raise ProgramError(m)
+
         except FileNotFoundError:
             m = "{}: no such executable".format(command[0])
             raise ProgramError(m)
+
         finally:
             # Closing the output files
             if stdout is not None:
@@ -233,7 +243,7 @@ class GenericTool(object):
             import drmaa
         except ImportError:
             # Executing it locally
-            GenericTool.__execute_command_locally(tmp_file.name)
+            GenericTool.__execute_command_locally([tmp_file.name])
         else:
             # Initializing a new DRMAA session
             s = drmaa.Session()
