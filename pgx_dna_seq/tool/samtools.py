@@ -1,7 +1,9 @@
-__all__ = ["Sam2Bam", "IndexBam", "KeepMapped", "FlagStat", "MPILEUP"]
+__all__ = ["Sam2Bam", "IndexBam", "KeepMapped", "FlagStat", "MPILEUP",
+           "MPILEUP_Multi"]
 
 import re
 
+from pgx_dna_seq import ProgramError
 from pgx_dna_seq.tool import GenericTool
 
 
@@ -184,3 +186,48 @@ class MPILEUP(Samtools):
 
         # Then we create the MPILEUP file
         super(MPILEUP, self).execute(options, out_dir)
+
+
+class MPILEUP_Multi(Samtools):
+
+    # The name of the tool
+    _tool_name = "mpileup_multi"
+
+    # The options
+    _command = "mpileup {other_opt} -f {reference} {inputs}"
+
+    # The STDOUT and STDERR
+    _stdout = "{output}"
+    _stderr = "{output}.err"
+
+    # The description of the required options
+    _required_options = {"inputs": GenericTool.INPUTS,
+                         "reference": GenericTool.INPUT,
+                         "other_opt": GenericTool.OPTIONAL,
+                         "output": GenericTool.OUTPUT}
+
+    # The suffix that will be added just before the extension of the output file
+    _suffix = "mpileup"
+
+    # The input and output type
+    _input_type = (r"\.(\S+\.)?[sb]am$", )
+    _output_type = (".{}".format(_suffix), )
+
+    # This tool needs multiple input
+    _merge_all_inputs = True
+
+    def __init__(self):
+        """Initialize a MPILEUP_Multi instance."""
+        pass
+
+    def execute(self, options, out_dir=None):
+        """Indexes a BAM and create the MPILEUP file."""
+        # First we index all the input files
+        if "inputs" not in options:
+            m = "{}: no input files".format(self.__class__.__name__)
+            raise ProgramError(m)
+        for filename in options["inputs"]:
+            IndexBam().execute({"input": filename}, out_dir)
+
+        # Then we create the MPILEUP file from multiple inputs
+        super(MPILEUP_Multi, self).execute(options, out_dir)

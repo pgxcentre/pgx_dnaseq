@@ -12,12 +12,16 @@ class GenericTool(object):
 
     # The type that can be use for options
     INPUT = 1
-    OUTPUT = 2
-    OPTIONAL = 3
-    REQUIREMENT = 4
+    INPUTS = 2
+    OUTPUT = 3
+    OPTIONAL = 4
+    REQUIREMENT = 5
 
     # By default, a tool produces usable data
     _produce_data = True
+
+    # By default, no multiple inputs
+    _merge_all_inputs = False
 
     # The local tool configuration
     __tool_configuration = {}
@@ -33,6 +37,10 @@ class GenericTool(object):
     def produce_usable_data(self):
         """Returns True if the tool produces data. False otherwise."""
         return self._produce_data
+
+    def need_to_merge_all_inputs(self):
+        """Returns True if the tool has multiple inputs. False otherwise."""
+        return self._merge_all_inputs
 
     @staticmethod
     def set_tool_configuration(drmaa_options):
@@ -309,6 +317,17 @@ class GenericTool(object):
 
                 # Option is now safe
                 safe_options[option_name] = options[option_name]
+
+            # Checking if the option is multiple input files
+            elif option_type == self.INPUTS:
+                # The files should all exists
+                for filename in options[option_name]:
+                    if not os.path.isfile(filename):
+                        m = "{}: no such file".format(filename)
+                        raise ProgramError(m)
+
+                # They all exists, so we merge the input files using spaces
+                safe_options[option_name] = " ".join(options[option_name])
 
             # Checking if the option is an output file
             elif option_type == self.OUTPUT:

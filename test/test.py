@@ -6,6 +6,7 @@ import __main__
 from copy import copy
 
 from ruffus import *
+from pgx_dna_seq import ProgramError
 from pgx_dna_seq.tool import GenericTool as Tool
 from pgx_dna_seq.read_config import read_config_file, get_pipeline_steps
 
@@ -62,6 +63,15 @@ for job_index, (job, job_options) in enumerate(what_to_run):
     curr_output = [os.path.join(output_dir, ("{SAMPLE[" + str(i) +"]}" +
                                              last_suffix + suffix))
                                 for i, suffix in enumerate(output_type)]
+    formatter_func = formatter
+
+    # What if we need to merge all inputs?
+    if job.need_to_merge_all_inputs():
+        curr_formatter = [r".+/\w+{}".format(i) for i in input_type]
+        curr_output = [os.path.join(output_dir, ("all_samples" + last_suffix +
+                                                  suffix))
+                                for suffix in output_type]
+        formatter_func = regex
 
     print("\n".join(curr_formatter))
     print("\n".join(curr_output))
@@ -73,16 +83,19 @@ for job_index, (job, job_options) in enumerate(what_to_run):
 
     # Getting the current Ruffus' decorator
     curr_decorator = None
-    if len(input_type) == len(output_type):
-        curr_decorator = transform
-    elif len(input_type) > len(output_type):
+    if (len(input_type) > len(output_type)) or job.need_to_merge_all_inputs():
         curr_decorator = collate
+    elif len(input_type) == len(output_type):
+        curr_decorator = transform
+    else:
+        m = "cannot choose a good Ruffus decorator"
+        raise ProgramError(m)
 
     # The name of the function
     func_name = "step{:02d}_{}".format(job_index + 1, job.get_tool_name())
 
     # Dynamically creating the pipeline
-    @curr_decorator(in_job, formatter(*curr_formatter), curr_output,
+    @curr_decorator(in_job, formatter_func(*curr_formatter), curr_output,
                     "{SAMPLE[0]}", job, len(input_type), len(output_type),
                     output_dir, job_options)
     @rename_func(func_name)
@@ -90,7 +103,12 @@ for job_index, (job, job_options) in enumerate(what_to_run):
                   options):
         print("\n###########################")
         print(job.get_tool_name())
-        # The i_files variable is a tuple of lists
+        # If we need to merge all inputs
+        if job.need_to_merge_all_inputs():
+            i_files = list(i_files)
+            sample_id = "all_samples"
+
+        # The i_files variable is usually a tuple of lists
         if isinstance(i_files, tuple):
             i_files = i_files[0]
 
@@ -102,7 +120,9 @@ for job_index, (job, job_options) in enumerate(what_to_run):
         curr_options = copy(options)
 
         # Adding the input to the tool option
-        if nb_in == 1:
+        if job.need_to_merge_all_inputs():
+            curr_options["inputs"] = i_files
+        elif nb_in == 1:
             curr_options["input"] = i_files
         else:
             for i in range(nb_in):
