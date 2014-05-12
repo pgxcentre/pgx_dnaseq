@@ -1,6 +1,6 @@
 __all__ = ["RealignerTargetCreator", "IndelRealigner", "PrintReads",
            "BaseRecalibrator", "UnifiedGenotyper", "UnifiedGenotyper_Multi",
-           "HaplotypeCaller"]
+           "HaplotypeCaller", "HaplotypeCaller_Multi"]
 
 import os
 import re
