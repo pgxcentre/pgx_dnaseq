@@ -35,17 +35,17 @@ class RealignerTargetCreator(GATK):
 
     # The options
     _command = ("-T RealignerTargetCreator -I {input} -R {reference} "
-                "-o {output} {other_opt}")
+                "-o {output} {other_rtc_opt}")
 
     # The STDOUT and STDERR
     _stdout = "{output}.out"
     _stderr = "{output}.err"
 
     # The description of the required options
-    _required_options = {"input":     GenericTool.INPUT,
-                         "output":    GenericTool.OUTPUT,
-                         "reference": GenericTool.INPUT,
-                         "other_opt": GenericTool.OPTIONAL}
+    _required_options = {"input":         GenericTool.INPUT,
+                         "output":        GenericTool.OUTPUT,
+                         "reference":     GenericTool.INPUT,
+                         "other_rtc_opt": GenericTool.OPTIONAL}
 
     # The suffix that will be added just before the extension of the output file
     _suffix = None
@@ -107,7 +107,8 @@ class IndelRealigner(GATK):
             # The options
             intervals_opt["input"] = options["input"]
             intervals_opt["reference"] = options["reference"]
-            intervals_opt["dt"] = options["dt"]
+            if "other_rtc_opt" in options:
+                intervals_opt["other_rtc_opt"] = options["other_rtc_opt"]
             if "java_memory" in options:
                 intervals_opt["java_memory"] = options["java_memory"]
 
