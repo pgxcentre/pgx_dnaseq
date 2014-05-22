@@ -139,16 +139,17 @@ class MarkDuplicates(PicardTools):
     _jar = "MarkDuplicates.jar"
 
     # The options
-    _command = ("INPUT={input} O={output} METRICS_FILE={metrics}")
+    _command = "INPUT={input} O={output} METRICS_FILE={metrics} {other_opt}"
 
     # The STDOUT and STDERR
     _stdout = "{output}.out"
     _stderr = "{output}.err"
 
     # The description of the required options
-    _required_options = {"input":   GenericTool.INPUT,
-                         "output":  GenericTool.OUTPUT,
-                         "metrics": GenericTool.OUTPUT}
+    _required_options = {"input":     GenericTool.INPUT,
+                         "output":    GenericTool.OUTPUT,
+                         "metrics":   GenericTool.OUTPUT,
+                         "other_opt": GenericTool.OPTIONAL}
 
     # The suffix that will be added just before the extension of the output file
     _suffix = "dedup"
