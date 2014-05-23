@@ -1,3 +1,16 @@
+"""pgx_dna_seq: A module to automatize and facilitate NGS data analysis."""
+
+__author__ = "Louis-Philippe Lemieux Perreault and Abdellatif Daghrach"
+__copyright__ = "Copyright 2014, Beaulieu-Saucier Pharmacogenomics Centre"
+__credits__ = ["Louis-Philippe Lemieux Perreault", "Abdellatif Daghrach",
+               "Michal Blazejczyk"]
+__license__ = "GPL"
+__version__ = "0.1"
+__maintainer__ = "Louis-Philippe Lemieux Perreault"
+__email__ = "louis-philippe.lemieux.perreault@statgen.org"
+__status__ = "Development"
+
+
 class ProgramError(Exception):
     """An :py:class:`Exception` raised in case of a problem.
     
