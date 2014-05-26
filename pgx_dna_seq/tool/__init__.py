@@ -1,5 +1,5 @@
 __all__ = ["bwa", "fastq_mcf", "fastqc", "gatk", "picard_tools", "samtools",
-           "bowtie2", "bcftools"]
+           "bowtie2", "bcftools", "pgx_coverage_graph"]
 
 import os
 from tempfile import NamedTemporaryFile
