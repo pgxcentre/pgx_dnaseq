@@ -54,6 +54,10 @@ def plot_depth(depth, samples, options):
     # The figure and axe
     fig, ax = plt.subplots(1, 1, figsize=(14, 8.5))
 
+    # Adding the grids
+    ax.grid(color='#8E8E8E', linestyle=':', linewidth=1, which="major")
+    ax.set_axisbelow(True)
+
     # The labels
     ax.set_title(("Sample Depth (MapQ={mapq}, BaseQ={baseq} "
                   "MaxDepth={bam_depth})".format(**vars(options))))
@@ -72,7 +76,7 @@ def plot_depth(depth, samples, options):
                          dtype=int) / np.sum(bins)
 
         # Plotting
-        plt.plot(np.arange(len(cumul)), cumul, "-", lw=2,
+        plt.plot(np.arange(len(cumul)), cumul, lw=2,
                  label=os.path.basename(sample.split(".")[0]))
 
     # Plotting the legend
