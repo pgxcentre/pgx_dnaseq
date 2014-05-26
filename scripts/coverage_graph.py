@@ -73,7 +73,7 @@ def plot_depth(depth, samples, options):
 
         # Plotting
         plt.plot(np.arange(len(cumul)), cumul, "-", lw=2,
-                label=os.path.basename(samples[0].split(".")[0]))
+                 label=os.path.basename(sample.split(".")[0]))
 
     # Plotting the legend
     ax.legend(loc="best",fancybox=True, ncol=3, shadow=True)
