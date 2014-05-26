@@ -2,6 +2,7 @@ __all__ = ["bwa", "fastq_mcf", "fastqc", "gatk", "picard_tools", "samtools",
            "bowtie2", "bcftools", "pgx_coverage_graph"]
 
 import os
+import shlex
 from tempfile import NamedTemporaryFile
 from subprocess import check_call, SubprocessError
 
@@ -231,8 +232,11 @@ class GenericTool(object):
         tmp_file = NamedTemporaryFile(mode="w", suffix="_execute.sh",
                                       delete=False, dir=out_dir)
         print("#!/usr/bin/env bash", file=tmp_file)
-        print("{} > {} 2> {}".format(" ".join(command), stdout, stderr),
-              file=tmp_file)
+        print(command[0], end=" ", file=tmp_file)
+        for chunck in command[1:]:
+            print(shlex.quote(chunck), end=" ", file=tmp_file)
+        print("> {}".format(shlex.quote(stdout)), end=" ", file=tmp_file)
+        print("2> {}".format(shlex.quote(stderr)), file=tmp_file)
         tmp_file.close()
 
         # Making the script executable
