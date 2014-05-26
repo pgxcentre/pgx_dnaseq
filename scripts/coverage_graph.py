@@ -192,20 +192,22 @@ def parse_args():
               :py:mod:`argparse` module. It contains the values of the different
               options.
 
-    ===============   =======  ================================================
-        Options        Type                      Description
-    ===============   =======  ================================================
-    ``--bam``         string   Input BAM file(s) (one or more, separated by
-                               spaces)
-    ``--bed``         string   BED file to restrict to targeted regions
-    ``-q``            int      skip alignments with mapQ smaller than INT
-    ``-Q``            int      skip bases with baseQ/BAQ smaller than INT
-    ``-d``            int      max per-BAM depth to avoid excessive memory
-                               usage
-    ``--max-depth``   int      The maximal depth to plot (in order to zoom in
-                               the plots)
-    ``--out``         string   The prefix of the output file
-    ===============   =======  ================================================
+    ================   =======  ================================================
+        Options         Type                      Description
+    ================   =======  ================================================
+    ``--depth-file``   string   Results from this script (to redo the plot
+                                faster)
+    ``--bam``          string   Input BAM file(s) (one or more, separated by
+                                spaces)
+    ``--bed``          string   BED file to restrict to targeted regions
+    ``-q``             int      skip alignments with mapQ smaller than INT
+    ``-Q``             int      skip bases with baseQ/BAQ smaller than INT
+    ``-d``             int      max per-BAM depth to avoid excessive memory
+                                usage
+    ``--max-depth``    int      The maximal depth to plot (in order to zoom in
+                                the plots)
+    ``--out``          string   The prefix of the output file
+    ================   =======  ================================================
 
     .. note::
         No option check is done here (except for the one automatically done by
