@@ -47,6 +47,9 @@ class CoverageGraph_Multi(PGx_CoverageGraph):
     # This tool needs multiple input
     _merge_all_inputs = True
 
+    # This tool does not produce usable data...
+    _produce_data = False
+
     def __init__(self):
         """Initialize a CoverageGraph_Multi instance."""
         pass
