@@ -130,7 +130,10 @@ def compute_sample_depth(options):
     nb_samples = len(samples)
 
     # The command
-    command = ["samtools", "mpileup", "-A", "-d", str(options.bam_depth), "-q",
+    command = "samtools"
+    if options.samtools_exec is not None:
+        command = os.path.join(options.samtools_exec, "samtools")
+    command = [command, "mpileup", "-A", "-d", str(options.bam_depth), "-q",
                str(options.mapq), "-Q", str(options.baseq)]
 
     # If there is a bed, we add it
@@ -215,6 +218,12 @@ def check_args(args):
         if args.max_depth <= 0:
             m = "{}: invalid maximal depth".format(args.max_depth)
             raise ProgramError(m)
+
+    # Checking for the executable
+    if args.samtools_exec is not None:
+        if not os.path.isfile(os.path.join(args.samtools_exec, "samtools")):
+            m = "{}: does not contain samtools".format(args.samtools_exec)
+            raise ProgramError(m)
             
     return True
 
@@ -279,6 +288,9 @@ parser = argparse.ArgumentParser(description=desc)
 
 parser.add_argument("--version", action="version",
                     version="%(prog)s {}".format(prog_version))
+parser.add_argument("--samtools-exec", type=str, metavar="PATH",
+                    help=("The PATH to the samtools executable if not in the "
+                          "$PATH variable"))
 
 # The input files
 group = parser.add_argument_group("Input Files")
