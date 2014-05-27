@@ -20,7 +20,7 @@ from csv import QUOTE_NONE
 from subprocess import Popen, PIPE
 
 import numpy as np
-from pandas import read_csv
+import pandas as pd
 
 
 # The version of the script
@@ -32,6 +32,10 @@ def main():
     args = parse_args()
     check_args(args)
 
+    # Reading the bed file to get the number of nucleotide that should be
+    # covered
+    nb_bases = read_bed(args.bed)
+
     # Getting the depth
     sample_depth = None
     if args.bam is not None:
@@ -41,9 +45,31 @@ def main():
 
     # Plots the graph
     sample_list = list(sample_depth.columns)
-    plot_depth(sample_depth, sample_list, args)
+    plot_depth(sample_depth, nb_bases, sample_list, args)
 
-def plot_depth(depth, samples, options):
+def read_bed(filename):
+    """Reads a BED file and computes the number of nucleotide included."""
+    # Reading the BED file
+    bed_file = pd.read_csv(filename, sep="\t", names=["chr", "start", "end"],
+                           usecols=range(3)).sort(columns=["chr", "start",
+                                                           "end"])
+
+    # Checking that the file is merged
+    for i in range(1, len(bed_file)):
+        if bed_file.chr.iloc[i] != bed_file.chr.iloc[i-1]:
+            continue
+        if bed_file.start.iloc[i] + 1 <= bed_file.end.iloc[i-1]:
+            m = "{}: regions should be merged".format(filename)
+            raise ProgramError(m)
+
+    # Computing the length of the regions (no need to add 1, since the starting
+    # position is in 0 format)
+    bed_file["length"] = bed_file.end - bed_file.start
+
+    # Returns the number of nucleotides in the targeted regions
+    return bed_file.length.sum()
+
+def plot_depth(depth, nb_bases, samples, options):
     # Importing
     import matplotlib as mpl
     mpl.use("Agg")
@@ -73,7 +99,7 @@ def plot_depth(depth, samples, options):
         # Computing the bins and the cumulative
         bins = np.bincount(depth[sample])
         cumul = np.array([np.sum(bins[i:]) for i in range(len(bins))],
-                         dtype=int) / np.sum(bins)
+                         dtype=int) / nb_bases
 
         # Plotting
         plt.plot(np.arange(len(cumul)), cumul, lw=2,
@@ -92,8 +118,8 @@ def plot_depth(depth, samples, options):
 
 def read_depth(filename):
     """Reads the depth from a pre-computed file (from this script)."""
-    depth = read_csv(filename, sep="\t", quoting=QUOTE_NONE,
-                     encoding="ascii")
+    depth = pd.read_csv(filename, sep="\t", quoting=QUOTE_NONE,
+                        encoding="ascii")
 
     return depth
 
@@ -104,7 +130,7 @@ def compute_sample_depth(options):
     nb_samples = len(samples)
 
     # The command
-    command = ["samtools", "mpileup", "-d", str(options.bam_depth), "-q",
+    command = ["samtools", "mpileup", "-A", "-d", str(options.bam_depth), "-q",
                str(options.mapq), "-Q", str(options.baseq)]
 
     # If there is a bed, we add it
@@ -118,9 +144,9 @@ def compute_sample_depth(options):
     p = Popen(command, stdout=PIPE)
 
     # Reading the output from samtools
-    depth = read_csv(p.stdout, sep="\t", names=samples, quoting=QUOTE_NONE,
-                     encoding="ascii",
-                     usecols=range(3, (nb_samples * 3) + 3, 3))
+    depth = pd.read_csv(p.stdout, sep="\t", names=samples, quoting=QUOTE_NONE,
+                        encoding="ascii",
+                        usecols=range(3, (nb_samples * 3) + 3, 3))
 
     # Closing the PIPE
     p.stdout.close()
@@ -168,10 +194,13 @@ def check_args(args):
             raise ProgramError(m)
 
     # Checking the BED file
-    if args.bed is not None:
-        if not os.path.isfile(args.bed):
-            m = "{}: no such file".format(args.bed)
-            raise ProgramError(m)
+    if not args.bed.endswith(".bed"):
+        m = "{}: no a bed format".format(args.bed)
+        raise ProgramError(m)
+
+    if not os.path.isfile(args.bed):
+        m = "{}: no such file".format(args.bed)
+        raise ProgramError(m)
 
     # Checking the qualities
     if args.mapq < 0:
@@ -257,7 +286,7 @@ group.add_argument("--depth-file", type=str, metavar="FILE",
                    help="Results from this script (to redo the plot faster)")
 group.add_argument("--bam", type=str, metavar="BAM", nargs="+",
                    help="Input BAM file(s) (one or more, separated by spaces)")
-group.add_argument("--bed", type=str, metavar="BED",
+group.add_argument("--bed", type=str, metavar="BED", required=True,
                    help="BED file to restrict to targeted regions")
 
 # The MPILEUP options
