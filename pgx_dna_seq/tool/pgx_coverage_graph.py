@@ -25,7 +25,7 @@ class CoverageGraph(PGx_CoverageGraph):
     _tool_name = "CoverageGraph"
 
     # The options
-    _command = "{other_opt} --out {out_prefix} --bam {input}"
+    _command = "{other_opt} --out {out_prefix} --bed {targets} --bam {input}"
 
     # The STDOUT and STDERR
     _stdout = "{output}.out"
@@ -35,6 +35,7 @@ class CoverageGraph(PGx_CoverageGraph):
     _required_options = {"input":      GenericTool.INPUT,
                          "output":     GenericTool.OUTPUT,
                          "out_prefix": GenericTool.OUTPUT,
+                         "targets":    GenericTool.INPUT,
                          "other_opt":  GenericTool.OPTIONAL}
 
     # The suffix that will be added just before the extension of the output file
@@ -73,7 +74,7 @@ class CoverageGraph_Multi(PGx_CoverageGraph):
     _tool_name = "CoverageGraph_Multi"
 
     # The options
-    _command = "{other_opt} --out {out_prefix} --bam {inputs}"
+    _command = "{other_opt} --out {out_prefix} --bed {targets} --bam {inputs}"
 
     # The STDOUT and STDERR
     _stdout = "{output}.out"
@@ -83,6 +84,7 @@ class CoverageGraph_Multi(PGx_CoverageGraph):
     _required_options = {"inputs":     GenericTool.INPUTS,
                          "output":     GenericTool.OUTPUT,
                          "out_prefix": GenericTool.OUTPUT,
+                         "targets":    GenericTool.INPUT,
                          "other_opt":  GenericTool.OPTIONAL}
 
     # The suffix that will be added just before the extension of the output file
