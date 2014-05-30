@@ -152,11 +152,12 @@ for job_index, (job, job_options) in enumerate(what_to_run):
     if job.produce_usable_data():
         in_job = curr_step
         last_suffix += ".{}".format(job.get_suffix())
-    else:
-        in_job = output_from([in_job, curr_step])
+
+    # Adding the current job to the pipeline
+    job_order.append(curr_step)
 
 
 print("Runing the pipeline...")
 pipeline_printout_graph("flowchart.svg", "svg", job_order)
-pipeline_run(verbose=0, multiprocess=1, checksum_level=1)
+pipeline_run(job_order, verbose=0, multiprocess=1, checksum_level=1)
 pipeline_printout_graph("flowchart_after.svg", "svg", job_order)
