@@ -152,6 +152,7 @@ def execute_pipeline(i_files, args):
                 curr_options["prefix"] = os.path.join(out_dir, sample_id)
             if "sample_id" not in curr_options:
                 curr_options["sample_id"] = sample_id
+            print(curr_options["sample_id"])
 
             # Running the task
             job.execute(curr_options, out_dir=out_dir)
