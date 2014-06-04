@@ -1,0 +1,2 @@
+data/NA12877_R1.fastq.gz data/NA12877_R2.fastq.gz
+data/NA12878_R1.fastq.gz	data/NA12878_R2.fastq.gz
