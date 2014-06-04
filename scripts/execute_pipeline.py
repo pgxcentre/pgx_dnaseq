@@ -11,6 +11,7 @@ from pgx_dna_seq import ProgramError
 # The version of the script
 prog_version = pgx_dna_seq.__version__
 
+
 def main():
     """The main function."""
     # Getting and checking the options
@@ -24,6 +25,7 @@ def main():
         option = option.replace("_", "-")
         print("    --{} {} \\".format(option, value))
     print()
+
 
 def check_args(args):
     """Checks the arguments and options.
@@ -49,6 +51,7 @@ def check_args(args):
 
     return True
 
+
 def parse_args():
     """Parses the command line options and arguments.
 
@@ -69,30 +72,30 @@ def parse_args():
     """
     return parser.parse_args()
 
+
 # The parser object
 desc = "Execute a NGS pipeline (version {}).".format(prog_version)
 parser = argparse.ArgumentParser(description=desc)
 
 # The input file
-parser.add_argument("--version", action="version",
-                    version="%(prog)s {}".format(prog_version))
+parser.add_argument("-v", "--version", action="version",
+                    version="%(prog)s version {}".format(prog_version))
 
 group = parser.add_argument_group("Pipeline Configuration")
 group.add_argument("--pipeline-config", type=str, metavar="FILE",
                    default="pipeline.conf",
-                   help=("The pipeline configuration file (default: "
-                         "%(default)s)"))
+                   help="The pipeline configuration file [%(default)s]")
 group.add_argument("--tool-config", type=str, metavar="FILE",
                    default="tools.conf",
-                   help="The tools configuration file (default: %(default)s)")
+                   help="The tools configuration file [%(default)s]")
 group.add_argument("--use-drmaa", action="store_true", default=False,
                    help=("Use DRMAA to launch the tasks instead of running "
-                         "them locally (default: %(default)s)"))
+                         "them locally [%(default)s]"))
 group.add_argument("--nb-process", type=int, metavar="INT", default=1,
                    help=("The number of processes for job execution (allow "
                          "enough if '--use-drmaa' option is used since you "
-                         "want at least one job per sample) (default: "
-                         "%(default)s)"))
+                         "want at least one job per sample) [%(default)s]"))
+
 
 # Calling the main, if necessary
 if __name__ == "__main__":
