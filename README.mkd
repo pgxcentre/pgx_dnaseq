@@ -25,7 +25,7 @@ systems as well.
 For Linux users, make sure that the script is executable (using the *chmod*
 command).
 
-```ShellSession
+```console
 $ execute_pipeline.py -h
 usage: execute_pipeline.py [-h] [-v] [-i FILE] [-p FILE] [-t FILE] [-d]
                            [-n INT]
