@@ -20,6 +20,7 @@ setup(name="pgx_dna_seq",
       scripts=[os.path.join("scripts", script_name) for script_name in scripts],
       install_requires=["numpy >= 1.8.1", "pandas >= 0.13.1", "ruffus >= 2.4.1", 
                         "matplotlib >=1.3.1"],
+      packages=["pgx_dna_seq", "pgx_dna_seq.tool"],
       classifiers=['Operating System :: Linux',
                    'Programming Language :: Python',
                    'Programming Language :: Python :: 3.4'])
