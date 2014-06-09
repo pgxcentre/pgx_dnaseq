@@ -4,7 +4,6 @@ import os
 import re
 import sys
 import argparse
-import __main__
 import traceback
 from copy import copy
 
@@ -156,9 +155,6 @@ def execute_pipeline(i_files, args):
 
             # Running the task
             job.execute(curr_options, out_dir=out_dir)
-
-        # Setting the attribute for the new function so that it can be pickled
-        setattr(__main__, func_name, curr_step)
 
         # Updating the in_job and the last suffix only if the tool produces
         # usable data
