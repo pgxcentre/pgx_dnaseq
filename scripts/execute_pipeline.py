@@ -185,7 +185,7 @@ if __name__ == "__main__":
                 os.makedirs(output_dir)
 
             # What will be in the formatter
-            curr_formatter = [r".+/(?P<SAMPLE>\w+){}".format(i)
+            curr_formatter = [r".+/(?P<SAMPLE>[a-zA-Z0-9_\-]+){}".format(i)
                                                             for i in input_type]
             curr_output = [os.path.join(output_dir, ("{SAMPLE[" + str(i) +"]}" +
                                                     last_suffix + suffix))
@@ -194,7 +194,8 @@ if __name__ == "__main__":
 
             # What if we need to merge all inputs?
             if job.need_to_merge_all_inputs():
-                curr_formatter = [r".+/\w+{}".format(i) for i in input_type]
+                curr_formatter = [r".+/[a-zA-Z0-9_\-]+{}".format(i)
+                                                            for i in input_type]
                 curr_output = [os.path.join(output_dir, ("all_samples" +
                                                         last_suffix + suffix))
                                                       for suffix in output_type]
