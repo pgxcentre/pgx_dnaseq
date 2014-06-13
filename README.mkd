@@ -1,6 +1,6 @@
 # pgx_dna_seq - Automatic NGS pipeline
 
-*Version 0.1*
+*Version 0.2*
 
 `pgx_dna_seq` is an automatic pipeline to perform high-throughput sequencing
 analysis.
