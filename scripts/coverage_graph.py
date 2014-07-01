@@ -24,7 +24,7 @@ import pandas as pd
 
 
 # The version of the script
-prog_version = "0.1"
+prog_version = "0.2b"
 
 def main():
     """The main function."""
@@ -105,16 +105,17 @@ def plot_depth(depth, nb_bases, samples, options):
         plt.plot(np.arange(len(cumul)), cumul, lw=2,
                  label=os.path.basename(sample.split(".")[0]))
 
+        # Saving the cumulative data (if required)
+        if options.depth_file is None:
+            with open("{}.txt".format(options.out), "w") as o_file:
+                print(sample, file=o_file)
+                print(*cumul, sep=" ", file=o_file)
+
     # Plotting the legend
     ax.legend(loc="best",fancybox=True, ncol=3, shadow=True)
 
     fig.savefig("{}.png".format(options.out), bbox_inches="tight", dpi=300)
     plt.close(fig)
-
-    # Saving the partial data (if required)
-    if options.depth_file is None:
-        depth.to_csv("{}.txt".format(options.out), sep="\t", index=False,
-                    encoding="ascii", quoting=QUOTE_NONE)
 
 def read_depth(filename):
     """Reads the depth from a pre-computed file (from this script)."""
