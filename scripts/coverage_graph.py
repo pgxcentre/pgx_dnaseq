@@ -7,7 +7,7 @@ __copyright__ = "Copyright 2014, Beaulieu-Saucier Pharmacogenomics Centre"
 __credits__ = ["Louis-Philippe Lemieux Perreault", "Abdellatif Daghrach",
                "Michal Blazejczyk"]
 __license__ = "GPL"
-__version__ = "0.1"
+__version__ = "0.2b"
 __maintainer__ = "Louis-Philippe Lemieux Perreault"
 __email__ = "louis-philippe.lemieux.perreault@statgen.org"
 __status__ = "Development"
@@ -23,9 +23,6 @@ import numpy as np
 import pandas as pd
 
 
-# The version of the script
-prog_version = "0.2b"
-
 def main():
     """The main function."""
     # Getting and checking the options
@@ -38,14 +35,17 @@ def main():
 
     # Getting the depth
     sample_depth = None
+    sample_list = None
     if args.bam is not None:
         sample_depth = compute_sample_depth(args)
+        sample_list = list(sample_depth.columns)
     else:
         sample_depth = read_depth(args.depth_file)
+        sample_list = sample_depth.keys()
 
     # Plots the graph
-    sample_list = list(sample_depth.columns)
     plot_depth(sample_depth, nb_bases, sample_list, args)
+
 
 def read_bed(filename):
     """Reads a BED file and computes the number of nucleotide included."""
@@ -69,6 +69,7 @@ def read_bed(filename):
     # Returns the number of nucleotides in the targeted regions
     return bed_file.length.sum()
 
+
 def plot_depth(depth, nb_bases, samples, options):
     # Importing
     import matplotlib as mpl
@@ -85,7 +86,7 @@ def plot_depth(depth, nb_bases, samples, options):
     ax.set_axisbelow(True)
 
     # The labels
-    ax.set_title(("Sample Depth (MapQ={mapq}, BaseQ={baseq} "
+    ax.set_title(("Sample Depth (MapQ={mapq}, BaseQ={baseq}, "
                   "MaxDepth={bam_depth})".format(**vars(options))))
     ax.set_xlabel("Read Depth")
     ax.set_ylabel("Base Proportion")
@@ -96,10 +97,16 @@ def plot_depth(depth, nb_bases, samples, options):
 
     # Plotting for each sample
     for sample in samples:
-        # Computing the bins and the cumulative
-        bins = np.bincount(depth[sample])
-        cumul = np.array([np.sum(bins[i:]) for i in range(len(bins))],
-                         dtype=int) / nb_bases
+        # Do we need to compute the cumulative values?
+        cumul = None
+        if options.depth_file is None:
+            # Computing the bins and the cumulative
+            bins = np.bincount(depth[sample])
+            cumul = np.array([np.sum(bins[i:]) for i in range(len(bins))],
+                             dtype=int) / nb_bases
+        else:
+            # Getting the pre-computed cumulative values
+            cumul = depth[sample]
 
         # Plotting
         plt.plot(np.arange(len(cumul)), cumul, lw=2,
@@ -117,12 +124,30 @@ def plot_depth(depth, nb_bases, samples, options):
     fig.savefig("{}.png".format(options.out), bbox_inches="tight", dpi=300)
     plt.close(fig)
 
-def read_depth(filename):
-    """Reads the depth from a pre-computed file (from this script)."""
-    depth = pd.read_csv(filename, sep="\t", quoting=QUOTE_NONE,
-                        encoding="ascii")
 
-    return depth
+def read_depth(filenames):
+    """Reads the depth from pre-computed files (from this script)."""
+    # The map containing the values
+    depths = {}
+
+    # Each file contains the following two lines:
+    #     1- The name of the original BAM file
+    #     2- A list of cumulative values (float) separated by spaces
+    for filename in filenames:
+        with open(filename, "r") as i_file:
+            bam_file = i_file.readline().rstrip("\r\n")
+            cumul_values = np.array(i_file.readline().rstrip("\r\n").split(" "),
+                                    dtype=float)
+            if bam_file in depths:
+                print("WARNING: {}: already seen... "
+                      "overwriting".format(bam_file), file=sys.stderr)
+
+            # Saving the depth
+            depths[bam_file] = cumul_values
+
+    # Returning the cumulative values
+    return depths
+
 
 def compute_sample_depth(options):
     """Computes the sample depth using samtools (and extract relevant info."""
@@ -157,6 +182,7 @@ def compute_sample_depth(options):
 
     return depth
 
+
 def check_args(args):
     """Checks the arguments and options.
 
@@ -173,11 +199,11 @@ def check_args(args):
     """
     # Checking the BAM files
     if (args.bam is None) and (args.depth_file is None):
-        m = "use one of --bam or --depth"
+        m = "use one of --bam or --depth-file"
         raise ProgramError(m)
 
     elif (args.bam is not None) and (args.depth_file is not None):
-        m = "use either --bam or --depth"
+        m = "use either --bam or --depth-file"
         raise ProgramError(m)
 
     if args.bam is not None:
@@ -193,9 +219,10 @@ def check_args(args):
                 raise ProgramError(m)
 
     elif args.depth_file is not None:
-        if not os.path.isfile(args.depth_file):
-            m = "{}: no such file".format(args.depth_file)
-            raise ProgramError(m)
+        for filename in args.depth_file:
+            if not os.path.isfile(filename):
+                m = "{}: no such file".format(filename)
+                raise ProgramError(m)
 
     # Checking the BED file
     if not args.bed.endswith(".bed"):
@@ -227,6 +254,7 @@ def check_args(args):
             raise ProgramError(m)
             
     return True
+
 
 def parse_args():
     """Parses the command line options and arguments.
@@ -284,19 +312,20 @@ class ProgramError(Exception):
 
 
 # The parser object
-desc = "Plots NGS coverage (version {}).".format(prog_version)
+desc = "Plots NGS coverage (version {}).".format(__version__)
 parser = argparse.ArgumentParser(description=desc)
 
 parser.add_argument("--version", action="version",
-                    version="%(prog)s {}".format(prog_version))
+                    version="%(prog)s {}".format(__version__))
 parser.add_argument("--samtools-exec", type=str, metavar="PATH",
                     help=("The PATH to the samtools executable if not in the "
                           "$PATH variable"))
 
 # The input files
 group = parser.add_argument_group("Input Files")
-group.add_argument("--depth-file", type=str, metavar="FILE",
-                   help="Results from this script (to redo the plot faster)")
+group.add_argument("--depth-file", type=str, metavar="FILE", nargs="+",
+                   help=("Results from this script (to redo the plot faster) "
+                         "(one or more, separate by spaces)"))
 group.add_argument("--bam", type=str, metavar="BAM", nargs="+",
                    help="Input BAM file(s) (one or more, separated by spaces)")
 group.add_argument("--bed", type=str, metavar="BED", required=True,
