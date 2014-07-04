@@ -359,7 +359,7 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print >>sys.stderr, "Cancelled by user"
+        print("Cancelled by user", sys.stderr)
         sys.exit(0)
     except ProgramError as e:
         parser.error(e.message)
