@@ -130,6 +130,12 @@ group.add_argument("-n", "--nb-process", type=int, metavar="INT", default=1,
                          "enough if '--use-drmaa' option is used since you "
                          "want at least one job per sample) [%(default)s]"))
 
+# The graphic type
+group = parser.add_argument_group("Pipeline Flowchart")
+group.add_argument("-f", "--format", type=str, metavar="FORMAT", default="pdf",
+                   choices=["pdf", "png", "svg"], dest="flowchart_format",
+                   help="The format of the pipeline flowchart [%(default)s]")
+
 
 # Calling the main, if necessary
 if __name__ == "__main__":
@@ -281,7 +287,8 @@ if __name__ == "__main__":
 
         # Printing the pipeline
         print("Running the pipeline...")
-        pipeline_printout_graph("flowchart.svg", "svg", job_order)
+        pipeline_printout_graph("flowchart.{}".format(args.flowchart_format),
+                                args.flowchart_format, job_order)
         pipeline_run(job_order, verbose=0, multiprocess=args.nb_process,
                      checksum_level=1)
 
