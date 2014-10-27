@@ -164,7 +164,7 @@ def print_report(what_to_run,sample_list):
    
     #Sample page  
         page="\\begin{landscape} \n\
-\subsection{All Samples} \n\
+\subsection{"+sample+"} \n\
 \\begin{minipage}[c][6in]{9.3in} \n\
 \centering \n\
 \\begin{minipage}[c][6in]{4in}\n\
@@ -246,7 +246,7 @@ bookmarks=true,bookmarksnumbered=false,bookmarksopen=false, \n \
 breaklinks=false,pdfborder={0 0 0},backref=false,colorlinks=true] \n \
 {hyperref} \n\
 \hypersetup{pdftitle={Automatic Sequencing Report}, \n\
-pdfauthor={Louis-Philippe Lemieux Perreault}, \n\
+pdfauthor={Automatic Sequencing Reporter}, \n\
 linkcolor={link_blue},citecolor={link_blue},urlcolor={link_blue}} \n\
 \n\
 \makeatletter \n\
@@ -283,7 +283,7 @@ linkcolor={link_blue},citecolor={link_blue},urlcolor={link_blue}} \n\
 \\usepackage{arydshln} \n\
 \n \
 % The Report number... \n\
-\\newcommand{\RunName}{140430\_SN1064\_0137\_AC3TMHACXX} \n\
+\\newcommand{\RunName}{"+run_name+"} \n\
 \n\
 % Fancy header \n\
 \setlength{\headheight}{18pt} \n\
@@ -340,22 +340,15 @@ document\n\
 \listoffigures{}\n\
 \microtypesetup{protrusion=true} % enables protrusion\n\
 \cleardoublepage\n\
-\\newpage\n\
-\n\
 \section{Overview}\n\
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris sed leo dolor.\n\
-Curabitur sit amet tortor tempor orci sagittis interdum sit amet a odio.\n\
-dapibus orci et convallis molestie. Praesent volutpat risus sed nibh elementum\n\
-ullamcorper. Morbi vitae erat nibh. Integer malesuada urna non vestibulum\n\
-sodales. Duis ornare dui urna, sed fermentum lectus faucibus elementum. Donec\n\
-dui erat, dignissim sit amet neque nec, pretium tincidunt quam. Curabitur \n\
-egestas tempus orci eu volutpat. Aliquam erat volutpat. Suspendisse ut ipsu \n\
-accumsan, venenatis neque eget, porta ante. Figure~\\ref{pipeline_overview} \n\
+This report includes metrics collected using picard Hsmetrics , picard\n\
+MarkDuplicate , picard insert size metrics . \n\
+ Figure~\\ref{pipeline_overview} \n\
 the schematic of the pipeline used for run \RunName. \n\
 \n\
 \\begin{figure}[H]\n\
 \centering \n\
-\includegraphics[width=0.6\\textwidth]{images/flowchart.png} \n\
+\includegraphics[width=0.6\\textwidth]{images/flowchart.pdf} \n\
 \caption[Pipeline overview]{Overview of the pipeline used for run \n\
 \RunName.\label{pipeline_overview}} \n\
 \end{figure} \n\
@@ -400,7 +393,9 @@ group.add_argument("-i", "--input", type=str, metavar="FILE",
 group.add_argument("-p", "--pipeline-config", type=str, metavar="FILE",
                    default="pipeline.conf",
                    help="The pipeline configuration file [%(default)s]")
-
+group.add_argument("-r", "--run-name", type=str, metavar="STRING",
+                    default="Sequencing_Run",
+                    help="The Sequencing run name [%(default)s]")
 
 try:
     # Getting and checking the options
@@ -414,10 +409,14 @@ try:
         option = option.replace("_", "-")
         print("    --{} {} \\".format(option, value))
     print()
-
+    #get run name
+    run_name="Sequencing_Run"
+    run_name=args.run_name
+    run_name=run_name.replace("_", "\_")
+    print (run_name)
     # Checking the input files
     input_files,sample_list = check_input_files(args.input)
-
+     
     #Print report
     # Getting the pipeline steps
     what_to_run = get_pipeline_steps(args.pipeline_config)
