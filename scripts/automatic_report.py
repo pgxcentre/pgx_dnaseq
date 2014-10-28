@@ -7,17 +7,20 @@ import sys
 import argparse
 import glob
 
+
+
+
+
 from datetime import date
-
-import numpy as np
-
-
 from ruffus import originate , formatter
 
 import pgx_dna_seq
 
 from pgx_dna_seq import ProgramError
-from pgx_dna_seq.read_config import read_config_file, get_pipeline_steps
+from pgx_dna_seq.read_config import  get_pipeline_steps
+
+
+
 
 prog_version = "0.1"
 
@@ -161,7 +164,7 @@ def print_report(what_to_run,sample_list):
                             val_PCT_T_BASES_50X.append(float(PCT_T_BASES_50X))
                             val_PCT_T_BASES_100X.append(float(PCT_T_BASES_100X))
 
-         #Duplicate 
+         #InsertSize
             if job.get_tool_name() ==  'MarkDuplicates' :
                     dedup_file=glob.glob(output_dir +'/'+sample+'*.dedup')[0]
                     myfile=open (dedup_file)
@@ -169,16 +172,32 @@ def print_report(what_to_run,sample_list):
                     for i, line in enumerate (myfile):
                         if i==7:
                             data.append(line.replace("_","-").rstrip("\r\n").split("\t"))
-                            Total_Duplicate=data[0][5]
-                            Optical_Duplicate=str (int(data[0][6]) * 100 / float(Total_Duplicate))
-                            PCR_Duplicate=str(100-float(Optical_Duplicate))
-                            Duplicate_Per=str(float(data[0][7]) * 100 )
+                            Mean_Insert_Size=data[0][4]
+                            Median_Insert_Size=data[0][0]
+                            Standard_Deviation=data[0][5]
                             
-                            val_Total_Duplicate.append(float(data[0][5]))
-                            val_Optical_Duplicate.append(int(data[0][6])*100 / int(Total_Duplicate))
-                            val_PCR_Duplicate.append(100-float(Optical_Duplicate))
-                            val_Duplicate_Per.append(float(data[0][7])*100)
-         #Coverage_graph
+                            val_Mean_Insert_Size.append(float(data[0][4]))
+                            val_Median_Insert_Size.append(float(data[0][0]))
+                            val_Standard_Deviation.append(float(data[0][5]))
+        
+        #Duplicate
+            if job.get_tool_name() ==  'InsertSize' :
+                isize_file=glob.glob(output_dir +'/'+sample+'*.insertsize')[0]
+                myfile=open (isize_file)
+                data= list ()
+                for i, line in enumerate (myfile):
+                    if i==7:
+                        data.append(line.replace("_","-").rstrip("\r\n").split("\t"))
+                        Total_Duplicate=data[0][5]
+                        Optical_Duplicate=str (int(data[0][6]) * 100 / float(Total_Duplicate))
+                        PCR_Duplicate=str(100-float(Optical_Duplicate))
+                        Duplicate_Per=str(float(data[0][7]) * 100 )
+
+                        val_Total_Duplicate.append(float(data[0][5]))
+                        val_Optical_Duplicate.append(int(data[0][6])*100 / int(Total_Duplicate))
+                        val_PCR_Duplicate.append(100-float(Optical_Duplicate))
+                isize_graph = glob.glob(output_dir +'/'+sample+'*.png')[0]
+        #Coverage_graph
             if job.get_tool_name() ==  'CoverageGraph' :
                     coverage_graph = glob.glob(output_dir +'/'+sample+'*.png')[0]
                     coverage_graph=coverage_graph.replace(".png",".png").replace("/"+sample,"/"+sample)
@@ -249,15 +268,15 @@ PCT-TARGET-BASES-100X   & "+str("%.2f" % float(PCT_T_BASES_100X))+"\%   \\\ \n\
 \hline \n\
 \\\\ \n\
 \hline \n\
-Mean Insert Size        &        & $\pm$ 10 \\\ \n\
-Median Insert Size      &        & $\pm$ 9 \\\ \n\
-Insert Size Std Dev     &         & $\pm$ 3 \\\ \n\
+Mean Insert Size        & "+str("%.2f" % float(Mean_Insert_Size))+" \\\ \n\
+Median Insert Size      & "+str("%.2f" % float(Median_Insert_Size))+" \\\ \n\
+Insert Size Std Dev     & "+str("%.2f" % float(Standard_Deviation))+" \\\ \n\
 \hline \n\
 \end{tabular}\n\
 \end{minipage}%\n\
 \\begin{minipage}[c][6in]{5in}\n\
 \centering \n\
-\includegraphics[width=4.5in]{"+coverage_graph+"}\\\ \n\
+\includegraphics[width=4.5in]{"+isize_graph+"}\\\ \n\
 \\vfill \n\
 \includegraphics[width=4.5in]{"+coverage_graph+"} \n\
 \end{minipage} \n\
