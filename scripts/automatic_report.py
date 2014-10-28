@@ -436,10 +436,9 @@ the schematic of the pipeline used for run \RunName. \n\
     plt.xlabel('Sample')
     plt.ylabel('Mean Insert Size')
     plt.title('Histogram Mean Insert size values')
-    x = range(sample_num-1)
-    plt.axis([1,sample_num,0,500])
-    plt.plot(x,sample_num)
-    plt.grid(True)
+    x=list (range(1,sample_num+1))
+    plt.axis([0,sample_num+1,0,500])
+    plt.plot(x,val_Mean_Insert_Size,color='red',marker='o', markersize=10)
     plt.savefig(isize_path)
 
 #all samples page
