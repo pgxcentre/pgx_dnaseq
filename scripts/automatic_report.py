@@ -7,9 +7,9 @@ import sys
 import argparse
 import glob
 
-
-
-
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 from datetime import date
 from ruffus import originate , formatter
@@ -17,14 +17,14 @@ from ruffus import originate , formatter
 import pgx_dna_seq
 
 from pgx_dna_seq import ProgramError
-from pgx_dna_seq.read_config import  get_pipeline_steps
+from pgx_dna_seq.read_config import  read_config_file, get_pipeline_steps
 
 
 
 
 prog_version = "0.1"
 
-# check input files
+# build sample list
 def check_input_files(filename):
     """Checks the input file names."""
     split_re = re.compile(r"\s+")
@@ -33,17 +33,12 @@ def check_input_files(filename):
     with open(filename, "r") as i_file:
         input_filenames = [re.split(r"\s+", i.rstrip("\r\n"))
         for i in i_file.readlines()]
-    # Checking that all those files exists
+    
     for sample_files in input_filenames:
         sample_list.append(sample_files[0].replace("data/","").replace("_R1.fastq.gz","")) 
-        for input_filename in sample_files:
-            if not os.path.isfile(input_filename):
-                m = "{}: no such file".format(input_filename)
-                raise ProgramError(m)
     
     return input_filenames,sample_list
 
-# Read pipeline config file:
 
 def check_args(args):
     """Checks the arguments and options.
@@ -78,6 +73,7 @@ def std_dev(list):
     z=sum(([(x-m)**2 for x in list]))/len(list)
     return z**0.5
 
+
 def parse_args():
     """Parses the command line options and arguments.
 
@@ -100,7 +96,9 @@ def parse_args():
 
 
 def print_report(what_to_run,sample_list):
-    rmlist = ['report.toc','report.lof','report.out','report.log','report.aux']
+    isize_path=""
+    isize_list =list ()
+    rmlist =['report.toc','report.lof','report.out','report.log','report.aux','report.tex']
     pages=list ()
     val_total_read= list ()
     val_too_short= list ()
@@ -123,6 +121,9 @@ def print_report(what_to_run,sample_list):
     val_PCT_T_BASES_40X= list ()
     val_PCT_T_BASES_50X= list ()
     val_PCT_T_BASES_100X= list ()
+    val_Mean_Insert_Size= list ()
+    val_Median_Insert_Size= list ()
+    val_Standard_Deviation =list ()
     for sample in  (sample_list):   
 
         for job_index, (job, job_options) in enumerate(what_to_run):
@@ -164,26 +165,28 @@ def print_report(what_to_run,sample_list):
                             val_PCT_T_BASES_50X.append(float(PCT_T_BASES_50X))
                             val_PCT_T_BASES_100X.append(float(PCT_T_BASES_100X))
 
-         #InsertSize
-            if job.get_tool_name() ==  'MarkDuplicates' :
-                    dedup_file=glob.glob(output_dir +'/'+sample+'*.dedup')[0]
-                    myfile=open (dedup_file)
-                    data= list ()
-                    for i, line in enumerate (myfile):
-                        if i==7:
-                            data.append(line.replace("_","-").rstrip("\r\n").split("\t"))
-                            Mean_Insert_Size=data[0][4]
-                            Median_Insert_Size=data[0][0]
-                            Standard_Deviation=data[0][5]
-                            
-                            val_Mean_Insert_Size.append(float(data[0][4]))
-                            val_Median_Insert_Size.append(float(data[0][0]))
-                            val_Standard_Deviation.append(float(data[0][5]))
-        
-        #Duplicate
+         #InserSize
             if job.get_tool_name() ==  'InsertSize' :
                 isize_file=glob.glob(output_dir +'/'+sample+'*.insertsize')[0]
+                isize_graph=glob.glob(output_dir +'/'+sample+'*.png')[0]
+                isize_path=output_dir +'/all_samples.png'
                 myfile=open (isize_file)
+                data= list ()
+                for i, line in enumerate (myfile):
+                    if i==7:
+                        data.append(line.replace("_","-").rstrip("\r\n").split("\t"))
+                        Mean_Insert_Size=data[0][4]
+                        Median_Insert_Size=data[0][0]
+                        Standard_Deviation=data[0][5]
+                            
+                        val_Mean_Insert_Size.append(float(data[0][4]))
+                        val_Median_Insert_Size.append(float(data[0][0]))
+                        val_Standard_Deviation.append(float(data[0][5]))
+        
+        #Duplicate 
+            if job.get_tool_name() ==  'MarkDuplicates' :
+                dedup_file=glob.glob(output_dir +'/'+sample+'*.dedup')[0]
+                myfile=open (dedup_file)
                 data= list ()
                 for i, line in enumerate (myfile):
                     if i==7:
@@ -196,18 +199,21 @@ def print_report(what_to_run,sample_list):
                         val_Total_Duplicate.append(float(data[0][5]))
                         val_Optical_Duplicate.append(int(data[0][6])*100 / int(Total_Duplicate))
                         val_PCR_Duplicate.append(100-float(Optical_Duplicate))
-                isize_graph = glob.glob(output_dir +'/'+sample+'*.png')[0]
-        #Coverage_graph
+                        val_Duplicate_Per.append(float(data[0][7]) * 100)
+        
+       #Coverage_graph
             if job.get_tool_name() ==  'CoverageGraph' :
                     coverage_graph = glob.glob(output_dir +'/'+sample+'*.png')[0]
                     coverage_graph=coverage_graph.replace(".png",".png").replace("/"+sample,"/"+sample)
-                    shutil.copy(coverage_graph, output_dir +'/'+sample+'.png')
+                    if not os.path.isfile(output_dir +'/'+sample+'.png'):
+                        shutil.copy(coverage_graph, output_dir +'/'+sample+'.png')
                     coverage_graph=output_dir +'/'+sample+'.png'
                     rmlist.append(coverage_graph)
         #CoverageGraph_Multi
             if (job.get_tool_name() ==  'CoverageGraph_Multi' and 'coverage_graph_multi'  not  in locals()):
                     coverage_graph_multi = glob.glob(output_dir+'/all_samples*.png')[0]
-                    shutil.copy(coverage_graph_multi, output_dir+'/all_samples.png')
+                    if not os.path.isfile(output_dir +'/all_samples.png'):
+                        shutil.copy(coverage_graph_multi, output_dir+'/all_samples.png')
                     coverage_graph_multi=output_dir +'/all_samples.png'
                     rmlist.append(coverage_graph_multi)
          #ClipTrim 
@@ -424,7 +430,18 @@ the schematic of the pipeline used for run \RunName. \n\
     end="% The summary for all samples \n\
 \end{document} " 
 
-    
+    sample_num=len(sample_list)
+
+#Generate Insert Size plot
+    plt.xlabel('Sample')
+    plt.ylabel('Mean Insert Size')
+    plt.title('Histogram Mean Insert size values')
+    x = range(sample_num-1)
+    plt.axis([1,sample_num,0,500])
+    plt.plot(x,sample_num)
+    plt.grid(True)
+    plt.savefig(isize_path)
+
 #all samples page
     sample_num=len(sample_list)
     all_samples="\\begin{landscape} \n\
@@ -465,15 +482,15 @@ PCT-TARGET-BASES-100X   & "+str("%.2f"%(sum(val_PCT_T_BASES_100X)/sample_num))+"
 \hline \n\
 \\\\ \n\
 \hline \n\
-Mean Insert Size        &        & $\pm$ 10 \\\ \n\
-Median Insert Size      &        & $\pm$ 9 \\\ \n\
-Insert Size Std Dev     &         & $\pm$ 3 \\\ \n\
+Mean Insert Size        & "+str("%.2f"%(sum(val_Mean_Insert_Size)/sample_num))+"  & $\pm$ "+str("%.2f" %std_dev(val_Mean_Insert_Size))+" \\\ \n\
+Median Insert Size      & "+str("%.2f"%(sum(val_Median_Insert_Size)/sample_num))+"  & $\pm$ "+str("%.2f" %std_dev(val_Median_Insert_Size))+" \\\ \n\
+Insert Size Std Dev     & "+str("%.2f"%(sum(val_Standard_Deviation)/sample_num))+"  & $\pm$ "+str("%.2f" % std_dev(val_Standard_Deviation))+" \\\ \n\
 \hline \n\
 \end{tabular}\n\
 \end{minipage}%\n\
 \\begin{minipage}[c][6in]{5in}\n\
 \centering \n\
-\includegraphics[width=4.5in]{"+coverage_graph_multi+"}\\\ \n\
+\includegraphics[width=4.5in]{"+isize_path+"}\\\ \n\
 \\vfill \n\
 \includegraphics[width=4.5in]{"+coverage_graph_multi+"} \n\
 \end{minipage} \n\
