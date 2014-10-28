@@ -114,7 +114,7 @@ class InsertSize(PicardTools):
                          "other_opt": GenericTool.OPTIONAL}
     
     # The suffix that will be added just before the extension of the output file
-    _suffix = "InsertSize"
+    _suffix = "insertsize"
 
     # The input and output type
     _input_type = (r"\.(\S+\.)?[sb]am$", )
