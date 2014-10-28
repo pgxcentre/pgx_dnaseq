@@ -1,4 +1,4 @@
-__all__ = ["SortSam", "AddRG", "MarkDuplicates", "HsMetrics"]
+__all__ = ["SortSam", "AddRG", "MarkDuplicates", "HsMetrics" , "InsertSize"]
 
 import re
 
@@ -91,6 +91,51 @@ class HsMetrics(PicardTools):
        """Initialize a HSmetrics instance."""
        pass
 
+class InsertSize(PicardTools):
+    # The name of the tool
+    _tool_name = "InsertSize"
+
+    # The jar file
+    _jar = "CollectInsertSizeMetrics.jar"
+
+    # The options
+    _command = ("INPUT={input} OUTPUT={output} REFERENCE_SEQUENCE={reference} "
+                "HISTOGRAM_FILE={hist_file} {other_opt}")
+
+    # The STDOUT and STDERR
+    _stdout = "{output}.out"
+    _stderr = "{output}.err"
+
+    # The description of the required options
+    _required_options = {"input":     GenericTool.INPUT,
+                         "output":    GenericTool.OUTPUT,
+                         "hist_file": GenericTool.OUTPUT,
+                         "reference": GenericTool.INPUT,
+                         "other_opt": GenericTool.OPTIONAL}
+    
+    # The suffix that will be added just before the extension of the output file
+    _suffix = "InsertSize"
+
+    # The input and output type
+    _input_type = (r"\.(\S+\.)?[sb]am$", )
+    _output_type = (".{}".format(_suffix), )
+    
+    # This tool does not produce usable data...
+    _produce_data = False
+    
+    def __init__(self):
+        """Initialize a HSmetrics instance."""
+    pass
+    
+    def execute(self, options, out_dir=None):
+        """InsertSize."""
+        # The plot file
+        if "output" not in options:
+            m = "{}: no output file".format(self.__class__.__name__)
+            raise ProgramError(m)
+        plot_file =re.sub(r"\..*",".png",options["output"])
+        options["hist_file"]=plot_file
+        super(InsertSize,self).execute(options,out_dir)
 
 class AddRG(PicardTools):
 
@@ -128,7 +173,7 @@ class AddRG(PicardTools):
     def __init__(self):
         """Initialize a AddRG instance."""
         pass
-
+    
 
 class MarkDuplicates(PicardTools):
 
