@@ -8,10 +8,12 @@
 import os
 from setuptools import setup
 
-scripts = ["coverage_graph.py", "execute_pipeline.py"]
+from pgx_dna_seq import __version__
+
+scripts = ["coverage_graph.py", "execute_pipeline.py", "automatic_report.py"]
 
 setup(name="pgx_dna_seq",
-      version="0.2.3",
+      version=__version__,
       description="Automatic PGx DNA sequencing pipeline",
       author="Louis-Philippe Lemieux Perreault",
       author_email="louis-philippe.lemieux.perreault@statgen.org",

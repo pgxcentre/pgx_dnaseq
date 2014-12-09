@@ -7,7 +7,7 @@ __copyright__ = "Copyright 2014, Beaulieu-Saucier Pharmacogenomics Centre"
 __credits__ = ["Louis-Philippe Lemieux Perreault", "Abdellatif Daghrach",
                "Michal Blazejczyk"]
 __license__ = "GPL"
-__version__ = "0.2"
+__version__ = "0.3"
 __maintainer__ = "Louis-Philippe Lemieux Perreault"
 __email__ = "louis-philippe.lemieux.perreault@statgen.org"
 __status__ = "Development"
@@ -25,26 +25,38 @@ import pandas as pd
 
 def main():
     """The main function."""
-    # Getting and checking the options
-    args = parse_args()
-    check_args(args)
+    # The parser object
+    desc = "Plots NGS coverage (version {}).".format(__version__)
+    parser = argparse.ArgumentParser(description=desc)
 
-    # Reading the bed file to get the number of nucleotide that should be
-    # covered
-    nb_bases = read_bed(args.bed)
+    try:
+        # Getting and checking the options
+        args = parse_args(parser)
+        check_args(args)
 
-    # Getting the depth
-    sample_depth = None
-    sample_list = None
-    if args.bam is not None:
-        sample_depth = compute_sample_depth(args)
-        sample_list = list(sample_depth.columns)
-    else:
-        sample_depth = read_depth(args.depth_file)
-        sample_list = sample_depth.keys()
+        # Reading the bed file to get the number of nucleotide that should be
+        # covered
+        nb_bases = read_bed(args.bed)
 
-    # Plots the graph
-    plot_depth(sample_depth, nb_bases, sample_list, args)
+        # Getting the depth
+        sample_depth = None
+        sample_list = None
+        if args.bam is not None:
+            sample_depth = compute_sample_depth(args)
+            sample_list = list(sample_depth.columns)
+        else:
+            sample_depth = read_depth(args.depth_file)
+            sample_list = sample_depth.keys()
+
+        # Plots the graph
+        plot_depth(sample_depth, nb_bases, sample_list, args)
+
+    except KeyboardInterrupt:
+        print("Cancelled by user", sys.stderr)
+        sys.exit(0)
+
+    except ProgramError as e:
+        parser.error(e.message)
 
 
 def read_bed(filename):
@@ -256,7 +268,7 @@ def check_args(args):
     return True
 
 
-def parse_args():
+def parse_args(parser):
     """Parses the command line options and arguments.
 
     :returns: A :py:class:`argparse.Namespace` object created by the
@@ -286,6 +298,45 @@ def parse_args():
         :py:func:`checkArgs`).
 
     """
+    parser.add_argument("--version", action="version",
+                        version="%(prog)s {}".format(__version__))
+    parser.add_argument("--samtools-exec", type=str, metavar="PATH",
+                        help=("The PATH to the samtools executable if not in the "
+                            "$PATH variable"))
+
+    # The input files
+    group = parser.add_argument_group("Input Files")
+    group.add_argument("--depth-file", type=str, metavar="FILE", nargs="+",
+                    help=("Results from this script (to redo the plot faster) "
+                            "(one or more, separate by spaces)"))
+    group.add_argument("--bam", type=str, metavar="BAM", nargs="+",
+                    help="Input BAM file(s) (one or more, separated by spaces)")
+    group.add_argument("--bed", type=str, metavar="BED", required=True,
+                    help="BED file to restrict to targeted regions")
+
+    # The MPILEUP options
+    group = parser.add_argument_group("MPILEUP Options")
+    group.add_argument("-q", type=int, metavar="INT", default=0, dest="mapq",
+                    help=("skip alignments with mapQ smaller than INT "
+                            "[%(default)d]"))
+    group.add_argument("-Q", type=int, metavar="INT", default=13, dest="baseq",
+                    help=("skip bases with baseQ/BAQ smaller than INT "
+                            "[%(default)d]"))
+    group.add_argument("-d", type=int, metavar="INT", default=250, dest="bam_depth",
+                    help=("max per-BAM depth to avoid excessive memory usage "
+                            "[%(default)d]"))
+
+    # Plotting options
+    group = parser.add_argument_group("Plotting Options")
+    group.add_argument("--max-depth", type=int, metavar="INT",
+                    help=("The maximal depth to plot (in order to zoom in the "
+                            "plots) [None]"))
+
+    # The output
+    group = parser.add_argument_group("Output Options")
+    group.add_argument("-o", "--out", metavar="FILE", default="depth",
+                    help="The name of the output file [%(default)s]")
+
     return parser.parse_args()
 
 
@@ -311,55 +362,7 @@ class ProgramError(Exception):
         return self.message
 
 
-# The parser object
-desc = "Plots NGS coverage (version {}).".format(__version__)
-parser = argparse.ArgumentParser(description=desc)
-
-parser.add_argument("--version", action="version",
-                    version="%(prog)s {}".format(__version__))
-parser.add_argument("--samtools-exec", type=str, metavar="PATH",
-                    help=("The PATH to the samtools executable if not in the "
-                          "$PATH variable"))
-
-# The input files
-group = parser.add_argument_group("Input Files")
-group.add_argument("--depth-file", type=str, metavar="FILE", nargs="+",
-                   help=("Results from this script (to redo the plot faster) "
-                         "(one or more, separate by spaces)"))
-group.add_argument("--bam", type=str, metavar="BAM", nargs="+",
-                   help="Input BAM file(s) (one or more, separated by spaces)")
-group.add_argument("--bed", type=str, metavar="BED", required=True,
-                   help="BED file to restrict to targeted regions")
-
-# The MPILEUP options
-group = parser.add_argument_group("MPILEUP Options")
-group.add_argument("-q", type=int, metavar="INT", default=0, dest="mapq",
-                   help=("skip alignments with mapQ smaller than INT "
-                         "[%(default)d]"))
-group.add_argument("-Q", type=int, metavar="INT", default=13, dest="baseq",
-                   help=("skip bases with baseQ/BAQ smaller than INT "
-                         "[%(default)d]"))
-group.add_argument("-d", type=int, metavar="INT", default=250, dest="bam_depth",
-                   help=("max per-BAM depth to avoid excessive memory usage "
-                         "[%(default)d]"))
-
-# Plotting options
-group = parser.add_argument_group("Plotting Options")
-group.add_argument("--max-depth", type=int, metavar="INT",
-                   help=("The maximal depth to plot (in order to zoom in the "
-                         "plots) [None]"))
-
-# The output
-group = parser.add_argument_group("Output Options")
-group.add_argument("-o", "--out", metavar="FILE", default="depth",
-                   help="The name of the output file [%(default)s]")
-
 # Calling the main, if necessary
 if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        print("Cancelled by user", sys.stderr)
-        sys.exit(0)
-    except ProgramError as e:
-        parser.error(e.message)
+    main()
+
