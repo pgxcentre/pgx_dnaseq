@@ -8,6 +8,7 @@ import shutil
 import logging
 import argparse
 
+import jinja2
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -74,15 +75,10 @@ def log_options(options):
 
 def gather_samples(filename):
     """Gather the sample list."""
-    # The required regular expression
-    split_re = re.compile(r"\s+")
-    sample_re = re.compile(r"^\w+")
-
-    # Reading the input file
     all_samples = set()
     with open(filename, "r") as i_file:
         for line in i_file:
-            samples = split_re.split(line.rstrip("\n"))
+            samples = re.split(r"\s+", line.rstrip("\n"))
             samples = [os.path.basename(i) for i in samples]
 
             for sample in samples:
@@ -98,6 +94,21 @@ def gather_samples(filename):
 
 def print_report(sample_list, pipeline_steps):
     """Creates the report."""
+    # Creating the jinja2 environment
+    env = jinja2.Environment(
+        block_start_string = '\BLOCK{',
+        block_end_string = '}',
+        variable_start_string = '\VAR{',
+        variable_end_string = '}',
+        comment_start_string = '\#{',
+        comment_end_string = '}',
+        line_statement_prefix = '%-',
+        line_comment_prefix = '%#',
+        trim_blocks = True,
+        autoescape = False,
+        loader=jinja2.PackageLoader("pgx_dna_seq", "report_templates")
+    )
+    template = env.get_template("main_template.tex")
     pass
 
 
@@ -153,27 +164,6 @@ if __name__ == "__main__":
 ##     m=sum(list)/len(list)
 ##     z=sum(([(x-m)**2 for x in list]))/len(list)
 ##     return z**0.5
-## 
-## 
-## def parse_args():
-##     """Parses the command line options and arguments.
-## 
-##     :returns: A :py:class:`argparse.Namespace` object created by the
-##               :py:mod:`argparse` module. It contains the values of the different
-##               options.
-## 
-##     ===============   =======  ================================================
-##         Options        Type                      Description
-##     ===============   =======  ================================================
-##     ===============   =======  ================================================
-## 
-##     .. note::
-##         No option check is done here (except for the one automatically done by
-##         :py:mod:`argparse`). Those need to be done elsewhere (see
-##         :py:func:`checkArgs`).
-## 
-##     """
-##     return parser.parse_args()
 ## 
 ## 
 ## def print_report(what_to_run,sample_list):
@@ -592,14 +582,3 @@ if __name__ == "__main__":
 ## # remove intermediate file
 ##     for i in  (rmlist):
 ##         os.remove(i)
-## 
-## 
-## 
-## try:
-## 
-## except KeyboardInterrupt:
-##     print >>sys.stderr, "Cancelled by user"
-##     sys.exit(0)
-## except ProgramError as e:
-##     parser.error(e.message)
-
