@@ -43,19 +43,13 @@ def main():
         log_options(args)
 
         # Gathering the samples
-        t, sample_list = gather_samples(args.input)
-        print(sample_list)
+        sample_list = gather_samples(args.input)
 
-##         #get run name
-##         run_name="Sequencing_Run"
-##         run_name=args.run_name
-##         run_name=run_name.replace("_", "\_")
-##         # Checking the input files
-##         
-##         #Print report
-##         # Getting the pipeline steps
-##         what_to_run = get_pipeline_steps(args.pipeline_config)
-##         print_report (what_to_run,sample_list)
+        # Getting the pipeline steps
+        steps = get_pipeline_steps(args.pipeline_config)
+
+        # Printing the report
+        print_report(sample_list, steps)
 
     except KeyboardInterrupt:
         logging.info("Cancelled by user")
@@ -82,29 +76,29 @@ def gather_samples(filename):
     """Gather the sample list."""
     # The required regular expression
     split_re = re.compile(r"\s+")
+    sample_re = re.compile(r"^\w+")
 
     # Reading the input file
-    samples = None
+    all_samples = set()
     with open(filename, "r") as i_file:
         for line in i_file:
             samples = split_re.split(line.rstrip("\n"))
             samples = [os.path.basename(i) for i in samples]
-            print(samples)
 
-    return None, None
-    split_re = re.compile(r"\s+")
-    input_filenames = None
-    sample_list = list ()
-    with open(filename, "r") as i_file:
-        input_filenames = [re.split(r"\s+", i.rstrip("\r\n"))
-        for i in i_file.readlines()]
+            for sample in samples:
+                if sample.endswith(".fastq") or sample.endswith(".fastq.gz"):
+                    all_samples.add(re.search(r"(^\w+)_R[12]", sample).group(1))
 
-    print(input_filenames)
-    
-    for sample_files in input_filenames:
-        sample_list.append(sample_files[0].replace("data/","").replace("_R1.fastq.gz","")) 
-    
-    return input_filenames,sample_list
+                else:
+                    all_samples.add(re.search(r"\w+", sample).group())
+
+    logging.info("Found {:,d} samples".format(len(all_samples)))
+    return sorted(all_samples)
+
+
+def print_report(sample_list, pipeline_steps):
+    """Creates the report."""
+    pass
 
 
 def check_args(args):
