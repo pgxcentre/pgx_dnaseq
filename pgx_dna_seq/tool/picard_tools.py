@@ -138,6 +138,7 @@ class InsertSize(PicardTools):
         options["hist_file"]=plot_file
         super(InsertSize,self).execute(options,out_dir)
 
+
 class AddRG(PicardTools):
 
     # The name of the tool
