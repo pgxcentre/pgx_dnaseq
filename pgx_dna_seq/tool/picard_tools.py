@@ -91,6 +91,7 @@ class HsMetrics(PicardTools):
        """Initialize a HSmetrics instance."""
        pass
 
+
 class InsertSize(PicardTools):
     # The name of the tool
     _tool_name = "InsertSize"
