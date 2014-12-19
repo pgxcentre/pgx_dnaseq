@@ -55,7 +55,7 @@ linkcolor={link_blue},citecolor={link_blue},urlcolor={link_blue}}
 \usepackage{arydshln} 
 
  % The Report number... 
-\newcommand{\RunName}{Sequencing\_Run} 
+\newcommand{\RunName}{\VAR{ run_name }}
 
 % Fancy header 
 \setlength{\headheight}{18pt} 
@@ -111,176 +111,127 @@ linkcolor={link_blue},citecolor={link_blue},urlcolor={link_blue}}
 \microtypesetup{protrusion=true} % enables protrusion
 \cleardoublepage
 \section{Overview}
-This report includes metrics collected using picard Hsmetrics , picard
-MarkDuplicate , picard insert size metrics . 
- Figure~\ref{pipeline_overview} 
-the schematic of the pipeline used for run \RunName. 
+The following steps were performed: \VAR{ summary }. This report includes
+metrics collected using \VAR{ metrics_from }.
+\BLOCK{ if flowchart is not none }
+\\
+
+Figure~\ref{pipeline_overview} the schematic of the pipeline used for run
+\RunName. 
 
 \begin{figure}[H]
-\centering 
-\includegraphics[width=0.6\textwidth]{images/flowchart.pdf} 
-\caption[Pipeline overview]{Overview of the pipeline used for run 
-\RunName.\label{pipeline_overview}} 
-\end{figure} 
-
-\begin{landscape} 
-\subsection{all\_sample} 
-\begin{minipage}[c][6in]{9.3in} 
-\centering 
-\begin{minipage}[c][6in]{4in}
 \centering
-\begin{tabular}{lrl}
-\multicolumn{3}{l}{Clipping/Trimming} \\ 
+\includegraphics[width=\textwidth]{\VAR{ flowchart }}
+\caption[Pipeline overview]{Overview of the pipeline used for run
+\RunName.\label{pipeline_overview}}
+\end{figure}
+\BLOCK{ endif }
 
-\hline 
-Total read              & 500000.00& $\pm$ 0.00  \\ 
-Too short after clip    & 3796.00 & $\pm$ 165.00\\ 
-Trimmed R1              & 36425.50 & $\pm$ 688.50\\ 
-Trimmed R2              & 62169.50 & $\pm$ 1715.50 \\ 
-\hline 
-\\\\ 
-\multicolumn{3}{l}{HS Metrics} \\ 
-\hline 
-Total Reads             & 988087.50 & $\pm$ 826.50\\ 
-Total Duplicate         & 955.00\%  & $\pm$ 33.00\\ 
-Duplicate Percentage    & 0.19\%  & $\pm$ 0.01 \\ 
-Optical Duplicate       & 100.00\%  & $\pm$ 0.00 \\ 
-PCR Duplicate           & 0.00\%  & $\pm$ 0.00 \\ 
-Off-Bait                & 6259324.50  & $\pm$ 573700.50 \\ 
-Mean Bait Coverage      & 1.41  & $\pm$ 0.01 \\ 
-Mean Target Coverage    & 1.95  & $\pm$ 0.02 \\ 
-Fold Enrichement        & 45.39  & $\pm$ 0.35 \\ 
-Zero CVG Target         & 0.40\%  & $\pm$ 0.00 \\ 
-PCT-TARGET-BASES-2X     & 0.35\%  & $\pm$ 0.00 \\ 
-PCT-TARGET-BASES-10X    & 0.01\%  & $\pm$ 0.00 \\ 
-PCT-TARGET-BASES-20X    & 0.00\%  & $\pm$  0.00\\ 
-PCT-TARGET-BASES-30X    & 0.00\%  & $\pm$ 0.00 \\ 
-PCT-TARGET-BASES-40X    & 0.00\%  & $\pm$ 0.00 \\ 
-PCT-TARGET-BASES-50X    & 0.00\%  & $\pm$ 0.00 \\ 
-PCT-TARGET-BASES-100X   & 0.00\%  & $\pm$ 0.00\\ 
-\hline 
-\\ 
-\hline 
-Mean Insert Size        & 207.23  & $\pm$ 0.65 \\ 
-Median Insert Size      & 193.50  & $\pm$ 0.50 \\ 
-Insert Size Std Dev     & 68.62  & $\pm$ 3.23 \\ 
-\hline 
-\end{tabular}
-\end{minipage}%
-\begin{minipage}[c][6in]{5in}
-\centering 
-\includegraphics[width=4.5in]{output/12_InsertSize/all_samples.png}\\ 
-\vfill 
-\includegraphics[width=4.5in]{output/13_CoverageGraph_Multi/all_samples.png} 
-\end{minipage} 
-\end{minipage} 
-\end{landscape} 
-
- \begin{landscape} 
-\subsection{NA12877} 
-\begin{minipage}[c][6in]{9.3in} 
-\centering 
-\begin{minipage}[c][6in]{4in}
-\centering
-\begin{tabular}{lrl}
-\multicolumn{3}{l}{Clipping/Trimming} \\ 
-
-\hline 
-Total read              & 500000 \\ 
-Too short after clip    & 3631  \\ 
-Trimmed R1              & 35737 \\ 
-Trimmed R2              & 60454  \\ 
-\hline 
-\\\\ 
-\multicolumn{3}{l}{HS Metrics} \\ 
-\hline 
-Total Reads             & 988914.00  \\ 
-Total Duplicate         & 988.00  \\ 
-Duplicate Percentage    & 0.20\%   \\ 
-Optical Duplicate       & 100.00\%   \\ 
-PCR Duplicate           & 0.00\%   \\ 
-Off-Bait                & 5685624.00   \\ 
-Mean Bait Coverage      & 1.43   \\ 
-Mean Target Coverage    & 1.97   \\ 
-Fold Enrichement        & 45.74   \\ 
-Zero CVG Target         & 0.40\%  \\ 
-PCT-TARGET-BASES-2X     & 0.35\%   \\ 
-PCT-TARGET-BASES-10X    & 0.01\%   \\ 
-PCT-TARGET-BASES-20X    & 0.00\%   \\ 
-PCT-TARGET-BASES-30X    & 0.00\%   \\ 
-PCT-TARGET-BASES-40X    & 0.00\%   \\ 
-PCT-TARGET-BASES-50X    & 0.00\%   \\ 
-PCT-TARGET-BASES-100X   & 0.00\%   \\ 
-\hline 
-\\ 
-\hline 
-Mean Insert Size        & 206.59 \\ 
-Median Insert Size      & 194.00 \\ 
-Insert Size Std Dev     & 65.39 \\ 
-\hline 
-\end{tabular}
-\end{minipage}%
-\begin{minipage}[c][6in]{5in}
-\centering 
-\includegraphics[width=4.5in]{output/12_InsertSize/NA12877.png}\\ 
-\vfill 
-\includegraphics[width=4.5in]{output/14_CoverageGraph/NA12877.png} 
-\end{minipage} 
-\end{minipage} 
-\end{landscape} 
-
- \begin{landscape} 
-\subsection{NA12878} 
-\begin{minipage}[c][6in]{9.3in} 
-\centering 
-\begin{minipage}[c][6in]{4in}
-\centering
-\begin{tabular}{lrl}
-\multicolumn{3}{l}{Clipping/Trimming} \\ 
-
-\hline 
-Total read              & 500000 \\ 
-Too short after clip    & 3961  \\ 
-Trimmed R1              & 37114 \\ 
-Trimmed R2              & 63885  \\ 
-\hline 
-\\\\ 
-\multicolumn{3}{l}{HS Metrics} \\ 
-\hline 
-Total Reads             & 987261.00  \\ 
-Total Duplicate         & 922.00  \\ 
-Duplicate Percentage    & 0.19\%   \\ 
-Optical Duplicate       & 100.00\%   \\ 
-PCR Duplicate           & 0.00\%   \\ 
-Off-Bait                & 6833025.00   \\ 
-Mean Bait Coverage      & 1.40   \\ 
-Mean Target Coverage    & 1.93   \\ 
-Fold Enrichement        & 45.04   \\ 
-Zero CVG Target         & 0.40\%  \\ 
-PCT-TARGET-BASES-2X     & 0.34\%   \\ 
-PCT-TARGET-BASES-10X    & 0.01\%   \\ 
-PCT-TARGET-BASES-20X    & 0.00\%   \\ 
-PCT-TARGET-BASES-30X    & 0.00\%   \\ 
-PCT-TARGET-BASES-40X    & 0.00\%   \\ 
-PCT-TARGET-BASES-50X    & 0.00\%   \\ 
-PCT-TARGET-BASES-100X   & 0.00\%   \\ 
-\hline 
-\\ 
-\hline 
-Mean Insert Size        & 207.88 \\ 
-Median Insert Size      & 193.00 \\ 
-Insert Size Std Dev     & 71.84 \\ 
-\hline 
-\end{tabular}
-\end{minipage}%
-\begin{minipage}[c][6in]{5in}
-\centering 
-\includegraphics[width=4.5in]{output/12_InsertSize/NA12878.png}\\ 
-\vfill 
-\includegraphics[width=4.5in]{output/14_CoverageGraph/NA12878.png} 
-\end{minipage} 
-\end{minipage} 
-\end{landscape} 
+%%  \begin{landscape} 
+%% \subsection{NA12877} 
+%% \begin{minipage}[c][6in]{9.3in} 
+%% \centering 
+%% \begin{minipage}[c][6in]{4in}
+%% \centering
+%% \begin{tabular}{lrl}
+%% \multicolumn{3}{l}{Clipping/Trimming} \\ 
+%% 
+%% \hline 
+%% Total read              & 500000 \\ 
+%% Too short after clip    & 3631  \\ 
+%% Trimmed R1              & 35737 \\ 
+%% Trimmed R2              & 60454  \\ 
+%% \hline 
+%% \\\\ 
+%% \multicolumn{3}{l}{HS Metrics} \\ 
+%% \hline 
+%% Total Reads             & 988914.00  \\ 
+%% Total Duplicate         & 988.00  \\ 
+%% Duplicate Percentage    & 0.20\%   \\ 
+%% Optical Duplicate       & 100.00\%   \\ 
+%% PCR Duplicate           & 0.00\%   \\ 
+%% Off-Bait                & 5685624.00   \\ 
+%% Mean Bait Coverage      & 1.43   \\ 
+%% Mean Target Coverage    & 1.97   \\ 
+%% Fold Enrichement        & 45.74   \\ 
+%% Zero CVG Target         & 0.40\%  \\ 
+%% PCT-TARGET-BASES-2X     & 0.35\%   \\ 
+%% PCT-TARGET-BASES-10X    & 0.01\%   \\ 
+%% PCT-TARGET-BASES-20X    & 0.00\%   \\ 
+%% PCT-TARGET-BASES-30X    & 0.00\%   \\ 
+%% PCT-TARGET-BASES-40X    & 0.00\%   \\ 
+%% PCT-TARGET-BASES-50X    & 0.00\%   \\ 
+%% PCT-TARGET-BASES-100X   & 0.00\%   \\ 
+%% \hline 
+%% \\ 
+%% \hline 
+%% Mean Insert Size        & 206.59 \\ 
+%% Median Insert Size      & 194.00 \\ 
+%% Insert Size Std Dev     & 65.39 \\ 
+%% \hline 
+%% \end{tabular}
+%% \end{minipage}%
+%% \begin{minipage}[c][6in]{5in}
+%% \centering 
+%% \includegraphics[width=4.5in]{output/12_InsertSize/NA12877.png}\\ 
+%% \vfill 
+%% \includegraphics[width=4.5in]{output/14_CoverageGraph/NA12877.png} 
+%% \end{minipage} 
+%% \end{minipage} 
+%% \end{landscape} 
+%% 
+%%  \begin{landscape} 
+%% \subsection{NA12878} 
+%% \begin{minipage}[c][6in]{9.3in} 
+%% \centering 
+%% \begin{minipage}[c][6in]{4in}
+%% \centering
+%% \begin{tabular}{lrl}
+%% \multicolumn{3}{l}{Clipping/Trimming} \\ 
+%% 
+%% \hline 
+%% Total read              & 500000 \\ 
+%% Too short after clip    & 3961  \\ 
+%% Trimmed R1              & 37114 \\ 
+%% Trimmed R2              & 63885  \\ 
+%% \hline 
+%% \\\\ 
+%% \multicolumn{3}{l}{HS Metrics} \\ 
+%% \hline 
+%% Total Reads             & 987261.00  \\ 
+%% Total Duplicate         & 922.00  \\ 
+%% Duplicate Percentage    & 0.19\%   \\ 
+%% Optical Duplicate       & 100.00\%   \\ 
+%% PCR Duplicate           & 0.00\%   \\ 
+%% Off-Bait                & 6833025.00   \\ 
+%% Mean Bait Coverage      & 1.40   \\ 
+%% Mean Target Coverage    & 1.93   \\ 
+%% Fold Enrichement        & 45.04   \\ 
+%% Zero CVG Target         & 0.40\%  \\ 
+%% PCT-TARGET-BASES-2X     & 0.34\%   \\ 
+%% PCT-TARGET-BASES-10X    & 0.01\%   \\ 
+%% PCT-TARGET-BASES-20X    & 0.00\%   \\ 
+%% PCT-TARGET-BASES-30X    & 0.00\%   \\ 
+%% PCT-TARGET-BASES-40X    & 0.00\%   \\ 
+%% PCT-TARGET-BASES-50X    & 0.00\%   \\ 
+%% PCT-TARGET-BASES-100X   & 0.00\%   \\ 
+%% \hline 
+%% \\ 
+%% \hline 
+%% Mean Insert Size        & 207.88 \\ 
+%% Median Insert Size      & 193.00 \\ 
+%% Insert Size Std Dev     & 71.84 \\ 
+%% \hline 
+%% \end{tabular}
+%% \end{minipage}%
+%% \begin{minipage}[c][6in]{5in}
+%% \centering 
+%% \includegraphics[width=4.5in]{output/12_InsertSize/NA12878.png}\\ 
+%% \vfill 
+%% \includegraphics[width=4.5in]{output/14_CoverageGraph/NA12878.png} 
+%% \end{minipage} 
+%% \end{minipage} 
+%% \end{landscape} 
 
  % The summary for all samples 
 \end{document} 

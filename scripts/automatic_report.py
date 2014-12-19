@@ -7,6 +7,7 @@ import glob
 import shutil
 import logging
 import argparse
+from subprocess import Popen, PIPE, TimeoutExpired
 
 import jinja2
 import matplotlib
@@ -50,7 +51,7 @@ def main():
         steps = get_pipeline_steps(args.pipeline_config)
 
         # Printing the report
-        print_report(sample_list, steps)
+        print_report(sample_list, steps, args)
 
     except KeyboardInterrupt:
         logging.info("Cancelled by user")
@@ -92,7 +93,7 @@ def gather_samples(filename):
     return sorted(all_samples)
 
 
-def print_report(sample_list, pipeline_steps):
+def print_report(sample_list, pipeline_steps, options):
     """Creates the report."""
     # Creating the jinja2 environment
     env = jinja2.Environment(
@@ -108,8 +109,105 @@ def print_report(sample_list, pipeline_steps):
         autoescape = False,
         loader=jinja2.PackageLoader("pgx_dna_seq", "report_templates")
     )
-    template = env.get_template("main_template.tex")
-    pass
+
+    # Getting the flowchart (either PNG or PDF only)
+    flowchart = None
+    if os.path.isfile("flowchart.pdf"):
+        flowchart = "flowchart.pdf"
+    elif os.path.isfile("flowchart.png"):
+        flowchart = "flowchart.png"
+
+    # Creating the data to put into the final report
+    report_data = {
+        "run_name":     sanitize_tex(options.run_name),
+        "flowchart":    flowchart,
+        "summary":      sanitize_tex(get_pipeline_summary(pipeline_steps)),
+        "metrics_from": sanitize_tex(pretty_join(["HsMetrics", "MarkDuplicate",
+                                                  "InsertSize"])),
+    }
+
+    # The name of the TEX file
+    report_filename = re.sub(r"\.pdf$", ".tex", options.output)
+
+    # Creating the TEX using the main template
+    try:
+        template = env.get_template("main_template.tex")
+        with open(report_filename, "w") as o_file:
+            print(template.render(**report_data), file=o_file)
+
+    except FileNotFoundError:
+        raise ProgramError("{}: cannot write file".format(report_filename))
+
+    # The output directory
+    out_dir = os.path.dirname(options.output)
+    out_dir = out_dir if out_dir else "."
+
+##     # Now copying the images for the report
+##     image_dir = resource_filename(__name__, "templates/images")
+##     image_dest = os.path.join(os.getcwd(), "images")
+##     try:
+##         copytree(image_dir, image_dest)
+##     except FileExistsError:
+##         raise ProgramError("directory 'images' exists in the working "
+##                            "directory, please rename/remove and run again")
+
+    # Compiling the LaTeX report (2 times)
+    command = ["pdflatex", "-halt-on-error", "-output-directory", out_dir,
+               report_filename]
+    try:
+        for i in range(2):
+            # Executing the command
+            proc = Popen(command, stdout=PIPE, stderr=PIPE)
+
+            # Waiting for the process to terminate
+            try:
+                outs, errs = proc.communicate(timeout=60)
+
+            except TimeoutExpired:
+                # Killing the process
+                proc.kill()
+                m = ("something went wrong while compiling the report: try "
+                     "running the following "
+                     "command\n\t{}".format(" ".join(command)))
+                raise ProgramError(m)
+
+            # Getting the return code
+            rc = proc.returncode
+            if rc != 0:
+                # There was a problem...
+                m = ("problem while compiling the report: check log "
+                     "'{}'".format(re.sub(r"\.pdf", ".log", options.output)))
+                raise ProgramError(m)
+
+    except FileNotFoundError:
+        m = "'{}' is not installed".format(command[0])
+        raise ProgramError(m)
+
+    # Now, we want to delete the following extensions
+    ext_to_delete = [".aux", ".lot", ".log", ".toc", ".out"]
+    for ext in ext_to_delete:
+        file_to_delete = re.sub(r"\.pdf", ext, options.output)
+        if os.path.isfile(file_to_delete):
+            os.remove(file_to_delete)
+
+
+def get_pipeline_summary(steps):
+    """Gets the pipeline summary."""
+    steps = [r"\texttt{" + i.get_tool_name() + "}" for i, j in steps]
+    return pretty_join(steps)
+
+
+def pretty_join(items):
+    """Pretty join a list for English."""
+    return ", ".join(items[:-1]) + " and " + items[-1]
+
+
+def sanitize_tex(text):
+    """Sanitize TeX text."""
+    text = text.replace("_", r"\_")
+    text = text.replace("#", r"\#")
+
+    return text
 
 
 def check_args(args):
@@ -123,6 +221,10 @@ def check_args(args):
     if not os.path.isfile(args.input):
         m = "{}: no such file".format(args.input)
         raise ProgramError(m)
+
+    # Checking the output report
+    if not args.output.endswith(".pdf"):
+        args.output += ".pdf"
    
     return True
 
@@ -148,6 +250,9 @@ def parse_args(parser):
     group.add_argument("-r", "--run-name", type=str, metavar="STRING",
                        default="Sequencing_Run",
                        help="The Sequencing run name [%(default)s]")
+    group.add_argument("-o", "--output", type=str, metavar="FILE",
+                       default="dna_seq_report.pdf",
+                       help="The name of the final report [%(default)s]")
 
     return parser.parse_args()
 
