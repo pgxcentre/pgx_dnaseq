@@ -386,3 +386,9 @@ class GenericTool(object):
 
         # Returning the "safe" options
         return safe_options
+
+    def read_report(self, *kargs, **kwargs):
+        """Reads the report from one prefix."""
+        raise NotImplementedError("No reporting options for "
+                                  "'{}'".format(self.get_tool_name()))
+

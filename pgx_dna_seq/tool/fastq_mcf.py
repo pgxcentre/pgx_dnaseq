@@ -1,5 +1,8 @@
 __all__ = ["ClipTrim"]
 
+import re
+from glob import glob
+
 from pgx_dna_seq.tool import GenericTool
 
 
@@ -50,3 +53,39 @@ class ClipTrim(FastQMCF):
     def __init__(self):
         """Initialize a ClipTrim instance."""
         pass
+
+    def read_report(self, prefix):
+        """Reads a ClipTrim report file."""
+        # Getting the report file name
+        filename = glob("{}.out".format(prefix))
+        assert len(filename) == 1
+        filename = filename[0]
+
+        # Reading the content
+        content = None
+        with open(filename, "r") as i_file:
+            content = i_file.read()
+
+        # Getting the total number of reads
+        nb_reads = int(re.search(r"Total reads: (\d+)", content).group(1)) * 2
+
+        # Getting the number of reads that were too short
+        nb_shorts = re.search(r"Too short after clip: (\d+)", content)
+        nb_shorts = int(nb_shorts.group(1)) * 2
+
+        # The number of trimmed reads
+        trim_r1 = re.search(r"Trimmed (\d+) reads .*_R1\.fastq\.gz", content)
+        trim_r1 = int(trim_r1.group(1))
+        trim_r2 = re.search(r"Trimmed (\d+) reads .*_R2\.fastq\.gz", content)
+        trim_r2 = int(trim_r2.group(1))
+
+        # Saving the results
+        result = {
+            "total_reads_before_trim":   nb_reads,
+            "nb_short_reads_after_trim": nb_shorts,
+            "nb_trimmed_r1":             trim_r1,
+            "nb_trimmed_r2":             trim_r2,
+        }
+
+        return result
+

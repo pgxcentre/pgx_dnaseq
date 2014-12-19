@@ -1,6 +1,8 @@
 __all__ = ["SortSam", "AddRG", "MarkDuplicates", "HsMetrics" , "InsertSize"]
 
+import os
 import re
+from glob import glob
 
 from pgx_dna_seq.tool.java import JAR
 from pgx_dna_seq.tool import GenericTool
@@ -91,6 +93,29 @@ class HsMetrics(PicardTools):
        """Initialize a HSmetrics instance."""
        pass
 
+    def read_report(self, prefix):
+        """Reads a HsMetrics report file."""
+        # Getting the report file name
+        filename = glob("{}*.{}".format(prefix, self._suffix))
+        assert len(filename) == 1
+        filename = filename[0]
+
+        result = {}
+        with open(filename, "r") as i_file:
+            # Reading until the header
+            header = i_file.readline()
+            while not header.startswith("## METRICS"):
+                header = i_file.readline()
+
+            # The two rows (header and data)
+            header = i_file.readline().rstrip("\n").split("\t")
+            data = i_file.readline().rstrip("\n").split("\t")
+
+            for name, value in zip(header, data):
+                result[name.lower()] = value
+
+        return result
+
 
 class InsertSize(PicardTools):
     # The name of the tool
@@ -137,6 +162,61 @@ class InsertSize(PicardTools):
         plot_file =re.sub(r"\..*",".png",options["output"])
         options["hist_file"]=plot_file
         super(InsertSize,self).execute(options,out_dir)
+
+    def read_report(self, prefix):
+        """Reads a InsertSize report file."""
+        import pandas as pd
+        import matplotlib.pyplot as plt
+
+        # Getting the report file name
+        filename = glob("{}*.{}".format(prefix, self._suffix))
+        assert len(filename) == 1
+        filename = filename[0]
+
+        result = {}
+        with open(filename, "r") as i_file:
+            # Reading until the header
+            header = i_file.readline()
+            while header.startswith("#") or header == "\n":
+                header = i_file.readline()
+
+            # The two rows (header and data)
+            header = header.rstrip("\n").split("\t")
+            data = i_file.readline().rstrip("\n").split("\t")
+
+            for name, value in zip(header, data):
+                result[name.lower()] = value
+
+            # Then, reading until the histogram
+            line = i_file.readline()
+            while not line.startswith("## HISTOGRAM"):
+                line = i_file.readline()
+
+            # Plotting the barplot
+            hist_data = pd.read_csv(i_file, sep="\t")
+
+            # The figure and axe
+            figure, axe = plt.subplots(1, 1, figsize=(12, 5))
+            axe.bar(hist_data.insert_size, hist_data["All_Reads.fr_count"],
+                    align="center", color="#0099CC", edgecolor="#0099CC", lw=0)
+
+            # The labels
+            axe.set_title("{} - Insert Size".format(os.path.basename(prefix)),
+                          weight="bold", fontsize=12)
+            axe.set_xlabel("Size", weight="bold", fontsize=10)
+            axe.set_ylabel("Count", weight="bold", fontsize=10)
+
+            # The tick labels fontsize
+            axe.tick_params(axis='both', which='major', labelsize=8)
+
+            # Saving the figure
+            figname = "{}_{}.pdf".format(prefix, self._suffix)
+            plt.savefig(figname, figure=figure, bbox_inches="tight")
+            plt.close(figure)
+
+            result["hist_figname"] = figname
+
+        return result
 
 
 class AddRG(PicardTools):
@@ -218,3 +298,27 @@ class MarkDuplicates(PicardTools):
         metrics_file = re.sub(r"\.[sb]am$", ".dedup", options["output"])
         options["metrics"] = metrics_file
         super(MarkDuplicates, self).execute(options, out_dir)
+
+    def read_report(self, prefix):
+        """Reads a MarkDuplicates report file."""
+        # Getting the report file name
+        filename = glob("{}*.{}".format(prefix, self._suffix))
+        assert len(filename) == 1
+        filename = filename[0]
+
+        result = {}
+        with open(filename, "r") as i_file:
+            # Reading until the header
+            header = i_file.readline()
+            while not header.startswith("## METRICS"):
+                header = i_file.readline()
+
+            # The two rows (header and data)
+            header = i_file.readline().rstrip("\n").split("\t")
+            data = i_file.readline().rstrip("\n").split("\t")
+
+            for name, value in zip(header, data):
+                result[name.lower()] = value
+
+        return result
+

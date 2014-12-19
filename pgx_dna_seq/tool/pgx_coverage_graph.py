@@ -1,6 +1,8 @@
 __all__ = ["CoverageGraph", "CoverageGraph_Multi"]
 
 import re
+from glob import glob
+from shutil import copyfile
 
 from pgx_dna_seq.tool import GenericTool
 from pgx_dna_seq.tool.samtools import IndexBam
@@ -67,6 +69,24 @@ class CoverageGraph(PGx_CoverageGraph):
         # Executing the software
         super(CoverageGraph, self).execute(options, out_dir)
 
+    def read_report(self, prefix):
+        """Reads a CoverageGraph report file."""
+        # Getting the report file name
+        filename = glob("{}*.{}.png".format(prefix, self._suffix))
+        assert len(filename) == 1
+        filename = filename[0]
+
+        # Copying the file
+        new_filename = "{}_{}.png".format(prefix, self.get_tool_name())
+        copyfile(filename, new_filename)
+
+        # Saving the results
+        result = {
+            "coverage_figname": new_filename,
+        }
+
+        return result
+
 
 class CoverageGraph_Multi(PGx_CoverageGraph):
 
@@ -119,3 +139,22 @@ class CoverageGraph_Multi(PGx_CoverageGraph):
 
         # Executing the software
         super(CoverageGraph_Multi, self).execute(options, out_dir)
+
+    def read_report(self, prefix):
+        """Reads a CoverageGraph report file."""
+        # Getting the report file name
+        filename = glob("{}*.{}.png".format(prefix, self._suffix))
+        assert len(filename) == 1
+        filename = filename[0]
+
+        # Copying the file
+        new_filename = "{}_{}.png".format(prefix, self.get_tool_name())
+        copyfile(filename, new_filename)
+
+        # Saving the results
+        result = {
+            "coverage_multi_figname": new_filename,
+        }
+
+        return result
+
