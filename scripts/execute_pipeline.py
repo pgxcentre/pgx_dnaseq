@@ -184,8 +184,8 @@ if __name__ == "__main__":
 
             # The output directory
             output_dir = os.path.join("output",
-                                    "{:02d}_{}".format(job_index + 1,
-                                                        job.get_tool_name()))
+                                      "{:02d}_{}".format(job_index + 1,
+                                                         job.get_tool_name()))
             # Creating the output directory
             if not os.path.isdir(output_dir):
                 os.makedirs(output_dir)
