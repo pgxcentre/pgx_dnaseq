@@ -11,6 +11,7 @@ from subprocess import Popen, PIPE, TimeoutExpired
 
 import jinja2
 import matplotlib.pyplot as plt
+from pkg_resources import resource_filename
 
 from pgx_dna_seq import ProgramError
 from pgx_dna_seq.read_config import get_pipeline_steps
@@ -124,7 +125,12 @@ def print_report(sample_list, pipeline_steps, options):
                                                             jinja2_env)
 
     # Creating the data to put into the final report
+    resource_prefix = "report_templates/images/"
     report_data = {
+        "logo_small":     resource_filename("pgx_dna_seq", resource_prefix +
+                                            "pgx_logo_small.png"),
+        "logo":           resource_filename("pgx_dna_seq",
+                                            resource_prefix + "pgx_logo.pdf"),
         "run_name":       sanitize_tex(options.run_name),
         "flowchart":      flowchart,
         "report_content": report_content,
@@ -150,15 +156,6 @@ def print_report(sample_list, pipeline_steps, options):
     # The output directory
     out_dir = os.path.dirname(options.output)
     out_dir = out_dir if out_dir else "."
-
-##     # Now copying the images for the report
-##     image_dir = resource_filename(__name__, "templates/images")
-##     image_dest = os.path.join(os.getcwd(), "images")
-##     try:
-##         copytree(image_dir, image_dest)
-##     except FileExistsError:
-##         raise ProgramError("directory 'images' exists in the working "
-##                            "directory, please rename/remove and run again")
 
     # Compiling the LaTeX report (2 times)
     command = ["pdflatex", "-halt-on-error", "-output-directory", out_dir,
@@ -193,7 +190,7 @@ def print_report(sample_list, pipeline_steps, options):
         raise ProgramError(m)
 
     # Now, we want to delete the following extensions
-    ext_to_delete = [".aux", ".lot", ".log", ".toc", ".out"]
+    ext_to_delete = [".aux", ".lot", ".log", ".toc", ".out", ".lof", ".tex"]
     for ext in ext_to_delete:
         file_to_delete = re.sub(r"\.pdf", ext, options.output)
         if os.path.isfile(file_to_delete):
