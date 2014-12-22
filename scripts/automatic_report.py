@@ -1,5 +1,17 @@
 #!/usr/bin/env python3
 
+
+__author__ = "Louis-Philippe Lemieux Perreault and Abdellatif Daghrach"
+__copyright__ = "Copyright 2014, Beaulieu-Saucier Pharmacogenomics Centre"
+__credits__ = ["Louis-Philippe Lemieux Perreault", "Abdellatif Daghrach",
+               "Michal Blazejczyk"]
+__license__ = "GPL"
+__version__ = "0.1"
+__maintainer__ = "Louis-Philippe Lemieux Perreault"
+__email__ = "louis-philippe.lemieux.perreault@statgen.org"
+__status__ = "Development"
+
+
 import os
 import re
 import sys
@@ -17,13 +29,10 @@ from pgx_dna_seq import ProgramError
 from pgx_dna_seq.read_config import get_pipeline_steps
 
 
-prog_version = "0.1"
-
-
 def main():
     """The main function."""
     # Creating the option parser
-    desc = "Generate automatic report (version {}).".format(prog_version)
+    desc = "Generate automatic report (version {}).".format(__version__)
     parser = argparse.ArgumentParser(description=desc)
 
     # Running the script
@@ -762,7 +771,7 @@ def check_args(args):
 def parse_args(parser):
     """Parses the command line options and arguments."""
     parser.add_argument("-v", "--version", action="version",
-                        version="%(prog)s version {}".format(prog_version))
+                        version="%(prog)s version {}".format(__version__))
     parser.add_argument("--debug", action="store_true",
                         help="Set the log level to debug.")
 
