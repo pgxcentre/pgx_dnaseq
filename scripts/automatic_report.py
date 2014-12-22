@@ -7,7 +7,8 @@ import glob
 import shutil
 import logging
 import argparse
-from collections import defaultdict, OrderedDict
+from statistics import mean, stdev
+from collections import defaultdict, defaultdict
 from subprocess import Popen, PIPE, TimeoutExpired
 
 import jinja2
@@ -316,6 +317,10 @@ def construct_report_content(samples, pipeline_steps, jinja2_env):
                 "coverage_multi_figname": str,
             }
 
+            final_data = gather_values(data, req_values, final_data, sample,
+                                       prefix)
+
+    sample_summary = defaultdict(list)
     final_tables = []
     for sample in sorted(final_data.keys()):
         sample_data = final_data[sample]
@@ -338,6 +343,12 @@ def construct_report_content(samples, pipeline_steps, jinja2_env):
                            ["Trimmed R2", "{:,d}".format(trimmed_r2)]],
             })
 
+            # Saving for the sample_summary
+            sample_summary["total_reads_before_trim"].append(total_reads)
+            sample_summary["nb_short_reads_after_trim"].append(too_short)
+            sample_summary["nb_trimmed_r1"].append(trimmed_r1)
+            sample_summary["nb_trimmed_r2"].append(trimmed_r2)
+
         # Mark duplicates
         if "MarkDuplicates" in available_steps:
             rp_dup = sample_data["read_pair_duplicates"]
@@ -355,6 +366,12 @@ def construct_report_content(samples, pipeline_steps, jinja2_env):
                            ["Optical duplicate", r"{:,.2f}\%".format(optical_dup)],
                            ["PCR duplicate", r"{:,.2f}\%".format(pcr_dup)]],
             })
+
+            # Saving for the sample summary
+            sample_summary["read_pair_duplicates"].append(rp_dup)
+            sample_summary["percent_duplication"].append(pc_dup)
+            sample_summary["read_pair_optical_duplicates"].append(optical_dup)
+            sample_summary["read_pair_pcr_duplicates"].append(pcr_dup)
 
         # HsMetrics
         if "HsMetrics" in available_steps:
@@ -382,21 +399,36 @@ def construct_report_content(samples, pipeline_steps, jinja2_env):
                            ["Mean target coverage", "{:,.2f}".format(mean_target)],
                            ["Fold enrichment", "{:,.2f}".format(fold)],
                            ["Zero CVG target", r"{:,.2f}\%".format(cvg_targets)],
-                           ["PCT target bases (2x)", r"{:,.2f}\%".format(pct_target_2x)],
-                           ["PCT target bases (10x)", r"{:,.2f}\%".format(pct_target_10x)],
-                           ["PCT target bases (20x)", r"{:,.2f}\%".format(pct_target_20x)],
-                           ["PCT target bases (30x)", r"{:,.2f}\%".format(pct_target_30x)],
-                           ["PCT target bases (40x)", r"{:,.2f}\%".format(pct_target_40x)],
-                           ["PCT target bases (50x)", r"{:,.2f}\%".format(pct_target_50x)],
-                           ["PCT target bases (100x)", r"{:,.2f}\%".format(pct_target_100x)]],
+                           ["Target bases (2x)", r"{:,.2f}\%".format(pct_target_2x)],
+                           ["Target bases (10x)", r"{:,.2f}\%".format(pct_target_10x)],
+                           ["Target bases (20x)", r"{:,.2f}\%".format(pct_target_20x)],
+                           ["Target bases (30x)", r"{:,.2f}\%".format(pct_target_30x)],
+                           ["Target bases (40x)", r"{:,.2f}\%".format(pct_target_40x)],
+                           ["Target bases (50x)", r"{:,.2f}\%".format(pct_target_50x)],
+                           ["Target bases (100x)", r"{:,.2f}\%".format(pct_target_100x)]],
             })
+
+            # Saving for the sample summary
+            sample_summary["total_reads"].append(total_reads)
+            sample_summary["off_bait_bases"].append(off_bait)
+            sample_summary["mean_bait_coverage"].append(mean_bait)
+            sample_summary["mean_target_coverage"].append(mean_target)
+            sample_summary["fold_enrichment"].append(fold)
+            sample_summary["zero_cvg_targets_pct"].append(cvg_targets)
+            sample_summary["pct_target_bases_2x"].append(pct_target_2x)
+            sample_summary["pct_target_bases_10x"].append(pct_target_10x)
+            sample_summary["pct_target_bases_20x"].append(pct_target_20x)
+            sample_summary["pct_target_bases_30x"].append(pct_target_30x)
+            sample_summary["pct_target_bases_40x"].append(pct_target_40x)
+            sample_summary["pct_target_bases_50x"].append(pct_target_50x)
+            sample_summary["pct_target_bases_100x"].append(pct_target_100x)
 
         # InsertSize
         size_hist = None
         if "InsertSize" in available_steps:
-            mean_size = sample_data["mean_insert_size"] #   float,
-            median_size = sample_data["median_insert_size"] # float,
-            std_size = sample_data["standard_deviation"] # float,
+            mean_size = sample_data["mean_insert_size"]
+            median_size = sample_data["median_insert_size"]
+            std_size = sample_data["standard_deviation"]
 
             # The table
             sample_tables.append({
@@ -410,14 +442,31 @@ def construct_report_content(samples, pipeline_steps, jinja2_env):
             # The histogram
             size_hist = sample_data["hist_figname"]
 
+            # Saving for the sample summary
+            sample_summary["mean_insert_size"].append(mean_size)
+            sample_summary["median_insert_size"].append(median_size)
+            sample_summary["standard_deviation"].append(std_size)
+
+        # The coverage plot (per sample)
         cov_plot = None
         if "CoverageGraph" in available_steps:
             cov_plot = sample_data["coverage_figname"]
 
+        # Saving tables
         final_tables.append((sample, sample_tables, size_hist, cov_plot))
 
+    # The summary plots
+    mean_size_multi_plot = None
+    cov_multi_plot = None
+    if "CoverageGraph_Multi" in available_steps:
+        cov_multi_plot = sample_data["coverage_multi_figname"]
+
     # Getting the report content
-    report_content = ""
+    template = jinja2_env.get_template("data_template.tex")
+    report_content = generate_sample_summary(sample_summary, len(final_data),
+                                             available_steps,
+                                             mean_size_multi_plot,
+                                             cov_multi_plot, template)
     for section_name, section_tables, first_plot, second_plot in final_tables:
         # If there is only one None plot, it should be the second one...
         if first_plot is None and second_plot is not None:
@@ -432,10 +481,213 @@ def construct_report_content(samples, pipeline_steps, jinja2_env):
         }
 
         # Generating the template
-        template = jinja2_env.get_template("data_template.tex")
         report_content += template.render(**report_data)
 
     return report_content, available_steps
+
+
+def generate_sample_summary(sample_values, nb_samples, steps, first_plot,
+                            second_plot, template):
+    """Generates the sample summary."""
+    if nb_samples < 2:
+        return ""
+
+    summary_tables = []
+    # Clipping and trimming
+    if "ClipTrim" in steps:
+        total_reads = sample_values["total_reads_before_trim"]
+        too_short = sample_values["nb_short_reads_after_trim"]
+        trimmed_r1 = sample_values["nb_trimmed_r1"]
+        trimmed_r2 = sample_values["nb_trimmed_r2"]
+
+        # The table
+        summary_tables.append({
+            "name":   "Clipping/Trimming",
+            "format": "lrl",
+            "data":   [[
+                "Total reads",
+                "{:,.2f}".format(mean(total_reads)),
+                r"$\pm$ {:,.2f}".format(stdev(total_reads)),
+            ],
+            [
+                "Too short after clip",
+                "{:,.2f}".format(mean(too_short)),
+                r"$\pm$ {:,.2f}".format(stdev(too_short)),
+            ],
+            [
+                "Trimmed R1",
+                "{:,.2f}".format(mean(trimmed_r1)),
+                r"$\pm$ {:,.2f}".format(stdev(trimmed_r1)),
+            ],
+            [
+                "Trimmed R2",
+                "{:,.2f}".format(mean(trimmed_r2)),
+                r"$\pm$ {:,.2f}".format(stdev(trimmed_r2)),
+            ]],
+        })
+
+    # Mark duplicates
+    if "MarkDuplicates" in steps:
+        rp_dup = sample_values["read_pair_duplicates"]
+        pc_dup = sample_values["percent_duplication"]
+        optical_dup = sample_values["read_pair_optical_duplicates"]
+        pcr_dup = sample_values["read_pair_pcr_duplicates"]
+
+        # The table
+        summary_tables.append({
+            "name":   "Duplicated Reads",
+            "format": "lrl",
+            "data":   [[
+                "Total duplicates",
+                "{:,.2f}".format(mean(rp_dup)),
+                r"$\pm$ {:,.2f}".format(stdev(rp_dup)),
+            ],
+            [
+                "Duplicated percentage",
+                r"{:,.2f}\%".format(mean(pc_dup)),
+                r"$\pm$ {:,.2f}".format(stdev(pc_dup)),
+            ],
+            [
+                "Optical duplicate",
+                r"{:,.2f}\%".format(mean(optical_dup)),
+                r"$\pm$ {:,.2f}".format(stdev(optical_dup)),
+            ],
+            [
+                "PCR duplicate",
+                r"{:,.2f}\%".format(mean(pcr_dup)),
+                r"$\pm$ {:,.2f}".format(stdev(pcr_dup)),
+            ]],
+        })
+
+    # HsMetrics
+    if "HsMetrics" in steps:
+        total_reads = sample_values["total_reads"]
+        off_bait = sample_values["off_bait_bases"]
+        mean_bait = sample_values["mean_bait_coverage"]
+        mean_target = sample_values["mean_target_coverage"]
+        fold = sample_values["fold_enrichment"]
+        cvg_targets = sample_values["zero_cvg_targets_pct"]
+        pct_target_2x = sample_values["pct_target_bases_2x"]
+        pct_target_10x = sample_values["pct_target_bases_10x"]
+        pct_target_20x = sample_values["pct_target_bases_20x"]
+        pct_target_30x = sample_values["pct_target_bases_30x"]
+        pct_target_40x = sample_values["pct_target_bases_40x"]
+        pct_target_50x = sample_values["pct_target_bases_50x"]
+        pct_target_100x = sample_values["pct_target_bases_100x"]
+
+        # The table
+        summary_tables.append({
+            "name":   "HS Metrics",
+            "format": "lrl",
+            "data":   [[
+                "Total reads",
+                "{:,.2f}".format(mean(total_reads)),
+                r"$\pm$ {:,.2f}".format(stdev(total_reads)),
+            ],
+            [
+                "Off bait",
+                "{:,.2f}".format(mean(off_bait)),
+                r"$\pm$ {:,.2f}".format(stdev(off_bait)),
+            ],
+            [
+                "Mean bait coverage",
+                "{:,.2f}".format(mean(mean_bait)),
+                r"$\pm$ {:,.2f}".format(stdev(mean_bait)),
+            ],
+            [
+                "Mean target coverage",
+                "{:,.2f}".format(mean(mean_target)),
+                r"$\pm$ {:,.2f}".format(stdev(mean_target)),
+            ],
+            [
+                "Fold enrichment",
+                "{:,.2f}".format(mean(fold)),
+                r"$\pm$ {:,.2f}".format(stdev(fold)),
+            ],
+            [
+                "Zero CVG target",
+                r"{:,.2f}\%".format(mean(cvg_targets)),
+                r"$\pm$ {:,.2f}".format(stdev(cvg_targets)),
+            ],
+            [
+                "Target bases (2x)",
+                r"{:,.2f}\%".format(mean(pct_target_2x)),
+                r"$\pm$ {:,.2f}".format(stdev(pct_target_2x)),
+            ],
+            [
+                "Target bases (10x)",
+                r"{:,.2f}\%".format(mean(pct_target_10x)),
+                r"$\pm$ {:,.2f}".format(stdev(pct_target_10x)),
+            ],
+            [
+                "Target bases (20x)",
+                r"{:,.2f}\%".format(mean(pct_target_20x)),
+                r"$\pm$ {:,.2f}".format(stdev(pct_target_20x)),
+            ],
+            [
+                "Target bases (30x)",
+                r"{:,.2f}\%".format(mean(pct_target_30x)),
+                r"$\pm$ {:,.2f}".format(stdev(pct_target_30x)),
+            ],
+            [
+                "Target bases (40x)",
+                r"{:,.2f}\%".format(mean(pct_target_40x)),
+                r"$\pm$ {:,.2f}".format(stdev(pct_target_40x)),
+            ],
+            [
+                "Target bases (50x)",
+                r"{:,.2f}\%".format(mean(pct_target_50x)),
+                r"$\pm$ {:,.2f}".format(stdev(pct_target_50x)),
+            ],
+            [
+                "Target bases (100x)",
+                r"{:,.2f}\%".format(mean(pct_target_100x)),
+                r"$\pm$ {:,.2f}".format(stdev(pct_target_100x)),
+            ]],
+        })
+
+    # InsertSize
+    size_hist = None
+    if "InsertSize" in steps:
+        mean_size = sample_values["mean_insert_size"]
+        median_size = sample_values["median_insert_size"]
+        std_size = sample_values["standard_deviation"]
+
+        # The table
+        summary_tables.append({
+            "name":   "Insert Size",
+            "format": "lrl",
+            "data":   [[
+                "Mean",
+                "{:,.2f}".format(mean(mean_size)),
+                r"$\pm$ {:,.2f}".format(stdev(mean_size)),
+            ],
+            [
+                "Median",
+                "{:,.2f}".format(mean(median_size)),
+                r"$\pm$ {:,.2f}".format(stdev(median_size)),
+            ],
+            [
+                "Standard deviation",
+                "{:,.2f}".format(mean(std_size)),
+                r"$\pm$ {:,.2f}".format(stdev(std_size)),
+            ]],
+        })
+
+    # The plots
+    if first_plot is None and second_plot is not None:
+        first_plot, second_plot = second_plot, first_plot
+
+    # The template data
+    report_data = {
+        "section_name": "All samples",
+        "tables":       summary_tables,
+        "first_plot":   first_plot,
+        "second_plot":  second_plot,
+    }
+
+    # Generating the template
+    return template.render(**report_data)
 
 
 def gather_values(values, required_values, final_values, sample, prefix):
