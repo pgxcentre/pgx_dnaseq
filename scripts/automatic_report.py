@@ -3,12 +3,10 @@
 import os
 import re
 import sys
-import glob
-import shutil
 import logging
 import argparse
 from statistics import mean, stdev
-from collections import defaultdict, defaultdict
+from collections import defaultdict
 from subprocess import Popen, PIPE, TimeoutExpired
 
 import jinja2
