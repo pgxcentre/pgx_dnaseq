@@ -7,7 +7,7 @@ import glob
 import shutil
 import logging
 import argparse
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from subprocess import Popen, PIPE, TimeoutExpired
 
 import jinja2
@@ -122,8 +122,9 @@ def print_report(sample_list, pipeline_steps, options):
         flowchart = "flowchart.png"
 
     # Getting the report content
-    report_content = construct_report_content(sample_list, pipeline_steps,
-                                              jinja2_env)
+    report_content, metrics_from = construct_report_content(sample_list,
+                                                            pipeline_steps,
+                                                            jinja2_env)
 
     # Creating the data to put into the final report
     report_data = {
@@ -131,9 +132,9 @@ def print_report(sample_list, pipeline_steps, options):
         "flowchart":      flowchart,
         "report_content": report_content,
         "summary":        sanitize_tex(get_pipeline_summary(pipeline_steps)),
-        "metrics_from":   sanitize_tex(pretty_join(["HsMetrics",
-                                                    "MarkDuplicate",
-                                                    "InsertSize"])),
+        "metrics_from":   sanitize_tex(pretty_join(
+            [r"\texttt{" + name + "}" for name in sorted(metrics_from)]
+        )),
     }
 
     # The name of the TEX file
@@ -206,12 +207,14 @@ def construct_report_content(samples, pipeline_steps, jinja2_env):
     """Constructs the report content."""
     report_content = ""
 
+    available_steps = set()
     final_data = defaultdict(dict)
     for i, (step, step_option) in enumerate(pipeline_steps):
         prefix = os.path.join("output",
                               "{:02d}_{}".format(i+1, step.get_tool_name()))
 
         if step.get_tool_name() == "HsMetrics":
+            available_steps.add("HsMetrics")
             logging.info("Collecting HsMetrics")
             for sample in samples:
                 sample_data = step.read_report(os.path.join(prefix, sample))
@@ -235,9 +238,10 @@ def construct_report_content(samples, pipeline_steps, jinja2_env):
 
                 # Checking the required columns
                 final_data = gather_values(sample_data, req_values, final_data,
-                                         sample, prefix)
+                                           sample, prefix)
 
         if step.get_tool_name() == "MarkDuplicates":
+            available_steps.add("MarkDuplicates")
             logging.info("Collecting MarkDuplicates")
             for sample in samples:
                 sample_data = step.read_report(os.path.join(prefix, sample))
@@ -251,9 +255,10 @@ def construct_report_content(samples, pipeline_steps, jinja2_env):
 
                 # Checking the required columns
                 final_data = gather_values(sample_data, req_values, final_data,
-                                         sample, prefix)
+                                           sample, prefix)
 
         if step.get_tool_name() == "InsertSize":
+            available_steps.add("InsertSize")
             logging.info("Collecting InsertSize")
             for sample in samples:
                 sample_data = step.read_report(os.path.join(prefix, sample))
@@ -268,9 +273,10 @@ def construct_report_content(samples, pipeline_steps, jinja2_env):
 
                 # Checking the required columns
                 final_data = gather_values(sample_data, req_values, final_data,
-                                         sample, prefix)
+                                           sample, prefix)
 
         if step.get_tool_name() == "ClipTrim":
+            available_steps.add("ClipTrim")
             logging.info("Collecting ClipTrim")
             for sample in samples:
                 sample_data = step.read_report(os.path.join(prefix, sample))
@@ -284,9 +290,10 @@ def construct_report_content(samples, pipeline_steps, jinja2_env):
                 }
 
                 final_data = gather_values(sample_data, req_values, final_data,
-                                         sample, prefix)
+                                           sample, prefix)
 
         if step.get_tool_name() == "CoverageGraph":
+            available_steps.add("CoverageGraph")
             logging.info("Collecting CoverageGraph")
             for sample in samples:
                 sample_data = step.read_report(os.path.join(prefix, sample))
@@ -297,9 +304,10 @@ def construct_report_content(samples, pipeline_steps, jinja2_env):
                 }
 
                 final_data = gather_values(sample_data, req_values, final_data,
-                                         sample, prefix)
+                                           sample, prefix)
 
         if step.get_tool_name() == "CoverageGraph_Multi":
+            available_steps.add("CoverageGraph_Multi")
             logging.info("Collecting CoverageGraph_Multi")
             data = step.read_report(os.path.join(prefix, "all_samples"))
 
@@ -308,8 +316,126 @@ def construct_report_content(samples, pipeline_steps, jinja2_env):
                 "coverage_multi_figname": str,
             }
 
-    print(final_data)
-    return get_report_content(jinja2_env)
+    final_tables = []
+    for sample in sorted(final_data.keys()):
+        sample_data = final_data[sample]
+        sample_tables = []
+
+        # Clipping and trimming
+        if "ClipTrim" in available_steps:
+            total_reads = sample_data["total_reads_before_trim"]
+            too_short = sample_data["nb_short_reads_after_trim"]
+            trimmed_r1 = sample_data["nb_trimmed_r1"]
+            trimmed_r2 = sample_data["nb_trimmed_r2"]
+
+            # The table
+            sample_tables.append({
+                "name":   "Clipping/Trimming",
+                "format": "lr",
+                "data":   [["Total reads", "{:,d}".format(total_reads)],
+                           ["Too short after clip", "{:,d}".format(too_short)],
+                           ["Trimmed R1", "{:,d}".format(trimmed_r1)],
+                           ["Trimmed R2", "{:,d}".format(trimmed_r2)]],
+            })
+
+        # Mark duplicates
+        if "MarkDuplicates" in available_steps:
+            rp_dup = sample_data["read_pair_duplicates"]
+            pc_dup = sample_data["percent_duplication"] * 100
+            optical_dup = sample_data["read_pair_optical_duplicates"]
+            optical_dup = optical_dup / rp_dup * 100
+            pcr_dup = 100 - optical_dup
+
+            # The table
+            sample_tables.append({
+                "name":   "Duplicated Reads",
+                "format": "lr",
+                "data":   [["Total duplicates", "{:,d}".format(rp_dup)],
+                           ["Duplicated percentage", r"{:,.2f}\%".format(pc_dup)],
+                           ["Optical duplicate", r"{:,.2f}\%".format(optical_dup)],
+                           ["PCR duplicate", r"{:,.2f}\%".format(pcr_dup)]],
+            })
+
+        # HsMetrics
+        if "HsMetrics" in available_steps:
+            total_reads = sample_data["total_reads"]
+            off_bait = sample_data["off_bait_bases"]
+            mean_bait = sample_data["mean_bait_coverage"]
+            mean_target = sample_data["mean_target_coverage"]
+            fold = sample_data["fold_enrichment"]
+            cvg_targets = sample_data["zero_cvg_targets_pct"]
+            pct_target_2x = sample_data["pct_target_bases_2x"]
+            pct_target_10x = sample_data["pct_target_bases_10x"]
+            pct_target_20x = sample_data["pct_target_bases_20x"]
+            pct_target_30x = sample_data["pct_target_bases_30x"]
+            pct_target_40x = sample_data["pct_target_bases_40x"]
+            pct_target_50x = sample_data["pct_target_bases_50x"]
+            pct_target_100x = sample_data["pct_target_bases_100x"]
+
+            # The table
+            sample_tables.append({
+                "name":   "HS Metrics",
+                "format": "lr",
+                "data":   [["Total reads", "{:,d}".format(total_reads)],
+                           ["Off bait", "{:,d}".format(off_bait)],
+                           ["Mean bait coverage", "{:,.2f}".format(mean_bait)],
+                           ["Mean target coverage", "{:,.2f}".format(mean_target)],
+                           ["Fold enrichment", "{:,.2f}".format(fold)],
+                           ["Zero CVG target", r"{:,.2f}\%".format(cvg_targets)],
+                           ["PCT target bases (2x)", r"{:,.2f}\%".format(pct_target_2x)],
+                           ["PCT target bases (10x)", r"{:,.2f}\%".format(pct_target_10x)],
+                           ["PCT target bases (20x)", r"{:,.2f}\%".format(pct_target_20x)],
+                           ["PCT target bases (30x)", r"{:,.2f}\%".format(pct_target_30x)],
+                           ["PCT target bases (40x)", r"{:,.2f}\%".format(pct_target_40x)],
+                           ["PCT target bases (50x)", r"{:,.2f}\%".format(pct_target_50x)],
+                           ["PCT target bases (100x)", r"{:,.2f}\%".format(pct_target_100x)]],
+            })
+
+        # InsertSize
+        size_hist = None
+        if "InsertSize" in available_steps:
+            mean_size = sample_data["mean_insert_size"] #   float,
+            median_size = sample_data["median_insert_size"] # float,
+            std_size = sample_data["standard_deviation"] # float,
+
+            # The table
+            sample_tables.append({
+                "name":   "Insert Size",
+                "format": "lr",
+                "data":   [["Mean", "{:,.2f}".format(mean_size)],
+                           ["Median", "{:,.2f}".format(median_size)],
+                           ["Standard deviation", "{:,.2f}".format(std_size)]],
+            })
+
+            # The histogram
+            size_hist = sample_data["hist_figname"]
+
+        cov_plot = None
+        if "CoverageGraph" in available_steps:
+            cov_plot = sample_data["coverage_figname"]
+
+        final_tables.append((sample, sample_tables, size_hist, cov_plot))
+
+    # Getting the report content
+    report_content = ""
+    for section_name, section_tables, first_plot, second_plot in final_tables:
+        # If there is only one None plot, it should be the second one...
+        if first_plot is None and second_plot is not None:
+            first_plot, second_plot = second_plot, first_plot
+
+        # The template data
+        report_data = {
+            "section_name": section_name,
+            "tables":       section_tables,
+            "first_plot":   first_plot,
+            "second_plot":  second_plot,
+        }
+
+        # Generating the template
+        template = jinja2_env.get_template("data_template.tex")
+        report_content += template.render(**report_data)
+
+    return report_content, available_steps
 
 
 def gather_values(values, required_values, final_values, sample, prefix):
@@ -329,68 +455,6 @@ def get_pipeline_summary(steps):
     """Gets the pipeline summary."""
     steps = [r"\texttt{" + i.get_tool_name() + "}" for i, j in steps]
     return pretty_join(steps)
-
-
-def get_report_content(jinja2_env):
-    """Gets the report content from the pipeline's output."""
-    # The required data
-    report_data = {
-        "section_name": "Dummy Section",
-        "tables":       table_testing(),
-    }
-
-    # Loading the template
-    template = jinja2_env.get_template("data_template.tex")
-    return template.render(**report_data)
-
-
-def table_testing():
-    """This is just to test the table creation in the report."""
-    #TODO: REMOVE THIS FUNCTION!!!
-    data = [
-        {"name":   "Clipping/Trimming",
-         "format": "lr",
-         "data":   [["Total read", "{:,d}".format(5000000)],
-                    ["Too short after clip", "{:,d}".format(3631)],
-                    ["Trimmed R1", "{:,d}".format(35737)],
-                    ["Trimmed R2", "{:,d}".format(60454)],
-                   ],
-        },
-
-        {"name":   "Hs Metrics",
-         "format": "lr",
-         "data":   [["Total reads", "{:,d}".format(988914)],
-                    ["Total duplicate", "{:,d}".format(988)],
-                    "hline",
-                    ["Duplicate percentage", r"{:,.2f}\%".format(0.20)],
-                    ["Optical duplicate", r"{:,.2f}\%".format(100.00)],
-                    ["PCR duplicate", r"{:,.2f}\%".format(0.00)],
-                    "hline",
-                    ["Off bait", "{:,d}".format(5685624)],
-                    ["Mean bait coverage", "{:,.2f}".format(1.43)],
-                    ["Mean target coverage", "{:,.2f}".format(1.97)],
-                    ["Fold enrichment", "{:,.2f}".format(45.74)],
-                    "hline",
-                    ["Zero CVG target", r"{:,.2f}\%".format(0.40)],
-                    ["PCT target bases (2x)", r"{:,.2f}\%".format(0.35)],
-                    ["PCT target bases (10x)", r"{:,.2f}\%".format(0.01)],
-                    ["PCT target bases (20x)", r"{:,.2f}\%".format(0)],
-                    ["PCT target bases (30x)", r"{:,.2f}\%".format(0)],
-                    ["PCT target bases (40x)", r"{:,.2f}\%".format(0)],
-                    ["PCT target bases (50x)", r"{:,.2f}\%".format(0)],
-                    ["PCT target bases (100x)", r"{:,.2f}\%".format(0)],
-                   ],
-        },
-
-        {"name":   "Insert Size",
-         "format": "lr",
-         "data":   [["Mean", "{:,.2f}".format(206.59)],
-                    ["Median", "{:,.2f}".format(194)],
-                    ["Standard deviation", "{:,.2f}".format(65.39)],
-                   ],
-        },
-    ]
-    return data
 
 
 def pretty_join(items):

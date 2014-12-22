@@ -1,0 +1,55 @@
+
+\begin{landscape}
+
+\subsection{\VAR{ section_name }}
+
+\begin{minipage}[c][6in]{9.3in}
+\centering
+
+\begin{minipage}[c][6in]{4in}
+\centering
+
+\BLOCK{ for table in tables }
+
+\begin{tabular}{\VAR{ table["format"] }}
+
+\multicolumn{\VAR{ table["format"]|length }}{p{3in}}{\textbf{\VAR{ table["name"] }}}\\
+\hline
+
+\BLOCK{ for row in table["data"] }
+\BLOCK{ if row == "hline" }
+\hline
+
+\BLOCK{ else }
+\BLOCK{ for value in row }
+\VAR{ " & " if not loop.first }\VAR{ value }\VAR{ "\\\\" if loop.last }
+\BLOCK{ endfor }
+\BLOCK{ endif }
+\BLOCK{ endfor }
+\hline
+
+\end{tabular}
+
+\BLOCK{ if not loop.last }
+\vspace{0.6cm}
+\BLOCK{ endif }
+
+\BLOCK{ endfor }
+
+\end{minipage}%
+\begin{minipage}[c][6in]{5in}
+\centering
+
+\BLOCK{ if first_plot is not none }
+\includegraphics[width=4.5in]{\VAR{ first_plot }}\\
+\BLOCK{ if second_plot is not none }
+\vfill
+\includegraphics[width=4.5in]{\VAR{ second_plot }}
+\BLOCK{ endif }
+\BLOCK{ endif }
+
+\end{minipage}%
+\end{minipage}
+
+\end{landscape}
+
