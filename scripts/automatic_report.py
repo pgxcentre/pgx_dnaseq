@@ -322,7 +322,8 @@ def construct_report_content(samples, pipeline_steps, jinja2_env):
 
     sample_summary = defaultdict(list)
     final_tables = []
-    for sample in sorted(final_data.keys()):
+    sample_order = sorted(final_data.keys())
+    for sample in sample_order:
         sample_data = final_data[sample]
         sample_tables = []
 
@@ -361,10 +362,11 @@ def construct_report_content(samples, pipeline_steps, jinja2_env):
             sample_tables.append({
                 "name":   "Duplicated Reads",
                 "format": "lr",
-                "data":   [["Total duplicates", "{:,d}".format(rp_dup)],
-                           ["Duplicated percentage", r"{:,.2f}\%".format(pc_dup)],
-                           ["Optical duplicate", r"{:,.2f}\%".format(optical_dup)],
-                           ["PCR duplicate", r"{:,.2f}\%".format(pcr_dup)]],
+                "data":   [
+                    ["Total duplicates", "{:,d}".format(rp_dup)],
+                    ["Duplicated percentage", r"{:,.2f}\%".format(pc_dup)],
+                    ["Optical duplicate", r"{:,.2f}\%".format(optical_dup)],
+                    ["PCR duplicate", r"{:,.2f}\%".format(pcr_dup)]],
             })
 
             # Saving for the sample summary
@@ -393,19 +395,20 @@ def construct_report_content(samples, pipeline_steps, jinja2_env):
             sample_tables.append({
                 "name":   "HS Metrics",
                 "format": "lr",
-                "data":   [["Total reads", "{:,d}".format(total_reads)],
-                           ["Off bait", "{:,d}".format(off_bait)],
-                           ["Mean bait coverage", "{:,.2f}".format(mean_bait)],
-                           ["Mean target coverage", "{:,.2f}".format(mean_target)],
-                           ["Fold enrichment", "{:,.2f}".format(fold)],
-                           ["Zero CVG target", r"{:,.2f}\%".format(cvg_targets)],
-                           ["Target bases (2x)", r"{:,.2f}\%".format(pct_target_2x)],
-                           ["Target bases (10x)", r"{:,.2f}\%".format(pct_target_10x)],
-                           ["Target bases (20x)", r"{:,.2f}\%".format(pct_target_20x)],
-                           ["Target bases (30x)", r"{:,.2f}\%".format(pct_target_30x)],
-                           ["Target bases (40x)", r"{:,.2f}\%".format(pct_target_40x)],
-                           ["Target bases (50x)", r"{:,.2f}\%".format(pct_target_50x)],
-                           ["Target bases (100x)", r"{:,.2f}\%".format(pct_target_100x)]],
+                "data":   [
+                    ["Total reads", "{:,d}".format(total_reads)],
+                    ["Off bait", "{:,d}".format(off_bait)],
+                    ["Mean bait coverage", "{:,.2f}".format(mean_bait)],
+                    ["Mean target coverage", "{:,.2f}".format(mean_target)],
+                    ["Fold enrichment", "{:,.2f}".format(fold)],
+                    ["Zero CVG target", r"{:,.2f}\%".format(cvg_targets)],
+                    ["Target bases (2x)", r"{:,.2f}\%".format(pct_target_2x)],
+                    ["Target bases (10x)", r"{:,.2f}\%".format(pct_target_10x)],
+                    ["Target bases (20x)", r"{:,.2f}\%".format(pct_target_20x)],
+                    ["Target bases (30x)", r"{:,.2f}\%".format(pct_target_30x)],
+                    ["Target bases (40x)", r"{:,.2f}\%".format(pct_target_40x)],
+                    ["Target bases (50x)", r"{:,.2f}\%".format(pct_target_50x)],
+                    ["Target bases (100x)", r"{:,.2f}\%".format(pct_target_100x)]],
             })
 
             # Saving for the sample summary
@@ -456,17 +459,15 @@ def construct_report_content(samples, pipeline_steps, jinja2_env):
         final_tables.append((sample, sample_tables, size_hist, cov_plot))
 
     # The summary plots
-    mean_size_multi_plot = None
     cov_multi_plot = None
     if "CoverageGraph_Multi" in available_steps:
         cov_multi_plot = sample_data["coverage_multi_figname"]
 
     # Getting the report content
     template = jinja2_env.get_template("data_template.tex")
-    report_content = generate_sample_summary(sample_summary, len(final_data),
-                                             available_steps,
-                                             mean_size_multi_plot,
-                                             cov_multi_plot, template)
+    report_content = generate_sample_summary(sample_summary, sample_order,
+                                             available_steps, cov_multi_plot,
+                                             template)
     for section_name, section_tables, first_plot, second_plot in final_tables:
         # If there is only one None plot, it should be the second one...
         if first_plot is None and second_plot is not None:
@@ -486,10 +487,10 @@ def construct_report_content(samples, pipeline_steps, jinja2_env):
     return report_content, available_steps
 
 
-def generate_sample_summary(sample_values, nb_samples, steps, first_plot,
-                            second_plot, template):
+def generate_sample_summary(sample_values, sample_order, steps, cov_multi,
+                            template):
     """Generates the sample summary."""
-    if nb_samples < 2:
+    if len(sample_order) < 2:
         return ""
 
     summary_tables = []
@@ -653,6 +654,28 @@ def generate_sample_summary(sample_values, nb_samples, steps, first_plot,
         median_size = sample_values["median_insert_size"]
         std_size = sample_values["standard_deviation"]
 
+        # The figure and axe
+        figure, axe = plt.subplots(1, 1, figsize=(12, 6))
+        axe.bar(range(len(mean_size)), mean_size,
+                align="center", color="#0099CC", edgecolor="#0099CC", lw=0)
+
+        # The labels
+        axe.set_title("All samples mean insert size", weight="bold",
+                      fontsize=12)
+        axe.set_ylabel("Mean Size", weight="bold", fontsize=10)
+
+        # The x tick labels
+        axe.set_xticks(range(len(mean_size)))
+        axe.set_xticklabels(sample_order)
+
+        # The tick labels fontsize
+        axe.tick_params(axis='both', which='major', labelsize=9)
+
+        # Saving the figure
+        size_hist = "{}.pdf".format(os.path.join("output", "mean_insert_size"))
+        plt.savefig(size_hist, figure=figure, bbox_inches="tight")
+        plt.close(figure)
+
         # The table
         summary_tables.append({
             "name":   "Insert Size",
@@ -675,6 +698,8 @@ def generate_sample_summary(sample_values, nb_samples, steps, first_plot,
         })
 
     # The plots
+    first_plot = size_hist
+    second_plot = cov_multi
     if first_plot is None and second_plot is not None:
         first_plot, second_plot = second_plot, first_plot
 
