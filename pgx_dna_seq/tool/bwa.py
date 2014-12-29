@@ -9,7 +9,7 @@ from pgx_dna_seq.tool import GenericTool
 class BWA(GenericTool):
 
     # The version of the TOOL
-    _version = "0.7.8"
+    _version = "0.7.12"
 
     # The executable
     _exec = "bwa"
