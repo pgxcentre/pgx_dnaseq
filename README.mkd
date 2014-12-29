@@ -1,6 +1,6 @@
 # pgx_dna_seq - Automatic NGS pipeline
 
-*Version 0.3*
+*Version 0.4*
 
 `pgx_dna_seq` is an automatic pipeline to perform high-throughput sequencing
 analysis.
@@ -62,7 +62,7 @@ $ execute_pipeline.py -h
 usage: execute_pipeline.py [-h] [-v] [-i FILE] [-p FILE] [-t FILE] [-d]
                            [-n INT]
 
-Execute a NGS pipeline (version 0.3).
+Execute a NGS pipeline (version 0.4).
 
 optional arguments:
   -h, --help            show this help message and exit
