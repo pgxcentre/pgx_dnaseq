@@ -9,7 +9,7 @@ from pgx_dna_seq.tool import GenericTool
 class FastQMCF(GenericTool):
 
     # The version of the tool
-    _version = "1.1.2-537"
+    _version = "1.1.2-806"
 
     # The executable
     _exec = "fastq-mcf"
