@@ -11,10 +11,11 @@ from pgx_dna_seq.tool import GenericTool
 class PicardTools(JAR):
 
     # The version of the tool
-    _version = "1.113"
+    _version = "1.127"
 
     # The jar file default location
-    _jar_location = "/opt/picard-tools-1.113"
+    _jar_location = "/opt/picard-tools-1.127"
+    _jar = "picard.jar"
 
     def __init__(self):
         """Initialize a PicardTools instance."""
@@ -26,11 +27,8 @@ class SortSam(PicardTools):
     # The name of the tool
     _tool_name = "SortSam"
 
-    # The jar file
-    _jar = "SortSam.jar"
-
     # The options
-    _command = ("INPUT={input} OUTPUT={output} SORT_ORDER={sort_order} "
+    _command = ("SortSam INPUT={input} OUTPUT={output} SORT_ORDER={sort_order} "
                 "{other_opt}")
 
     # The STDOUT and STDERR
@@ -60,12 +58,10 @@ class HsMetrics(PicardTools):
     # The name of the tool
     _tool_name = "HsMetrics"
 
-    # The jar file
-    _jar = "CalculateHsMetrics.jar"
-
     # The options
-    _command = ("INPUT={input} OUTPUT={output} REFERENCE_SEQUENCE={reference} "
-                "BAIT_INTERVALS={baits} TARGET_INTERVALS={targets} {other_opt}")
+    _command = ("CalculateHsMetrics INPUT={input} OUTPUT={output} "
+                "REFERENCE_SEQUENCE={reference} BAIT_INTERVALS={baits} "
+                "TARGET_INTERVALS={targets} {other_opt}")
 
     # The STDOUT and STDERR
     _stdout = "{output}.out"
@@ -121,12 +117,10 @@ class InsertSize(PicardTools):
     # The name of the tool
     _tool_name = "InsertSize"
 
-    # The jar file
-    _jar = "CollectInsertSizeMetrics.jar"
-
     # The options
-    _command = ("INPUT={input} OUTPUT={output} REFERENCE_SEQUENCE={reference} "
-                "HISTOGRAM_FILE={hist_file} {other_opt}")
+    _command = ("CollectInsertSizeMetrics INPUT={input} OUTPUT={output} "
+                "REFERENCE_SEQUENCE={reference} HISTOGRAM_FILE={hist_file} "
+                "{other_opt}")
 
     # The STDOUT and STDERR
     _stdout = "{output}.out"
@@ -224,12 +218,10 @@ class AddRG(PicardTools):
     # The name of the tool
     _tool_name = "AddRG"
 
-    # The jar file
-    _jar = "AddOrReplaceReadGroups.jar"
-
     # The options
-    _command = ("I={input} O={output} RGDS={rgds} RGPL={rgpl} RGPU={rgpu} "
-                "RGSM={sample_id} RGCN={rgcn} RGLB={rglb}")
+    _command = ("AddOrReplaceReadGroups I={input} O={output} RGDS={rgds} "
+                "RGPL={rgpl} RGPU={rgpu} RGSM={sample_id} RGCN={rgcn} "
+                "RGLB={rglb}")
 
     # The STDOUT and STDERR
     _stdout = "{output}.out"
@@ -262,11 +254,9 @@ class MarkDuplicates(PicardTools):
     # The name of the tool
     _tool_name = "MarkDuplicates"
 
-    # The jar file
-    _jar = "MarkDuplicates.jar"
-
     # The options
-    _command = "INPUT={input} O={output} METRICS_FILE={metrics} {other_opt}"
+    _command = ("MarkDuplicates INPUT={input} O={output} "
+                "METRICS_FILE={metrics} {other_opt}")
 
     # The STDOUT and STDERR
     _stdout = "{output}.out"
