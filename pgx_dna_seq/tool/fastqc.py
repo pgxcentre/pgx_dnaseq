@@ -11,7 +11,7 @@ from pgx_dna_seq.tool import GenericTool
 class FastQC(GenericTool):
 
     # The version of the tool
-    _version = "0.10.1"
+    _version = "0.11.2"
 
     # The executable
     _exec = "fastqc"
