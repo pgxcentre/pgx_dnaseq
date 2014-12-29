@@ -10,7 +10,7 @@ from pgx_dna_seq.tool import GenericTool
 class Samtools(GenericTool):
 
     # The version of the tool
-    _version = "0.1.19"
+    _version = "1.1"
 
     # The executable
     _exec = "samtools"
