@@ -11,7 +11,7 @@ from pgx_dna_seq.tool.samtools import IndexBam
 class PGx_CoverageGraph(GenericTool):
 
     # The version of the tool
-    _version = "0.1"
+    _version = "0.3"
 
     # The executable
     _exec = "coverage_graph.py"
