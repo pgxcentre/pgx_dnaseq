@@ -6,7 +6,7 @@ from pgx_dna_seq.tool import GenericTool
 class Bowtie2(GenericTool):
 
     # The version of the tool
-    _version = "2.2.2"
+    _version = "2.2.4"
 
     # The executable
     _exec = "bowtie2"
