@@ -15,10 +15,11 @@ from pgx_dna_seq.tool.samtools import IndexBam
 class GATK(JAR):
 
     # The version of the tool
-    _version = "3.1-1"
+    _version = "3.3-0"
 
     # The jar file default location
-    _jar_location = "/opt/GenomeAnalysisTK-3.1-1"
+    _jar_location = "/opt/GenomeAnalysisTK-3.3-0"
+    _jar = "GenomeAnalysisTK.jar"
 
     def __init__(self):
         """Initialize a PicardTools instance."""
@@ -29,9 +30,6 @@ class RealignerTargetCreator(GATK):
 
     # The name of the tool
     _tool_name = "RealignerTargetCreator"
-
-    # The jar file
-    _jar = "GenomeAnalysisTK.jar"
 
     # The options
     _command = ("-T RealignerTargetCreator -I {input} -R {reference} "
@@ -63,9 +61,6 @@ class IndelRealigner(GATK):
 
     # The name of the tool
     _tool_name = "IndelRealigner"
-
-    # The jar file
-    _jar = "GenomeAnalysisTK.jar"
 
     # The options
     _command = ("-T IndelRealigner -R {reference} -I {input} "
@@ -133,9 +128,6 @@ class PrintReads(GATK):
     # The name of the tool
     _tool_name = "PrintReads"
 
-    # The jar file
-    _jar = "GenomeAnalysisTK.jar"
-
     # The options
     _command = ("-T PrintReads -I {input} -R {reference} -BQSR {groups} "
                 "-o {output} {other_opt}")
@@ -167,9 +159,6 @@ class BaseRecalibrator(GATK):
 
     # The name of the tool
     _tool_name = "BaseRecalibrator"
-
-    # The jar file
-    _jar = "GenomeAnalysisTK.jar"
 
     # The options
     _command = ("-T BaseRecalibrator -R {reference} -I {input} "
@@ -222,9 +211,6 @@ class UnifiedGenotyper(GATK):
     # The name of the tool
     _tool_name = "UnifiedGenotyper"
 
-    # The jar file
-    _jar = "GenomeAnalysisTK.jar"
-
     # The options
     _command = ("-T UnifiedGenotyper -R {reference} -I {input} --dbsnp {dbsnp} "
                 "-o {output} {other_opt}")
@@ -267,9 +253,6 @@ class UnifiedGenotyper_Multi(GATK):
 
     # The name of the tool
     _tool_name = "UnifiedGenotyper_Multi"
-
-    # The jar file
-    _jar = "GenomeAnalysisTK.jar"
 
     # The options
     _command = ("-T UnifiedGenotyper -R {reference} --input_file {input} "
@@ -326,9 +309,6 @@ class HaplotypeCaller(GATK):
     # The name of the tool
     _tool_name = "HaplotypeCaller"
 
-    # The jar file
-    _jar = "GenomeAnalysisTK.jar"
-
     # The options
     _command = ("-T HaplotypeCaller -R {reference} -I {input} --dbsnp {dbsnp} "
                 "-o {output} {other_opt}")
@@ -371,9 +351,6 @@ class HaplotypeCaller_Multi(GATK):
 
     # The name of the tool
     _tool_name = "HaplotypeCaller_Multi"
-
-    # The jar file
-    _jar = "GenomeAnalysisTK.jar"
 
     # The options
     _command = ("-T HaplotypeCaller -R {reference} --input_file {input} "
@@ -430,9 +407,6 @@ class VariantRecalibrator(GATK):
     # The name of the tool
     _tool_name = "VariantRecalibrator"
 
-    # The jar file
-    _jar = "GenomeAnalysisTK.jar"
-
     # The options
     _command = ("-T VariantRecalibrator -R {reference} --input {input} "
                 "--recal_file {output_recal} --tranches_file {output_tranches} "
@@ -475,9 +449,6 @@ class ApplyRecalibration(GATK):
 
     # The name of the tool
     _tool_name = "ApplyRecalibration"
-
-    # The jar file
-    _jar = "GenomeAnalysisTK.jar"
 
     # The options
     _command = ("-T ApplyRecalibration -R {reference} --input {input} "
