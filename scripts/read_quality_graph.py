@@ -83,8 +83,7 @@ def plot_quantiles(data, output_filename):
     axe.plot(data.pos, data.q50, "-", lw=4, color="#CC0000")
 
     # Adding the labels
-    axe.set_title("(A) Pre-Trimming Quality Distribution", weight="bold",
-                  fontsize=16)
+    axe.set_title("Read Quality Distribution", weight="bold", fontsize=16)
     axe.set_xlabel("Base Position", weight="bold")
     axe.set_ylabel("PHRED Score", weight="bold")
 
