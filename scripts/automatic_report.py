@@ -322,6 +322,19 @@ def construct_report_content(samples, pipeline_steps, jinja2_env):
             final_data = gather_values(data, req_values, final_data, sample,
                                        prefix)
 
+        if step.get_tool_name() == "ReadQualityGraph":
+            available_steps.add("ReadQualityGraph")
+            logging.info("Collectiong ReadQualityGraph")
+            for sample in samples:
+                sample_data = step.read_report(os.path.join(prefix, sample))
+
+                # The required values and type
+                req_values = {
+                    "read_qual_figname": str,
+                }
+                final_data = gather_values(sample_data, req_values, final_data,
+                                           sample, prefix)
+
     sample_summary = defaultdict(list)
     final_tables = []
     sample_order = sorted(final_data.keys())
@@ -457,8 +470,19 @@ def construct_report_content(samples, pipeline_steps, jinja2_env):
         if "CoverageGraph" in available_steps:
             cov_plot = sample_data["coverage_figname"]
 
+        # The read quality graph (per sample)
+        qual_plot = None
+        if "ReadQualityGraph" in available_steps:
+            qual_plot = sample_data["read_qual_figname"]
+
         # Saving tables
-        final_tables.append((sample, sample_tables, size_hist, cov_plot))
+        final_tables.append({
+            "name": sample,
+            "tables": sample_tables,
+            "plot_1": size_hist,
+            "plot_2": qual_plot,
+            "plot_3": cov_plot
+        })
 
     # The summary plots
     cov_multi_plot = None
@@ -470,10 +494,23 @@ def construct_report_content(samples, pipeline_steps, jinja2_env):
     report_content = generate_sample_summary(sample_summary, sample_order,
                                              available_steps, cov_multi_plot,
                                              template)
-    for section_name, section_tables, first_plot, second_plot in final_tables:
+    for data in final_tables:
+        # Acquiring the data
+        section_name = data["name"]
+        section_tables = data["tables"]
+        plot_1 = data["plot_1"]
+        plot_2 = data["plot_2"]
+        plot_3 = data["plot_3"]
+
         # If there is only one None plot, it should be the second one...
-        if first_plot is None and second_plot is not None:
-            first_plot, second_plot = second_plot, first_plot
+        first_plot = None
+        second_plot = None
+        for plot in [plot_1, plot_2, plot_3]:
+            if plot is not None:
+                if first_plot is None:
+                    first_plot = plot
+                elif second_plot is None:
+                    second_plot = plot
 
         # The template data
         report_data = {
@@ -721,7 +758,8 @@ def gather_values(values, required_values, final_values, sample, prefix):
     """Gather all the required values."""
     for name in required_values.keys():
         if name in final_values[sample]:
-            raise ProgramError("{}: duplicated values".format(name))
+            logging.warning("{}: duplicated values (only the most recent will "
+                            "be kept".format(name))
         if name not in values:
             raise ProgramError("ClipTrim: {}: no value named "
                                 "{}".format(prefix, name))
