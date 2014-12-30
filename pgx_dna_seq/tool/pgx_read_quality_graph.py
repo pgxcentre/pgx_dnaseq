@@ -26,17 +26,18 @@ class ReadQualityGraph(PGx_ReadQualityGraph):
 
     # The options
     _command = ("{other_opt} --input {input1} {input2} --output {output} "
-                "--log {output}.log")
+                "--title-prefix {sample_id} --log {output}.log")
 
     # The STDOUT and STDERR
     _stdout = "{output}.out"
     _stderr = "{output}.err"
 
     # The description of the required options
-    _required_options = {"input1":     GenericTool.INPUT,
-                         "input2":     GenericTool.INPUT,
-                         "output":     GenericTool.OUTPUT,
-                         "other_opt":  GenericTool.OPTIONAL}
+    _required_options = {"input1":    GenericTool.INPUT,
+                         "input2":    GenericTool.INPUT,
+                         "output":    GenericTool.OUTPUT,
+                         "sample_id": GenericTool.REQUIREMENT,
+                         "other_opt": GenericTool.OPTIONAL}
 
     # The suffix that will be added just before the extension of the output file
     _suffix = "read_quality_graph"
