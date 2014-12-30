@@ -34,11 +34,10 @@ def main():
             "plot (version {}).".format(__version__))
     parser = argparse.ArgumentParser(description=desc)
 
-    # We run the script
     try:
         # Parsing the options
         args = parse_args(parser)
-        args = check_args(args)
+        check_args(args)
 
         # Adding the logging capability
         logging.basicConfig(
@@ -167,6 +166,10 @@ def read_quality_from_fastq(filename1, filename2):
             if len(qual) > max_length:
                 max_length = len(qual)
 
+    open_func = open
+    if filename2.endswith(".gz"):
+        open_func = fgzip.open
+
     logging.info("Reading {}".format(filename2))
     with open_func(filename2) as i_file:
         # Reading each 4 lines
@@ -191,30 +194,12 @@ def read_quality_from_fastq(filename1, filename2):
 
 def check_args(args):
     """Checks the arguments and options."""
-    # Checking that there is one input file
-    if (args.fastq is None) and (args.gzfastq is None):
-        raise ProgramError("use --fastq or --gzfastq")
-
-    if (args.fastq is not None) and (args.gzfastq is not None):
-        raise ProgramError("use only one of --fastq or --gzfastq")
-
-    if args.fastq is not None:
-        for filename in args.fastq:
-            if not os.path.isfile(filename):
-                raise ProgramError("{}: no such file".format(filename))
-            if not filename.endswith(".fastq"):
-                raise ProgramError("{}: not a FASTQ file".format(filename))
-        args.input_files = args.fastq
-
-    if args.gzfastq is not None:
-        for filename in args.gzfastq:
-            if not os.path.isfile(filename):
-                raise ProgramError("{}: no such file".format(filename))
-            if not filename.endswith(".fastq.gz"):
-                raise ProgramError("{}: not a FASTQ.GZ file".format(filename))
-        args.input_files = args.gzfastq
-
-    return args
+    # Checking the files
+    for filename in args.input_files:
+        if not os.path.isfile(filename):
+            raise ProgramError("{}: no such file".format(filename))
+        if (not filename.endswith(".fastq")) and (not filename.endswith(".fastq.gz")):
+            raise ProgramError("{}: not a FASTQ file".format(filename))
 
 
 def parse_args(parser):
@@ -229,10 +214,9 @@ def parse_args(parser):
 
     # The input files
     group = parser.add_argument_group("Input Files")
-    group.add_argument("--fastq", type=str, metavar="FILE", nargs=2,
-                       help="The input FASTQ file")
-    group.add_argument("--gzfastq", type=str, metavar="FILE", nargs=2,
-                       help="The input gzipped FASTQ file")
+    group.add_argument("-i", "--input", type=str, metavar="FILE", nargs=2,
+                       dest="input_files",
+                       help="The input FASTQ or FASTQ.GZ files")
 
     # The result file
     group = parser.add_argument_group("Result File")
