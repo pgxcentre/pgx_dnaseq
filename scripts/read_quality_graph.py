@@ -55,7 +55,7 @@ def main():
         # Computing the quantiles
         quantiles = compute_percentiles(quality)
 
-        plot_quantiles(quantiles, args.output)
+        plot_quantiles(quantiles, args.title_prefix, args.output)
 
     # Catching the Ctrl^C
     except KeyboardInterrupt:
@@ -68,7 +68,7 @@ def main():
         parser.error(e.message)
 
 
-def plot_quantiles(data, output_filename):
+def plot_quantiles(data, title_prefix, output_filename):
     """Plot quantiles."""
     logging.info("Plotting percentiles")
 
@@ -82,8 +82,13 @@ def plot_quantiles(data, output_filename):
     # Creating the boxplots from scratch
     axe.plot(data.pos, data.q50, "-", lw=4, color="#CC0000")
 
+    # The title
+    title = "Read Quality Distribution"
+    if title_prefix != "":
+        title = title_prefix + " - " + title
+
     # Adding the labels
-    axe.set_title("Read Quality Distribution", weight="bold", fontsize=16)
+    axe.set_title(title, weight="bold", fontsize=16)
     axe.set_xlabel("Base Position", weight="bold")
     axe.set_ylabel("PHRED Score", weight="bold")
 
@@ -222,6 +227,8 @@ def parse_args(parser):
     group.add_argument("-o", "--output", type=str, metavar="FILE",
                        default="read_quality.pdf",
                        help="The name of the output file [%(default)s]")
+    group.add_argument("-t", "--title-prefix", type=str, metavar="TITLE",
+                       default="", help="The title of the plot [%(default)s]")
 
     return parser.parse_args()
 
