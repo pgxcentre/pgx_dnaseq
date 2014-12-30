@@ -6,11 +6,10 @@
 # python setup.py sdist --format zip
 
 import os
+from glob import glob
 from setuptools import setup
 
 from pgx_dna_seq import __version__
-
-scripts = ["coverage_graph.py", "execute_pipeline.py", "automatic_report.py"]
 
 setup(name="pgx_dna_seq",
       version=__version__,
@@ -19,7 +18,7 @@ setup(name="pgx_dna_seq",
       author_email="louis-philippe.lemieux.perreault@statgen.org",
       url="http://www.statgen.org",
       license="GPL",
-      scripts=[os.path.join("scripts", script_name) for script_name in scripts],
+      scripts=glob(os.path.join("scripts", "*")),
       install_requires=["numpy >= 1.8.1", "pandas >= 0.13.1", "ruffus >= 2.4.1", 
                         "matplotlib >=1.3.1", "jinja2 >=2.7.3"],
       packages=["pgx_dna_seq", "pgx_dna_seq.tool"],
