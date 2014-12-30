@@ -1,5 +1,6 @@
 __all__ = ["bwa", "fastq_mcf", "fastqc", "gatk", "picard_tools", "samtools",
-           "bowtie2", "bcftools", "pgx_coverage_graph"]
+           "bowtie2", "bcftools", "pgx_coverage_graph",
+           "pgx_read_quality_graph"]
 
 import os
 import shlex
