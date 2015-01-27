@@ -9,3 +9,4 @@ test/reference
 test/.ruffus_history.sqlite
 test/flowchart*
 test/TMP
+test/dna_seq_report.pdf
