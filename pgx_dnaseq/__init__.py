@@ -18,7 +18,7 @@ __email__ = "louis-philippe.lemieux.perreault@statgen.org"
 __status__ = "Development"
 
 
-# Loading the verison
+# Loading the version
 try:
     from .version import pgx_dnaseq_version as __version__
 except ImportError:
