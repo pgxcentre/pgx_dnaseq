@@ -29,8 +29,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
-from pgx_dnaseq import ProgramError
 from pgx_dnaseq import __version__
+from pgx_dnaseq import ProgramError
 
 
 def main():

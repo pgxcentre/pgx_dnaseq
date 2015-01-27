@@ -30,9 +30,9 @@ import jinja2
 import matplotlib.pyplot as plt
 from pkg_resources import resource_filename
 
+from pgx_dnaseq import __version__
 from pgx_dnaseq import ProgramError
 from pgx_dnaseq.read_config import get_pipeline_steps
-from pgx_dnaseq import __version__
 
 
 def main():

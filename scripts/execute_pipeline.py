@@ -26,12 +26,12 @@ import traceback
 from copy import copy
 
 import pgx_dnaseq
-from ruffus import originate, formatter, collate, transform, regex
-from ruffus import pipeline_printout_graph, pipeline_run
+from pgx_dnaseq import __version__
 from pgx_dnaseq import ProgramError
 from pgx_dnaseq.tool import GenericTool as Tool
+from ruffus import pipeline_printout_graph, pipeline_run
+from ruffus import originate, formatter, collate, transform, regex
 from pgx_dnaseq.read_config import read_config_file, get_pipeline_steps
-from pgx_dnaseq import __version__
 
 
 def check_input_files(filename):
