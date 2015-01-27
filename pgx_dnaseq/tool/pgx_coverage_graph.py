@@ -1,11 +1,25 @@
-__all__ = ["CoverageGraph", "CoverageGraph_Multi"]
+
+# This file is part of pgx_dnaseq
+#
+# This work is licensed under The MIT License (MIT). To view a copy of this
+# license, visit http://opensource.org/licenses/MIT
+
+
+__author__ = "Louis-Philippe Lemieux Perreault"
+__copyright__ = ("Copyright 2015 Beaulieu-Saucier Universite de Montreal "
+                 "Pharmacogenomics Centre. All rights reserved.")
+__license__ = "MIT"
+
 
 import re
 from glob import glob
 from shutil import copyfile
 
-from pgx_dnaseq.tool import GenericTool
-from pgx_dnaseq.tool.samtools import IndexBam
+from . import GenericTool
+from .samtools import IndexBam
+
+
+__all__ = ["CoverageGraph", "CoverageGraph_Multi"]
 
 
 class PGx_CoverageGraph(GenericTool):

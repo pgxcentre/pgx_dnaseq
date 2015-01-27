@@ -1,10 +1,18 @@
 """pgx_dnaseq: A module to automatize and facilitate NGS data analysis."""
 
-__author__ = "Louis-Philippe Lemieux Perreault and Abdellatif Daghrach"
-__copyright__ = "Copyright 2014, Beaulieu-Saucier Pharmacogenomics Centre"
+
+# This file is part of pgx_dnaseq
+#
+# This work is licensed under The MIT License (MIT). To view a copy of this
+# license, visit http://opensource.org/licenses/MIT
+
+
+__author__ = "Louis-Philippe Lemieux Perreault"
+__copyright__ = ("Copyright 2015 Beaulieu-Saucier Universite de Montreal "
+                 "Pharmacogenomics Centre. All rights reserved.")
 __credits__ = ["Louis-Philippe Lemieux Perreault", "Abdellatif Daghrach",
                "Michal Blazejczyk"]
-__license__ = "GPL"
+__license__ = "MIT"
 __maintainer__ = "Louis-Philippe Lemieux Perreault"
 __email__ = "louis-philippe.lemieux.perreault@statgen.org"
 __status__ = "Development"

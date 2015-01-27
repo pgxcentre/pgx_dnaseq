@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
 
-"""coverage_graph: A module to plot NGS coverage."""
+# This file is part of pgx_dnaseq
+#
+# This work is licensed under The MIT License (MIT). To view a copy of this
+# license, visit http://opensource.org/licenses/MIT
 
-__author__ = "Louis-Philippe Lemieux Perreault and Abdellatif Daghrach"
-__copyright__ = "Copyright 2014, Beaulieu-Saucier Pharmacogenomics Centre"
+
+__author__ = "Louis-Philippe Lemieux Perreault"
+__copyright__ = ("Copyright 2015 Beaulieu-Saucier Universite de Montreal "
+                 "Pharmacogenomics Centre. All rights reserved.")
 __credits__ = ["Louis-Philippe Lemieux Perreault", "Abdellatif Daghrach",
                "Michal Blazejczyk"]
-__license__ = "GPL"
-__version__ = "0.3"
+__license__ = "MIT"
 __maintainer__ = "Louis-Philippe Lemieux Perreault"
 __email__ = "louis-philippe.lemieux.perreault@statgen.org"
 __status__ = "Development"
+
 
 import os
 import re
@@ -22,11 +27,14 @@ from subprocess import Popen, PIPE
 import numpy as np
 import pandas as pd
 
+from pgx_dnaseq import __version__
+
 
 def main():
     """The main function."""
     # The parser object
-    desc = "Plots NGS coverage (version {}).".format(__version__)
+    desc = ("Plots NGS coverage (part of pgx_dnaseq "
+            "version {}).".format(__version__))
     parser = argparse.ArgumentParser(description=desc)
 
     try:
@@ -299,7 +307,8 @@ def parse_args(parser):
 
     """
     parser.add_argument("--version", action="version",
-                        version="%(prog)s {}".format(__version__))
+                        version=("%(prog)s part of pgx_dnaseq "
+                                 "version {}".format(__version__)))
     parser.add_argument("--samtools-exec", type=str, metavar="PATH",
                         help=("The PATH to the samtools executable if not in the "
                             "$PATH variable"))

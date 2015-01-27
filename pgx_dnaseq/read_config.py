@@ -1,8 +1,21 @@
+
+# This file is part of pgx_dnaseq
+#
+# This work is licensed under The MIT License (MIT). To view a copy of this
+# license, visit http://opensource.org/licenses/MIT
+
+
+__author__ = "Louis-Philippe Lemieux Perreault"
+__copyright__ = ("Copyright 2015 Beaulieu-Saucier Universite de Montreal "
+                 "Pharmacogenomics Centre. All rights reserved.")
+__license__ = "MIT"
+
+
 import configparser
 
-from pgx_dnaseq import tool
-from pgx_dnaseq.tool import *
-from pgx_dnaseq import ProgramError
+from . import tool
+from .tool import *
+from . import ProgramError
 
 
 # Getting all the possible tools

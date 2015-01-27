@@ -1,6 +1,20 @@
-__all__ = ["Bowtie2_align"]
 
-from pgx_dnaseq.tool import GenericTool
+# This file is part of pgx_dnaseq
+#
+# This work is licensed under The MIT License (MIT). To view a copy of this
+# license, visit http://opensource.org/licenses/MIT
+
+
+__author__ = "Louis-Philippe Lemieux Perreault"
+__copyright__ = ("Copyright 2015 Beaulieu-Saucier Universite de Montreal "
+                 "Pharmacogenomics Centre. All rights reserved.")
+__license__ = "MIT"
+
+
+from . import GenericTool
+
+
+__all__ = ["Bowtie2_align"]
 
 
 class Bowtie2(GenericTool):

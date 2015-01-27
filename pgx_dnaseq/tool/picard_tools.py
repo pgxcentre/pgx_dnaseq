@@ -1,11 +1,25 @@
-__all__ = ["SortSam", "AddRG", "MarkDuplicates", "HsMetrics" , "InsertSize"]
+
+# This file is part of pgx_dnaseq
+#
+# This work is licensed under The MIT License (MIT). To view a copy of this
+# license, visit http://opensource.org/licenses/MIT
+
+
+__author__ = "Louis-Philippe Lemieux Perreault"
+__copyright__ = ("Copyright 2015 Beaulieu-Saucier Universite de Montreal "
+                 "Pharmacogenomics Centre. All rights reserved.")
+__license__ = "MIT"
+
 
 import os
 import re
 from glob import glob
 
-from pgx_dnaseq.tool.java import JAR
-from pgx_dnaseq.tool import GenericTool
+from .java import JAR
+from . import GenericTool
+
+
+__all__ = ["SortSam", "AddRG", "MarkDuplicates", "HsMetrics" , "InsertSize"]
 
 
 class PicardTools(JAR):

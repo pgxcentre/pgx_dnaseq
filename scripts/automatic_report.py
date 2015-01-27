@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 
+# This file is part of pgx_dnaseq
+#
+# This work is licensed under The MIT License (MIT). To view a copy of this
+# license, visit http://opensource.org/licenses/MIT
 
-__author__ = "Louis-Philippe Lemieux Perreault and Abdellatif Daghrach"
-__copyright__ = "Copyright 2014, Beaulieu-Saucier Pharmacogenomics Centre"
+
+__author__ = "Louis-Philippe Lemieux Perreault"
+__copyright__ = ("Copyright 2015 Beaulieu-Saucier Universite de Montreal "
+                 "Pharmacogenomics Centre. All rights reserved.")
 __credits__ = ["Louis-Philippe Lemieux Perreault", "Abdellatif Daghrach",
                "Michal Blazejczyk"]
-__license__ = "GPL"
-__version__ = "0.1"
+__license__ = "MIT"
 __maintainer__ = "Louis-Philippe Lemieux Perreault"
 __email__ = "louis-philippe.lemieux.perreault@statgen.org"
 __status__ = "Development"
@@ -27,12 +32,14 @@ from pkg_resources import resource_filename
 
 from pgx_dnaseq import ProgramError
 from pgx_dnaseq.read_config import get_pipeline_steps
+from pgx_dnaseq import __version__
 
 
 def main():
     """The main function."""
     # Creating the option parser
-    desc = "Generate automatic report (version {}).".format(__version__)
+    desc = ("Generate automatic report (part of pgx_dnaseq "
+            "version {}).".format(__version__))
     parser = argparse.ArgumentParser(description=desc)
 
     # Running the script
@@ -809,7 +816,8 @@ def check_args(args):
 def parse_args(parser):
     """Parses the command line options and arguments."""
     parser.add_argument("-v", "--version", action="version",
-                        version="%(prog)s version {}".format(__version__))
+                        version=("%(prog)s part of pgx_dnaseq "
+                                 "version {}".format(__version__)))
     parser.add_argument("--debug", action="store_true",
                         help="Set the log level to debug.")
 

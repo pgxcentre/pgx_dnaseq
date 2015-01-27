@@ -1,15 +1,29 @@
-__all__ = ["RealignerTargetCreator", "IndelRealigner", "PrintReads",
-           "BaseRecalibrator", "UnifiedGenotyper", "UnifiedGenotyper_Multi",
-           "HaplotypeCaller", "HaplotypeCaller_Multi", "VariantRecalibrator",
-           "ApplyRecalibration"]
+
+# This file is part of pgx_dnaseq
+#
+# This work is licensed under The MIT License (MIT). To view a copy of this
+# license, visit http://opensource.org/licenses/MIT
+
+
+__author__ = "Louis-Philippe Lemieux Perreault"
+__copyright__ = ("Copyright 2015 Beaulieu-Saucier Universite de Montreal "
+                 "Pharmacogenomics Centre. All rights reserved.")
+__license__ = "MIT"
+
 
 import os
 import re
 
-from pgx_dnaseq import ProgramError
-from pgx_dnaseq.tool.java import JAR
-from pgx_dnaseq.tool import GenericTool
-from pgx_dnaseq.tool.samtools import IndexBam
+from .java import JAR
+from . import GenericTool
+from .. import ProgramError
+from .samtools import IndexBam
+
+
+__all__ = ["RealignerTargetCreator", "IndelRealigner", "PrintReads",
+           "BaseRecalibrator", "UnifiedGenotyper", "UnifiedGenotyper_Multi",
+           "HaplotypeCaller", "HaplotypeCaller_Multi", "VariantRecalibrator",
+           "ApplyRecalibration"]
 
 
 class GATK(JAR):

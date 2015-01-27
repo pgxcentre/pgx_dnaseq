@@ -1,9 +1,23 @@
-__all__ = ["ReadQualityGraph", ]
+
+# This file is part of pgx_dnaseq
+#
+# This work is licensed under The MIT License (MIT). To view a copy of this
+# license, visit http://opensource.org/licenses/MIT
+
+
+__author__ = "Louis-Philippe Lemieux Perreault"
+__copyright__ = ("Copyright 2015 Beaulieu-Saucier Universite de Montreal "
+                 "Pharmacogenomics Centre. All rights reserved.")
+__license__ = "MIT"
+
 
 from glob import glob
 from shutil import copyfile
 
-from pgx_dnaseq.tool import GenericTool
+from . import GenericTool
+
+
+__all__ = ["ReadQualityGraph", ]
 
 
 class PGx_ReadQualityGraph(GenericTool):

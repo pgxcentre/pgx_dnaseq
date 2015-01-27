@@ -1,5 +1,22 @@
 #!/usr/bin/env python3
 
+# This file is part of pgx_dnaseq
+#
+# This work is licensed under The MIT License (MIT). To view a copy of this
+# license, visit http://opensource.org/licenses/MIT
+
+
+__author__ = "Louis-Philippe Lemieux Perreault"
+__copyright__ = ("Copyright 2015 Beaulieu-Saucier Universite de Montreal "
+                 "Pharmacogenomics Centre. All rights reserved.")
+__credits__ = ["Louis-Philippe Lemieux Perreault", "Abdellatif Daghrach",
+               "Michal Blazejczyk"]
+__license__ = "MIT"
+__maintainer__ = "Louis-Philippe Lemieux Perreault"
+__email__ = "louis-philippe.lemieux.perreault@statgen.org"
+__status__ = "Development"
+
+
 import os
 import re
 import sys
@@ -14,10 +31,7 @@ from ruffus import pipeline_printout_graph, pipeline_run
 from pgx_dnaseq import ProgramError
 from pgx_dnaseq.tool import GenericTool as Tool
 from pgx_dnaseq.read_config import read_config_file, get_pipeline_steps
-
-
-# The version of the script
-prog_version = pgx_dnaseq.__version__
+from pgx_dnaseq import __version__
 
 
 def check_input_files(filename):
@@ -103,12 +117,14 @@ def parse_args():
 
 
 # The parser object
-desc = "Execute a NGS pipeline (version {}).".format(prog_version)
+desc = ("Execute a NGS pipeline (part of pgx_dnaseq "
+        "version {}).".format(__version__))
 parser = argparse.ArgumentParser(description=desc)
 
 # The input file
 parser.add_argument("-v", "--version", action="version",
-                    version="%(prog)s version {}".format(prog_version))
+                    version=("%(prog)s part of pgx_dnaseq "
+                             "version {}".format(__version__)))
 
 group = parser.add_argument_group("Pipeline Configuration")
 group.add_argument("-i", "--input", type=str, metavar="FILE",
