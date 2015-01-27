@@ -4,8 +4,8 @@ import re
 from glob import glob
 from shutil import copyfile
 
-from pgx_dna_seq.tool import GenericTool
-from pgx_dna_seq.tool.samtools import IndexBam
+from pgx_dnaseq.tool import GenericTool
+from pgx_dnaseq.tool.samtools import IndexBam
 
 
 class PGx_CoverageGraph(GenericTool):

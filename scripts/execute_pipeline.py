@@ -8,16 +8,16 @@ import __main__
 import traceback
 from copy import copy
 
-import pgx_dna_seq
+import pgx_dnaseq
 from ruffus import originate, formatter, collate, transform, regex
 from ruffus import pipeline_printout_graph, pipeline_run
-from pgx_dna_seq import ProgramError
-from pgx_dna_seq.tool import GenericTool as Tool
-from pgx_dna_seq.read_config import read_config_file, get_pipeline_steps
+from pgx_dnaseq import ProgramError
+from pgx_dnaseq.tool import GenericTool as Tool
+from pgx_dnaseq.read_config import read_config_file, get_pipeline_steps
 
 
 # The version of the script
-prog_version = pgx_dna_seq.__version__
+prog_version = pgx_dnaseq.__version__
 
 
 def check_input_files(filename):

@@ -1,6 +1,6 @@
 __all__ = ["Bowtie2_align"]
 
-from pgx_dna_seq.tool import GenericTool
+from pgx_dnaseq.tool import GenericTool
 
 
 class Bowtie2(GenericTool):

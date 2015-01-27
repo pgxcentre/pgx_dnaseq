@@ -1,8 +1,8 @@
 import configparser
 
-from pgx_dna_seq import tool
-from pgx_dna_seq.tool import *
-from pgx_dna_seq import ProgramError
+from pgx_dnaseq import tool
+from pgx_dnaseq.tool import *
+from pgx_dnaseq import ProgramError
 
 
 # Getting all the possible tools

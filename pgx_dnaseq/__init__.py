@@ -1,14 +1,20 @@
-"""pgx_dna_seq: A module to automatize and facilitate NGS data analysis."""
+"""pgx_dnaseq: A module to automatize and facilitate NGS data analysis."""
 
 __author__ = "Louis-Philippe Lemieux Perreault and Abdellatif Daghrach"
 __copyright__ = "Copyright 2014, Beaulieu-Saucier Pharmacogenomics Centre"
 __credits__ = ["Louis-Philippe Lemieux Perreault", "Abdellatif Daghrach",
                "Michal Blazejczyk"]
 __license__ = "GPL"
-__version__ = "0.5"
 __maintainer__ = "Louis-Philippe Lemieux Perreault"
 __email__ = "louis-philippe.lemieux.perreault@statgen.org"
 __status__ = "Development"
+
+
+# Loading the verison
+try:
+    from .version import pgx_dnaseq_version as __version__
+except ImportError:
+    __version__ = None
 
 
 class ProgramError(Exception):

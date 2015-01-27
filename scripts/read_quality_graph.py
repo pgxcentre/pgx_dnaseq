@@ -24,7 +24,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
-from pgx_dna_seq import ProgramError
+from pgx_dnaseq import ProgramError
 
 
 def main():

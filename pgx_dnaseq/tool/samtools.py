@@ -3,8 +3,8 @@ __all__ = ["Sam2Bam", "IndexBam", "KeepMapped", "FlagStat", "MPILEUP",
 
 import re
 
-from pgx_dna_seq import ProgramError
-from pgx_dna_seq.tool import GenericTool
+from pgx_dnaseq import ProgramError
+from pgx_dnaseq.tool import GenericTool
 
 
 class Samtools(GenericTool):

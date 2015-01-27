@@ -4,8 +4,8 @@ import os
 import re
 from glob import glob
 
-from pgx_dna_seq.tool.java import JAR
-from pgx_dna_seq.tool import GenericTool
+from pgx_dnaseq.tool.java import JAR
+from pgx_dnaseq.tool import GenericTool
 
 
 class PicardTools(JAR):

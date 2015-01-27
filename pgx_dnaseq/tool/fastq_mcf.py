@@ -3,7 +3,7 @@ __all__ = ["ClipTrim"]
 import re
 from glob import glob
 
-from pgx_dna_seq.tool import GenericTool
+from pgx_dnaseq.tool import GenericTool
 
 
 class FastQMCF(GenericTool):

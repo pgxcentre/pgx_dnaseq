@@ -2,8 +2,8 @@ __all__ = ["Java", "JAR"]
 
 import os
 
-from pgx_dna_seq import ProgramError
-from pgx_dna_seq.tool import GenericTool
+from pgx_dnaseq import ProgramError
+from pgx_dnaseq.tool import GenericTool
 
 
 class Java(GenericTool):

@@ -15,7 +15,7 @@ MINOR = 6
 VERSION = "{}.{}".format(MAJOR, MINOR)
 
 
-def write_version_file(fn=os.path.join("pgx_dna_seq", "version.py")):
+def write_version_file(fn=os.path.join("pgx_dnaseq", "version.py")):
     content = """
 # THIS FILE WAS GENERATED AUTOMATICALLY BY PGX_DNASEQ SETUP.PY
 pgx_dnaseq_version = {version}
@@ -32,7 +32,7 @@ def setup_package():
     write_version_file()
 
     setup(
-        name="pgx_dna_seq",
+        name="pgx_dnaseq",
         version=VERSION,
         description="Automatic PGx DNA sequencing pipeline",
         author="Louis-Philippe Lemieux Perreault",
@@ -43,9 +43,9 @@ def setup_package():
         install_requires=["numpy >= 1.8.1", "pandas >= 0.13.1",
                           "ruffus >= 2.5", "matplotlib >=1.3.1",
                           "jinja2 >=2.7.3"],
-        packages=["pgx_dna_seq", "pgx_dna_seq.tool"],
-        package_data={"pgx_dna_seq": ["report_templates/*.tex",
-                                      "report_templates/images/*"]},
+        packages=["pgx_dnaseq", "pgx_dnaseq.tool"],
+        package_data={"pgx_dnaseq": ["report_templates/*.tex",
+                                     "report_templates/images/*"]},
         classifiers=['Operating System :: Linux',
                      'Programming Language :: Python',
                      'Programming Language :: Python :: 3.4'],

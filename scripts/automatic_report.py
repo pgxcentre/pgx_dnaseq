@@ -25,8 +25,8 @@ import jinja2
 import matplotlib.pyplot as plt
 from pkg_resources import resource_filename
 
-from pgx_dna_seq import ProgramError
-from pgx_dna_seq.read_config import get_pipeline_steps
+from pgx_dnaseq import ProgramError
+from pgx_dnaseq.read_config import get_pipeline_steps
 
 
 def main():
@@ -118,7 +118,7 @@ def print_report(sample_list, pipeline_steps, options):
         line_comment_prefix = '%#',
         trim_blocks = True,
         autoescape = False,
-        loader=jinja2.PackageLoader("pgx_dna_seq", "report_templates")
+        loader=jinja2.PackageLoader("pgx_dnaseq", "report_templates")
     )
 
     # Getting the flowchart (either PNG or PDF only)
@@ -136,9 +136,9 @@ def print_report(sample_list, pipeline_steps, options):
     # Creating the data to put into the final report
     resource_prefix = "report_templates/images/"
     report_data = {
-        "logo_small":     resource_filename("pgx_dna_seq", resource_prefix +
+        "logo_small":     resource_filename("pgx_dnaseq", resource_prefix +
                                             "pgx_logo_small.png"),
-        "logo":           resource_filename("pgx_dna_seq",
+        "logo":           resource_filename("pgx_dnaseq",
                                             resource_prefix + "pgx_logo.pdf"),
         "run_name":       sanitize_tex(options.run_name),
         "flowchart":      flowchart,

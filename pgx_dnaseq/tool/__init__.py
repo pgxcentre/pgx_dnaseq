@@ -7,7 +7,7 @@ import shlex
 from tempfile import NamedTemporaryFile
 from subprocess import check_call, SubprocessError
 
-from pgx_dna_seq import ProgramError
+from pgx_dnaseq import ProgramError
 
 
 class GenericTool(object):

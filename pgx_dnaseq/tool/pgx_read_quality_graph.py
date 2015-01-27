@@ -3,7 +3,7 @@ __all__ = ["ReadQualityGraph", ]
 from glob import glob
 from shutil import copyfile
 
-from pgx_dna_seq.tool import GenericTool
+from pgx_dnaseq.tool import GenericTool
 
 
 class PGx_ReadQualityGraph(GenericTool):

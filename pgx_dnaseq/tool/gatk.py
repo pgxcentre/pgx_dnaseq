@@ -6,10 +6,10 @@ __all__ = ["RealignerTargetCreator", "IndelRealigner", "PrintReads",
 import os
 import re
 
-from pgx_dna_seq import ProgramError
-from pgx_dna_seq.tool.java import JAR
-from pgx_dna_seq.tool import GenericTool
-from pgx_dna_seq.tool.samtools import IndexBam
+from pgx_dnaseq import ProgramError
+from pgx_dnaseq.tool.java import JAR
+from pgx_dnaseq.tool import GenericTool
+from pgx_dnaseq.tool.samtools import IndexBam
 
 
 class GATK(JAR):

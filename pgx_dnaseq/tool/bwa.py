@@ -2,8 +2,8 @@ __all__ = ["ALN", "SAMPE", "MEM"]
 
 import os
 
-from pgx_dna_seq import ProgramError
-from pgx_dna_seq.tool import GenericTool
+from pgx_dnaseq import ProgramError
+from pgx_dnaseq.tool import GenericTool
 
 
 class BWA(GenericTool):
