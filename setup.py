@@ -38,7 +38,7 @@ def setup_package():
         author="Louis-Philippe Lemieux Perreault",
         author_email="louis-philippe.lemieux.perreault@statgen.org",
         url="http://www.statgen.org",
-        license="MIT",
+        license="CC BY-NC 4.0",
         scripts=glob(os.path.join("scripts", "*")),
         install_requires=["numpy >= 1.8.1", "pandas >= 0.13.1",
                           "ruffus >= 2.5", "matplotlib >=1.3.1",
