@@ -53,7 +53,8 @@ class ReadQualityGraph(PGx_ReadQualityGraph):
                          "sample_id": GenericTool.REQUIREMENT,
                          "other_opt": GenericTool.OPTIONAL}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = "read_quality_graph"
 
     # The input and output type
@@ -85,4 +86,3 @@ class ReadQualityGraph(PGx_ReadQualityGraph):
         }
 
         return result
-

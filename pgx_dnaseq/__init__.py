@@ -27,7 +27,7 @@ except ImportError:
 
 class ProgramError(Exception):
     """An :py:class:`Exception` raised in case of a problem.
-    
+
     :param msg: the message to print to the user before exiting.
     :type msg: string
 

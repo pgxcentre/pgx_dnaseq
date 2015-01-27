@@ -75,7 +75,8 @@ class MEM(BWA):
                          "input2":    GenericTool.INPUT,
                          "output":    GenericTool.OUTPUT}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = "mem"
 
     # The input and output type
@@ -108,7 +109,8 @@ class SAMPE(BWA):
                          "input2":    GenericTool.INPUT,
                          "output":    GenericTool.OUTPUT}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = "sampe"
 
     # The input and output type
@@ -132,7 +134,8 @@ class SAMPE(BWA):
             aln_options["input"] = options["input1"]
 
             # the output SAI
-            output_sai = "{}.sai".format(os.path.basename(aln_options["input"]))
+            input_basename = os.path.basename(aln_options["input"])
+            output_sai = "{}.sai".format(input_basename)
             output_sai = os.path.join(os.path.dirname(options["output"]),
                                       output_sai)
             aln_options["output"] = output_sai
@@ -152,7 +155,8 @@ class SAMPE(BWA):
             aln_options["input"] = options["input2"]
 
             # The output SAI
-            output_sai = "{}.sai".format(os.path.basename(aln_options["input"]))
+            input_basename = os.path.basename(aln_options["input"])
+            output_sai = "{}.sai".format(input_basename)
             output_sai = os.path.join(os.path.dirname(options["output"]),
                                       output_sai)
             aln_options["output"] = output_sai

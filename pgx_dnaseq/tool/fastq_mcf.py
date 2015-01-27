@@ -55,7 +55,8 @@ class ClipTrim(FastQMCF):
                          "other_opt": GenericTool.OPTIONAL,
                          "prefix":    GenericTool.OUTPUT}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = "ct"
 
     # The input and output type
@@ -102,4 +103,3 @@ class ClipTrim(FastQMCF):
         }
 
         return result
-

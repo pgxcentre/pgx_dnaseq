@@ -25,10 +25,11 @@ for module_name in tool.__all__:
         __possible_tools[tool_name] = eval("{}.{}".format(module_name,
                                                           tool_name))
 
+
 def read_config_file(filename):
     """Reads a configuration file."""
-    # Creating the configuration file parser (we want to read as string, so that
-    # it is case sensitive)
+    # Creating the configuration file parser (we want to read as string, so
+    # that it is case sensitive)
     parser = configparser.RawConfigParser()
     parser.optionxform = str
     parser.read(filename)
@@ -43,6 +44,7 @@ def read_config_file(filename):
 
     # Returning the configuration
     return(configuration)
+
 
 def get_pipeline_steps(filename):
     """Gets the different pipeline steps and their options."""

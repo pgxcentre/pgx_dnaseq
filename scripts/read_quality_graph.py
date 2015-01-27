@@ -208,7 +208,8 @@ def check_args(args):
     for filename in args.input_files:
         if not os.path.isfile(filename):
             raise ProgramError("{}: no such file".format(filename))
-        if (not filename.endswith(".fastq")) and (not filename.endswith(".fastq.gz")):
+        if ((not filename.endswith(".fastq"))
+                and (not filename.endswith(".fastq.gz"))):
             raise ProgramError("{}: not a FASTQ file".format(filename))
 
 
@@ -242,4 +243,3 @@ def parse_args(parser):
 
 if __name__ == "__main__":
     main()
-

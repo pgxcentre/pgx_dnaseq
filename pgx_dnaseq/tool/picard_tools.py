@@ -19,7 +19,7 @@ from .java import JAR
 from . import GenericTool
 
 
-__all__ = ["SortSam", "AddRG", "MarkDuplicates", "HsMetrics" , "InsertSize"]
+__all__ = ["SortSam", "AddRG", "MarkDuplicates", "HsMetrics", "InsertSize"]
 
 
 class PicardTools(JAR):
@@ -42,8 +42,8 @@ class SortSam(PicardTools):
     _tool_name = "SortSam"
 
     # The options
-    _command = ("SortSam INPUT={input} OUTPUT={output} SORT_ORDER={sort_order} "
-                "{other_opt}")
+    _command = ("SortSam INPUT={input} OUTPUT={output} "
+                "SORT_ORDER={sort_order} {other_opt}")
 
     # The STDOUT and STDERR
     _stdout = "{output}.out"
@@ -55,7 +55,8 @@ class SortSam(PicardTools):
                          "sort_order": GenericTool.REQUIREMENT,
                          "other_opt":  GenericTool.OPTIONAL}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = "sorted"
 
     # The input and output type
@@ -63,8 +64,8 @@ class SortSam(PicardTools):
     _output_type = (".{}.bam".format(_suffix), )
 
     def __init__(self):
-       """Initialize a SortSam instance."""
-       pass
+        """Initialize a SortSam instance."""
+        pass
 
 
 class HsMetrics(PicardTools):
@@ -89,7 +90,8 @@ class HsMetrics(PicardTools):
                          "targets":   GenericTool.INPUT,
                          "other_opt": GenericTool.OPTIONAL}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = "hsmetrics"
 
     # The input and output type
@@ -98,10 +100,10 @@ class HsMetrics(PicardTools):
 
     # This tool does not produce usable data...
     _produce_data = False
-    
+
     def __init__(self):
-       """Initialize a HSmetrics instance."""
-       pass
+        """Initialize a HSmetrics instance."""
+        pass
 
     def read_report(self, prefix):
         """Reads a HsMetrics report file."""
@@ -146,30 +148,31 @@ class InsertSize(PicardTools):
                          "hist_file": GenericTool.OUTPUT,
                          "reference": GenericTool.INPUT,
                          "other_opt": GenericTool.OPTIONAL}
-    
-    # The suffix that will be added just before the extension of the output file
+
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = "insertsize"
 
     # The input and output type
     _input_type = (r"\.(\S+\.)?[sb]am$", )
     _output_type = (".{}".format(_suffix), )
-    
+
     # This tool does not produce usable data...
     _produce_data = False
-    
+
     def __init__(self):
         """Initialize a HSmetrics instance."""
-    pass
-    
+        pass
+
     def execute(self, options, out_dir=None):
         """InsertSize."""
         # The plot file
         if "output" not in options:
             m = "{}: no output file".format(self.__class__.__name__)
             raise ProgramError(m)
-        plot_file =re.sub(r"\..*",".png",options["output"])
-        options["hist_file"]=plot_file
-        super(InsertSize,self).execute(options,out_dir)
+        plot_file = re.sub(r"\..*", ".png", options["output"])
+        options["hist_file"] = plot_file
+        super(InsertSize, self).execute(options, out_dir)
 
     def read_report(self, prefix):
         """Reads a InsertSize report file."""
@@ -251,7 +254,8 @@ class AddRG(PicardTools):
                          "rgcn":        GenericTool.REQUIREMENT,
                          "rglb":        GenericTool.REQUIREMENT}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = "rg"
 
     # The input and output type
@@ -261,7 +265,7 @@ class AddRG(PicardTools):
     def __init__(self):
         """Initialize a AddRG instance."""
         pass
-    
+
 
 class MarkDuplicates(PicardTools):
 
@@ -282,7 +286,8 @@ class MarkDuplicates(PicardTools):
                          "metrics":   GenericTool.OUTPUT,
                          "other_opt": GenericTool.OPTIONAL}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = "dedup"
 
     # The input and output type
@@ -290,8 +295,8 @@ class MarkDuplicates(PicardTools):
     _output_type = (".{}.bam".format(_suffix), )
 
     def __init__(self):
-       """Initialize a MarkDuplicates instance."""
-       pass
+        """Initialize a MarkDuplicates instance."""
+        pass
 
     def execute(self, options, out_dir=None):
         """Mark duplicates."""
@@ -325,4 +330,3 @@ class MarkDuplicates(PicardTools):
                 result[name.lower()] = value
 
         return result
-

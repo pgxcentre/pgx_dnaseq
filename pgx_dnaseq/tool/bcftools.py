@@ -48,7 +48,8 @@ class BcftoolsVariantCaller(Bcftools):
     _required_options = {"input":  GenericTool.INPUT,
                          "output": GenericTool.OUTPUT}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = "bcftools"
 
     # The input and output type
@@ -58,6 +59,3 @@ class BcftoolsVariantCaller(Bcftools):
     def __init__(self):
         """Initialize a BcftoolsVariantCaller instance."""
         pass
-
-
-

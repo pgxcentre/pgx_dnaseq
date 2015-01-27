@@ -54,7 +54,8 @@ class CoverageGraph(PGx_CoverageGraph):
                          "targets":    GenericTool.INPUT,
                          "other_opt":  GenericTool.OPTIONAL}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = "coverage_graph"
 
     # The input and output type
@@ -121,7 +122,8 @@ class CoverageGraph_Multi(PGx_CoverageGraph):
                          "targets":    GenericTool.INPUT,
                          "other_opt":  GenericTool.OPTIONAL}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = "coverage_graph"
 
     # The input and output type
@@ -171,4 +173,3 @@ class CoverageGraph_Multi(PGx_CoverageGraph):
         }
 
         return result
-

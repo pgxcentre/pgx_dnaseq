@@ -49,7 +49,8 @@ class Bowtie2_align(Bowtie2):
                          "reference": GenericTool.REQUIREMENT,
                          "other_opt": GenericTool.OPTIONAL}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = "bowtie2"
 
     # The input and output type

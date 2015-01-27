@@ -50,7 +50,8 @@ class Sam2Bam(Samtools):
     _required_options = {"input":  GenericTool.INPUT,
                          "output": GenericTool.OUTPUT}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = "sam2bam"
 
     # The input and output type
@@ -77,7 +78,8 @@ class IndexBam(Samtools):
     # The description of the required options
     _required_options = {"input": GenericTool.INPUT}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = None
 
     # The input and output type
@@ -106,7 +108,8 @@ class KeepMapped(Samtools):
                          "output":     GenericTool.OUTPUT,
                          "mapped_opt": GenericTool.OPTIONAL}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = "mapped"
 
     # The input and output type
@@ -146,7 +149,8 @@ class FlagStat(Samtools):
     _required_options = {"input":  GenericTool.INPUT,
                          "output": GenericTool.OUTPUT}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = "flagstat"
 
     # The input and output type
@@ -179,7 +183,8 @@ class MPILEUP(Samtools):
                          "other_opt": GenericTool.OPTIONAL,
                          "output": GenericTool.OUTPUT}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = "mpileup"
 
     # The input and output type
@@ -220,7 +225,8 @@ class MPILEUP_Multi(Samtools):
                          "other_opt": GenericTool.OPTIONAL,
                          "output": GenericTool.OUTPUT}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = "mpileup"
 
     # The input and output type

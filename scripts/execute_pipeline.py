@@ -39,8 +39,9 @@ def check_input_files(filename):
     split_re = re.compile(r"\s+")
     input_filenames = None
     with open(filename, "r") as i_file:
-        input_filenames = [re.split(r"\s+", i.rstrip("\r\n"))
-                                                    for i in i_file.readlines()]
+        input_filenames = [
+            re.split(r"\s+", i.rstrip("\r\n")) for i in i_file.readlines()
+        ]
 
     # Checking that all those files exists
     for sample_files in input_filenames:
@@ -99,13 +100,8 @@ def parse_args():
     """Parses the command line options and arguments.
 
     :returns: A :py:class:`argparse.Namespace` object created by the
-              :py:mod:`argparse` module. It contains the values of the different
-              options.
-
-    ===============   =======  ================================================
-        Options        Type                      Description
-    ===============   =======  ================================================
-    ===============   =======  ================================================
+              :py:mod:`argparse` module. It contains the values of the
+              different options.
 
     .. note::
         No option check is done here (except for the one automatically done by
@@ -207,20 +203,31 @@ if __name__ == "__main__":
                 os.makedirs(output_dir)
 
             # What will be in the formatter
-            curr_formatter = [r".+/(?P<SAMPLE>[a-zA-Z0-9_\-]+){}".format(i)
-                                                            for i in input_type]
-            curr_output = [os.path.join(output_dir, ("{SAMPLE[" + str(i) +"]}" +
-                                                    last_suffix + suffix))
-                                        for i, suffix in enumerate(output_type)]
+            curr_formatter = [
+                r".+/(?P<SAMPLE>[a-zA-Z0-9_\-]+){}".format(i)
+                for i in input_type
+            ]
+            curr_output = [
+                os.path.join(
+                    output_dir,
+                    ("{SAMPLE[" + str(i) + "]}" + last_suffix + suffix),
+                )
+                for i, suffix in enumerate(output_type)
+            ]
             formatter_func = formatter
 
             # What if we need to merge all inputs?
             if job.need_to_merge_all_inputs():
-                curr_formatter = [r".+/[a-zA-Z0-9_\-]+{}".format(i)
-                                                            for i in input_type]
-                curr_output = [os.path.join(output_dir, ("all_samples" +
-                                                        last_suffix + suffix))
-                                                      for suffix in output_type]
+                curr_formatter = [
+                    r".+/[a-zA-Z0-9_\-]+{}".format(i) for i in input_type
+                ]
+                curr_output = [
+                    os.path.join(
+                        output_dir,
+                        ("all_samples" + last_suffix + suffix),
+                    )
+                    for suffix in output_type
+                ]
                 formatter_func = regex
 
             # Checking if there is only one output
@@ -229,9 +236,12 @@ if __name__ == "__main__":
 
             # Getting the current Ruffus' decorator
             curr_decorator = None
-            if (len(input_type) > len(output_type)) or job.need_to_merge_all_inputs():
+            if ((len(input_type) > len(output_type))
+                    or job.need_to_merge_all_inputs()):
+                # Collate
                 curr_decorator = collate
             elif len(input_type) == len(output_type):
+                # Transform
                 curr_decorator = transform
             else:
                 m = "cannot choose a good Ruffus decorator"

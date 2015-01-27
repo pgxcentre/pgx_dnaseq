@@ -51,7 +51,8 @@ class FastQC_FastQ(FastQC):
     _required_options = {"input":  GenericTool.INPUT,
                          "output": GenericTool.OUTPUT}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = "fastqc"
 
     # The input and output type
@@ -79,8 +80,8 @@ class FastQC_FastQ(FastQC):
         super(FastQC_FastQ, self).execute(options, out_dir)
 
         # We need to move the files... FastQC renames the original file so that
-        # the directory is the same, but ".fastq(.gz)?" is replaced to "_fastqc"
-        # (for the directory) and "_fastqc.zip" for the file.
+        # the directory is the same, but ".fastq(.gz)?" is replaced to
+        # "_fastqc" (for the directory) and "_fastqc.zip" for the file.
         dir_to_move = re.sub(r"\.fastq(\.gz)$", "_fastqc", options["input"])
         destination = re.sub(r"\.zip$", "", options["output1"])
         if os.path.isdir(dir_to_move):
@@ -99,8 +100,8 @@ class FastQC_FastQ(FastQC):
         super(FastQC_FastQ, self).execute(options, out_dir)
 
         # We need to move the files... FastQC renames the original file so that
-        # the directory is the same, but ".fastq(.gz)?" is replaced to "_fastqc"
-        # (for the directory) and "_fastqc.zip" for the file.
+        # the directory is the same, but ".fastq(.gz)?" is replaced to
+        # "_fastqc" (for the directory) and "_fastqc.zip" for the file.
         dir_to_move = re.sub(r"\.fastq(\.gz)$", "_fastqc", options["input"])
         destination = re.sub(r"\.zip$", "", options["output2"])
         if os.path.isdir(dir_to_move):

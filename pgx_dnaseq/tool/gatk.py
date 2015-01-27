@@ -59,7 +59,8 @@ class RealignerTargetCreator(GATK):
                          "reference":     GenericTool.INPUT,
                          "other_rtc_opt": GenericTool.OPTIONAL}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = None
 
     # The input and output type
@@ -67,8 +68,8 @@ class RealignerTargetCreator(GATK):
     _output_type = (".intervals", )
 
     def __init__(self):
-       """Initialize a _Realign instance."""
-       pass
+        """Initialize a _Realign instance."""
+        pass
 
 
 class IndelRealigner(GATK):
@@ -91,7 +92,8 @@ class IndelRealigner(GATK):
                          "interval_file": GenericTool.INPUT,
                          "other_opt":     GenericTool.OPTIONAL}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = "realign_gatk"
 
     # The input and output type
@@ -157,7 +159,8 @@ class PrintReads(GATK):
                          "groups":    GenericTool.INPUT,
                          "other_opt": GenericTool.OPTIONAL}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = None
 
     # The input and output type
@@ -165,8 +168,8 @@ class PrintReads(GATK):
     _output_type = (".grp", )
 
     def __init__(self):
-       """Initialize a PrintReads instance."""
-       pass
+        """Initialize a PrintReads instance."""
+        pass
 
 
 class BaseRecalibrator(GATK):
@@ -189,7 +192,8 @@ class BaseRecalibrator(GATK):
                          "dbsnp":     GenericTool.INPUT,
                          "other_opt": GenericTool.OPTIONAL}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = "base_recal"
 
     # The input and output type
@@ -226,8 +230,8 @@ class UnifiedGenotyper(GATK):
     _tool_name = "UnifiedGenotyper"
 
     # The options
-    _command = ("-T UnifiedGenotyper -R {reference} -I {input} --dbsnp {dbsnp} "
-                "-o {output} {other_opt}")
+    _command = ("-T UnifiedGenotyper -R {reference} -I {input} "
+                "--dbsnp {dbsnp} -o {output} {other_opt}")
 
     # The STDOUT and STDERR
     _stdout = "{output}.out"
@@ -240,7 +244,8 @@ class UnifiedGenotyper(GATK):
                          "other_opt": GenericTool.OPTIONAL,
                          "dbsnp":     GenericTool.INPUT}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = "unified_genotyper"
 
     # The input and output type
@@ -283,7 +288,8 @@ class UnifiedGenotyper_Multi(GATK):
                          "other_opt": GenericTool.OPTIONAL,
                          "dbsnp":     GenericTool.INPUT}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = "unified_genotyper"
 
     # The input and output type
@@ -338,7 +344,8 @@ class HaplotypeCaller(GATK):
                          "other_opt": GenericTool.OPTIONAL,
                          "dbsnp":     GenericTool.INPUT}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = "haplotype_caller"
 
     # The input and output type
@@ -381,7 +388,8 @@ class HaplotypeCaller_Multi(GATK):
                          "other_opt": GenericTool.OPTIONAL,
                          "dbsnp":     GenericTool.INPUT}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = "haplotype_caller"
 
     # The input and output type
@@ -423,11 +431,11 @@ class VariantRecalibrator(GATK):
 
     # The options
     _command = ("-T VariantRecalibrator -R {reference} --input {input} "
-                "--recal_file {output_recal} --tranches_file {output_tranches} "
-                "-an QD -an HaplotypeScore -an MQRankSum -an ReadPosRankSum "
-                "-an FS -an MQ -an InbreedingCoeff "
-                "--resource:hapmap,{hapmap_config} {hapmap_sites} "
-                "--resource:omni,{omni_config} {omni_sites} "
+                "--recal_file {output_recal} "
+                "--tranches_file {output_tranches} -an QD -an HaplotypeScore "
+                "-an MQRankSum -an ReadPosRankSum -an FS -an MQ "
+                "-an InbreedingCoeff --resource:hapmap,{hapmap_config} "
+                "{hapmap_sites} --resource:omni,{omni_config} {omni_sites} "
                 "--resource:dbsnp,{dbsnp_config} {dbsnp_sites} {other_opt}")
 
     # The STDOUT and STDERR
@@ -447,7 +455,8 @@ class VariantRecalibrator(GATK):
                          "dbsnp_sites":     GenericTool.INPUT,
                          "other_opt":       GenericTool.OPTIONAL}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = None
 
     # The input and output type
@@ -455,8 +464,8 @@ class VariantRecalibrator(GATK):
     _output_type = (".recal", )
 
     def __init__(self):
-       """Initialize a VariantRecalibrator instance."""
-       pass
+        """Initialize a VariantRecalibrator instance."""
+        pass
 
 
 class ApplyRecalibration(GATK):
@@ -481,7 +490,8 @@ class ApplyRecalibration(GATK):
                          "tranches_file": GenericTool.INPUT,
                          "other_opt":     GenericTool.OPTIONAL}
 
-    # The suffix that will be added just before the extension of the output file
+    # The suffix that will be added just before the extension of the output
+    # file
     _suffix = "variant_recal"
 
     # The input and output type
@@ -489,8 +499,8 @@ class ApplyRecalibration(GATK):
     _output_type = (".{}.vcf".format(_suffix), )
 
     def __init__(self):
-       """Initialize a ApplyRecalibration instance."""
-       pass
+        """Initialize a ApplyRecalibration instance."""
+        pass
 
     def execute(self, options, out_dir=None):
         """Computes and applies the recalibration."""

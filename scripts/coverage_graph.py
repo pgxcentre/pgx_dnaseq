@@ -139,7 +139,7 @@ def plot_depth(depth, nb_bases, samples, options):
                 print(*cumul, sep=" ", file=o_file)
 
     # Plotting the legend
-    ax.legend(loc="best",fancybox=True, ncol=3, shadow=True)
+    ax.legend(loc="best", fancybox=True, ncol=3, shadow=True)
 
     fig.savefig("{}.png".format(options.out), bbox_inches="tight", dpi=300)
     plt.close(fig)
@@ -155,8 +155,8 @@ def read_depth(filenames):
     #     2- A list of cumulative values (float) separated by spaces
     for filename in filenames:
         with open(filename, "r") as i_file:
-            bam_file = i_file.readline().rstrip("\r\n")
-            cumul_values = np.array(i_file.readline().rstrip("\r\n").split(" "),
+            bam_file = i_file.readline().rstrip("\n")
+            cumul_values = np.array(i_file.readline().rstrip("\n").split(" "),
                                     dtype=float)
             if bam_file in depths:
                 print("WARNING: {}: already seen... "
@@ -272,7 +272,7 @@ def check_args(args):
         if not os.path.isfile(os.path.join(args.samtools_exec, "samtools")):
             m = "{}: does not contain samtools".format(args.samtools_exec)
             raise ProgramError(m)
-            
+
     return True
 
 
@@ -280,12 +280,12 @@ def parse_args(parser):
     """Parses the command line options and arguments.
 
     :returns: A :py:class:`argparse.Namespace` object created by the
-              :py:mod:`argparse` module. It contains the values of the different
-              options.
+              :py:mod:`argparse` module. It contains the values of the
+              different options.
 
-    ================   =======  ================================================
+    ================   =======  ===============================================
         Options         Type                      Description
-    ================   =======  ================================================
+    ================   =======  ===============================================
     ``--depth-file``   string   Results from this script (to redo the plot
                                 faster)
     ``--bam``          string   Input BAM file(s) (one or more, separated by
@@ -298,7 +298,7 @@ def parse_args(parser):
     ``--max-depth``    int      The maximal depth to plot (in order to zoom in
                                 the plots)
     ``--out``          string   The prefix of the output file
-    ================   =======  ================================================
+    ================   =======  ===============================================
 
     .. note::
         No option check is done here (except for the one automatically done by
@@ -310,48 +310,50 @@ def parse_args(parser):
                         version=("%(prog)s part of pgx_dnaseq "
                                  "version {}".format(__version__)))
     parser.add_argument("--samtools-exec", type=str, metavar="PATH",
-                        help=("The PATH to the samtools executable if not in the "
-                            "$PATH variable"))
+                        help=("The PATH to the samtools executable if not in "
+                              "the $PATH variable"))
 
     # The input files
     group = parser.add_argument_group("Input Files")
     group.add_argument("--depth-file", type=str, metavar="FILE", nargs="+",
-                    help=("Results from this script (to redo the plot faster) "
-                            "(one or more, separate by spaces)"))
+                       help=("Results from this script (to redo the plot "
+                             "faster) (one or more, separate by spaces)"))
     group.add_argument("--bam", type=str, metavar="BAM", nargs="+",
-                    help="Input BAM file(s) (one or more, separated by spaces)")
+                       help=("Input BAM file(s) (one or more, separated by "
+                             "spaces)"))
     group.add_argument("--bed", type=str, metavar="BED", required=True,
-                    help="BED file to restrict to targeted regions")
+                       help="BED file to restrict to targeted regions")
 
     # The MPILEUP options
     group = parser.add_argument_group("MPILEUP Options")
     group.add_argument("-q", type=int, metavar="INT", default=0, dest="mapq",
-                    help=("skip alignments with mapQ smaller than INT "
-                            "[%(default)d]"))
+                       help=("skip alignments with mapQ smaller than INT "
+                             "[%(default)d]"))
     group.add_argument("-Q", type=int, metavar="INT", default=13, dest="baseq",
-                    help=("skip bases with baseQ/BAQ smaller than INT "
-                            "[%(default)d]"))
-    group.add_argument("-d", type=int, metavar="INT", default=250, dest="bam_depth",
-                    help=("max per-BAM depth to avoid excessive memory usage "
-                            "[%(default)d]"))
+                       help=("skip bases with baseQ/BAQ smaller than INT "
+                             "[%(default)d]"))
+    group.add_argument("-d", type=int, metavar="INT", default=250,
+                       dest="bam_depth",
+                       help=("max per-BAM depth to avoid excessive memory "
+                             "usage [%(default)d]"))
 
     # Plotting options
     group = parser.add_argument_group("Plotting Options")
     group.add_argument("--max-depth", type=int, metavar="INT",
-                    help=("The maximal depth to plot (in order to zoom in the "
-                            "plots) [None]"))
+                       help=("The maximal depth to plot (in order to zoom in "
+                             "the plots) [None]"))
 
     # The output
     group = parser.add_argument_group("Output Options")
     group.add_argument("-o", "--out", metavar="FILE", default="depth",
-                    help="The name of the output file [%(default)s]")
+                       help="The name of the output file [%(default)s]")
 
     return parser.parse_args()
 
 
 class ProgramError(Exception):
     """An :py:class:`Exception` raised in case of a problem.
-    
+
     :param msg: the message to print to the user before exiting.
 
     :type msg: string
@@ -374,4 +376,3 @@ class ProgramError(Exception):
 # Calling the main, if necessary
 if __name__ == "__main__":
     main()
-

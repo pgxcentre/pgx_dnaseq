@@ -102,7 +102,8 @@ def gather_samples(filename):
 
             for sample in samples:
                 if sample.endswith(".fastq") or sample.endswith(".fastq.gz"):
-                    all_samples.add(re.search(r"(^\w+)_R[12]", sample).group(1))
+                    all_samples.add(re.search(r"(^\w+)_R[12]",
+                                              sample).group(1))
 
                 else:
                     all_samples.add(re.search(r"\w+", sample).group())
@@ -115,16 +116,16 @@ def print_report(sample_list, pipeline_steps, options):
     """Creates the report."""
     # Creating the jinja2 environment
     jinja2_env = jinja2.Environment(
-        block_start_string = '\BLOCK{',
-        block_end_string = '}',
-        variable_start_string = '\VAR{',
-        variable_end_string = '}',
-        comment_start_string = '\#{',
-        comment_end_string = '}',
-        line_statement_prefix = '%-',
-        line_comment_prefix = '%#',
-        trim_blocks = True,
-        autoescape = False,
+        block_start_string='\BLOCK{',
+        block_end_string='}',
+        variable_start_string='\VAR{',
+        variable_end_string='}',
+        comment_start_string='\#{',
+        comment_end_string='}',
+        line_statement_prefix='%-',
+        line_comment_prefix='%#',
+        trim_blocks=True,
+        autoescape=False,
         loader=jinja2.PackageLoader("pgx_dnaseq", "report_templates")
     )
 
@@ -418,19 +419,58 @@ def construct_report_content(samples, pipeline_steps, jinja2_env):
                 "name":   "HS Metrics",
                 "format": "lr",
                 "data":   [
-                    ["Total reads", "{:,d}".format(total_reads)],
-                    ["Off bait", "{:,d}".format(off_bait)],
-                    ["Mean bait coverage", "{:,.2f}".format(mean_bait)],
-                    ["Mean target coverage", "{:,.2f}".format(mean_target)],
-                    ["Fold enrichment", "{:,.2f}".format(fold)],
-                    ["Zero CVG target", r"{:,.2f}\%".format(cvg_targets)],
-                    ["Target bases (2x)", r"{:,.2f}\%".format(pct_target_2x)],
-                    ["Target bases (10x)", r"{:,.2f}\%".format(pct_target_10x)],
-                    ["Target bases (20x)", r"{:,.2f}\%".format(pct_target_20x)],
-                    ["Target bases (30x)", r"{:,.2f}\%".format(pct_target_30x)],
-                    ["Target bases (40x)", r"{:,.2f}\%".format(pct_target_40x)],
-                    ["Target bases (50x)", r"{:,.2f}\%".format(pct_target_50x)],
-                    ["Target bases (100x)", r"{:,.2f}\%".format(pct_target_100x)]],
+                    [
+                        "Total reads",
+                        "{:,d}".format(total_reads),
+                    ],
+                    [
+                        "Off bait",
+                        "{:,d}".format(off_bait),
+                    ],
+                    [
+                        "Mean bait coverage",
+                        "{:,.2f}".format(mean_bait),
+                    ],
+                    [
+                        "Mean target coverage",
+                        "{:,.2f}".format(mean_target),
+                    ],
+                    [
+                        "Fold enrichment",
+                        "{:,.2f}".format(fold),
+                    ],
+                    [
+                        "Zero CVG target",
+                        r"{:,.2f}\%".format(cvg_targets),
+                    ],
+                    [
+                        "Target bases (2x)",
+                        r"{:,.2f}\%".format(pct_target_2x),
+                    ],
+                    [
+                        "Target bases (10x)",
+                        r"{:,.2f}\%".format(pct_target_10x),
+                    ],
+                    [
+                        "Target bases (20x)",
+                        r"{:,.2f}\%".format(pct_target_20x),
+                    ],
+                    [
+                        "Target bases (30x)",
+                        r"{:,.2f}\%".format(pct_target_30x),
+                    ],
+                    [
+                        "Target bases (40x)",
+                        r"{:,.2f}\%".format(pct_target_40x),
+                    ],
+                    [
+                        "Target bases (50x)",
+                        r"{:,.2f}\%".format(pct_target_50x),
+                    ],
+                    [
+                        "Target bases (100x)",
+                        r"{:,.2f}\%".format(pct_target_100x),
+                    ]],
             })
 
             # Saving for the sample summary
@@ -551,26 +591,18 @@ def generate_sample_summary(sample_values, sample_order, steps, cov_multi,
         summary_tables.append({
             "name":   "Clipping/Trimming",
             "format": "lrl",
-            "data":   [[
-                "Total reads",
-                "{:,.2f}".format(mean(total_reads)),
-                r"$\pm$ {:,.2f}".format(stdev(total_reads)),
-            ],
-            [
-                "Too short after clip",
-                "{:,.2f}".format(mean(too_short)),
-                r"$\pm$ {:,.2f}".format(stdev(too_short)),
-            ],
-            [
-                "Trimmed R1",
-                "{:,.2f}".format(mean(trimmed_r1)),
-                r"$\pm$ {:,.2f}".format(stdev(trimmed_r1)),
-            ],
-            [
-                "Trimmed R2",
-                "{:,.2f}".format(mean(trimmed_r2)),
-                r"$\pm$ {:,.2f}".format(stdev(trimmed_r2)),
-            ]],
+            "data":   [["Total reads",
+                        "{:,.2f}".format(mean(total_reads)),
+                        r"$\pm$ {:,.2f}".format(stdev(total_reads))],
+                       ["Too short after clip",
+                        "{:,.2f}".format(mean(too_short)),
+                        r"$\pm$ {:,.2f}".format(stdev(too_short))],
+                       ["Trimmed R1",
+                        "{:,.2f}".format(mean(trimmed_r1)),
+                        r"$\pm$ {:,.2f}".format(stdev(trimmed_r1))],
+                       ["Trimmed R2",
+                        "{:,.2f}".format(mean(trimmed_r2)),
+                        r"$\pm$ {:,.2f}".format(stdev(trimmed_r2))]],
         })
 
     # Mark duplicates
@@ -584,26 +616,18 @@ def generate_sample_summary(sample_values, sample_order, steps, cov_multi,
         summary_tables.append({
             "name":   "Duplicated Reads",
             "format": "lrl",
-            "data":   [[
-                "Total duplicates",
-                "{:,.2f}".format(mean(rp_dup)),
-                r"$\pm$ {:,.2f}".format(stdev(rp_dup)),
-            ],
-            [
-                "Duplicated percentage",
-                r"{:,.2f}\%".format(mean(pc_dup)),
-                r"$\pm$ {:,.2f}".format(stdev(pc_dup)),
-            ],
-            [
-                "Optical duplicate",
-                r"{:,.2f}\%".format(mean(optical_dup)),
-                r"$\pm$ {:,.2f}".format(stdev(optical_dup)),
-            ],
-            [
-                "PCR duplicate",
-                r"{:,.2f}\%".format(mean(pcr_dup)),
-                r"$\pm$ {:,.2f}".format(stdev(pcr_dup)),
-            ]],
+            "data":   [["Total duplicates",
+                        "{:,.2f}".format(mean(rp_dup)),
+                        r"$\pm$ {:,.2f}".format(stdev(rp_dup))],
+                       ["Duplicated percentage",
+                        r"{:,.2f}\%".format(mean(pc_dup)),
+                        r"$\pm$ {:,.2f}".format(stdev(pc_dup))],
+                       ["Optical duplicate",
+                        r"{:,.2f}\%".format(mean(optical_dup)),
+                        r"$\pm$ {:,.2f}".format(stdev(optical_dup))],
+                       ["PCR duplicate",
+                        r"{:,.2f}\%".format(mean(pcr_dup)),
+                        r"$\pm$ {:,.2f}".format(stdev(pcr_dup))]],
         })
 
     # HsMetrics
@@ -626,71 +650,45 @@ def generate_sample_summary(sample_values, sample_order, steps, cov_multi,
         summary_tables.append({
             "name":   "HS Metrics",
             "format": "lrl",
-            "data":   [[
-                "Total reads",
-                "{:,.2f}".format(mean(total_reads)),
-                r"$\pm$ {:,.2f}".format(stdev(total_reads)),
-            ],
-            [
-                "Off bait",
-                "{:,.2f}".format(mean(off_bait)),
-                r"$\pm$ {:,.2f}".format(stdev(off_bait)),
-            ],
-            [
-                "Mean bait coverage",
-                "{:,.2f}".format(mean(mean_bait)),
-                r"$\pm$ {:,.2f}".format(stdev(mean_bait)),
-            ],
-            [
-                "Mean target coverage",
-                "{:,.2f}".format(mean(mean_target)),
-                r"$\pm$ {:,.2f}".format(stdev(mean_target)),
-            ],
-            [
-                "Fold enrichment",
-                "{:,.2f}".format(mean(fold)),
-                r"$\pm$ {:,.2f}".format(stdev(fold)),
-            ],
-            [
-                "Zero CVG target",
-                r"{:,.2f}\%".format(mean(cvg_targets)),
-                r"$\pm$ {:,.2f}".format(stdev(cvg_targets)),
-            ],
-            [
-                "Target bases (2x)",
-                r"{:,.2f}\%".format(mean(pct_target_2x)),
-                r"$\pm$ {:,.2f}".format(stdev(pct_target_2x)),
-            ],
-            [
-                "Target bases (10x)",
-                r"{:,.2f}\%".format(mean(pct_target_10x)),
-                r"$\pm$ {:,.2f}".format(stdev(pct_target_10x)),
-            ],
-            [
-                "Target bases (20x)",
-                r"{:,.2f}\%".format(mean(pct_target_20x)),
-                r"$\pm$ {:,.2f}".format(stdev(pct_target_20x)),
-            ],
-            [
-                "Target bases (30x)",
-                r"{:,.2f}\%".format(mean(pct_target_30x)),
-                r"$\pm$ {:,.2f}".format(stdev(pct_target_30x)),
-            ],
-            [
-                "Target bases (40x)",
-                r"{:,.2f}\%".format(mean(pct_target_40x)),
-                r"$\pm$ {:,.2f}".format(stdev(pct_target_40x)),
-            ],
-            [
-                "Target bases (50x)",
-                r"{:,.2f}\%".format(mean(pct_target_50x)),
-                r"$\pm$ {:,.2f}".format(stdev(pct_target_50x)),
-            ],
-            [
-                "Target bases (100x)",
-                r"{:,.2f}\%".format(mean(pct_target_100x)),
-                r"$\pm$ {:,.2f}".format(stdev(pct_target_100x)),
-            ]],
+            "data":   [["Total reads",
+                        "{:,.2f}".format(mean(total_reads)),
+                        r"$\pm$ {:,.2f}".format(stdev(total_reads))],
+                       ["Off bait",
+                        "{:,.2f}".format(mean(off_bait)),
+                        r"$\pm$ {:,.2f}".format(stdev(off_bait))],
+                       ["Mean bait coverage",
+                        "{:,.2f}".format(mean(mean_bait)),
+                        r"$\pm$ {:,.2f}".format(stdev(mean_bait))],
+                       ["Mean target coverage",
+                        "{:,.2f}".format(mean(mean_target)),
+                        r"$\pm$ {:,.2f}".format(stdev(mean_target))],
+                       ["Fold enrichment",
+                        "{:,.2f}".format(mean(fold)),
+                        r"$\pm$ {:,.2f}".format(stdev(fold))],
+                       ["Zero CVG target",
+                        r"{:,.2f}\%".format(mean(cvg_targets)),
+                        r"$\pm$ {:,.2f}".format(stdev(cvg_targets))],
+                       ["Target bases (2x)",
+                        r"{:,.2f}\%".format(mean(pct_target_2x)),
+                        r"$\pm$ {:,.2f}".format(stdev(pct_target_2x))],
+                       ["Target bases (10x)",
+                        r"{:,.2f}\%".format(mean(pct_target_10x)),
+                        r"$\pm$ {:,.2f}".format(stdev(pct_target_10x))],
+                       ["Target bases (20x)",
+                        r"{:,.2f}\%".format(mean(pct_target_20x)),
+                        r"$\pm$ {:,.2f}".format(stdev(pct_target_20x))],
+                       ["Target bases (30x)",
+                        r"{:,.2f}\%".format(mean(pct_target_30x)),
+                        r"$\pm$ {:,.2f}".format(stdev(pct_target_30x))],
+                       ["Target bases (40x)",
+                        r"{:,.2f}\%".format(mean(pct_target_40x)),
+                        r"$\pm$ {:,.2f}".format(stdev(pct_target_40x))],
+                       ["Target bases (50x)",
+                        r"{:,.2f}\%".format(mean(pct_target_50x)),
+                        r"$\pm$ {:,.2f}".format(stdev(pct_target_50x))],
+                       ["Target bases (100x)",
+                        r"{:,.2f}\%".format(mean(pct_target_100x)),
+                        r"$\pm$ {:,.2f}".format(stdev(pct_target_100x))]],
         })
 
     # InsertSize
@@ -726,21 +724,15 @@ def generate_sample_summary(sample_values, sample_order, steps, cov_multi,
         summary_tables.append({
             "name":   "Insert Size",
             "format": "lrl",
-            "data":   [[
-                "Mean",
-                "{:,.2f}".format(mean(mean_size)),
-                r"$\pm$ {:,.2f}".format(stdev(mean_size)),
-            ],
-            [
-                "Median",
-                "{:,.2f}".format(mean(median_size)),
-                r"$\pm$ {:,.2f}".format(stdev(median_size)),
-            ],
-            [
-                "Standard deviation",
-                "{:,.2f}".format(mean(std_size)),
-                r"$\pm$ {:,.2f}".format(stdev(std_size)),
-            ]],
+            "data":   [["Mean",
+                        "{:,.2f}".format(mean(mean_size)),
+                        r"$\pm$ {:,.2f}".format(stdev(mean_size))],
+                       ["Median",
+                        "{:,.2f}".format(mean(median_size)),
+                        r"$\pm$ {:,.2f}".format(stdev(median_size))],
+                       ["Standard deviation",
+                        "{:,.2f}".format(mean(std_size)),
+                        r"$\pm$ {:,.2f}".format(stdev(std_size))]],
         })
 
     # The plots
@@ -769,7 +761,7 @@ def gather_values(values, required_values, final_values, sample, prefix):
                             "be kept".format(name))
         if name not in values:
             raise ProgramError("ClipTrim: {}: no value named "
-                                "{}".format(prefix, name))
+                               "{}".format(prefix, name))
         final_values[sample][name] = required_values[name](values[name])
 
     return final_values
@@ -809,7 +801,7 @@ def check_args(args):
     # Checking the output report
     if not args.output.endswith(".pdf"):
         args.output += ".pdf"
-   
+
     return True
 
 
@@ -844,4 +836,3 @@ def parse_args(parser):
 
 if __name__ == "__main__":
     main()
-

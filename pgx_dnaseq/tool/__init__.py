@@ -44,7 +44,7 @@ class GenericTool(object):
 
     # By default, we run locally
     __locally = True
-    
+
     def __init__(self):
         """Initialize an new GeneticTool object."""
         # The generic command for the generic tool
@@ -196,8 +196,9 @@ class GenericTool(object):
         else:
             # Getting the tool walltime and nodes variable (for DRMAA)
             walltime, nodes = GenericTool.__create_drmaa_var(
-                                          GenericTool.get_tool_configuration(),
-                                          tool_name)
+                GenericTool.get_tool_configuration(),
+                tool_name,
+            )
             GenericTool.__execute_command_drmaa(job_command, job_stdout,
                                                 job_stderr, out_dir, tool_name,
                                                 walltime, nodes)
@@ -331,7 +332,7 @@ class GenericTool(object):
         # The required options
         required_options = self.get_required_options()
 
-       # We check every required options
+        # We check every required options
         for option_name, option_type in required_options.items():
             if (option_name not in options) and option_type != self.OPTIONAL:
                 m = "{}: missing required option".format(option_name)
@@ -406,4 +407,3 @@ class GenericTool(object):
         """Reads the report from one prefix."""
         raise NotImplementedError("No reporting options for "
                                   "'{}'".format(self.get_tool_name()))
-
