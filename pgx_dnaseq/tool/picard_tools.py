@@ -5,7 +5,7 @@
 # license, visit http://opensource.org/licenses/MIT
 
 
-__author__ = "Louis-Philippe Lemieux Perreault"
+__author__ = "Abdellatif Daghrach"
 __copyright__ = ("Copyright 2015 Beaulieu-Saucier Universite de Montreal "
                  "Pharmacogenomics Centre. All rights reserved.")
 __license__ = "MIT"
