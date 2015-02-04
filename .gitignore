@@ -2,7 +2,7 @@
 *.pyc
 dist
 *.egg-info
-pgx_dna_seq/version.py
+pgx_dnaseq/version.py
 
 test/data
 test/output
