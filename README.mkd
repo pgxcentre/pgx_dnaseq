@@ -1,9 +1,10 @@
 # pgx_dnaseq - Automatic NGS pipeline
 
-*Version 0.6*
+*Version 0.7*
 
 `pgx_dnaseq` is an automatic pipeline to perform high-throughput sequencing
-analysis.
+analysis. It also provides useful tools such as `coverage_graph.py` and
+`read_quality_graph.py`.
 
 
 ## Dependencies
@@ -46,19 +47,22 @@ $ pip install -U numpy
 Finally, install the pipeline (it will install all the remaining requirements):
 
 ```console
-$ pip install -U pgx_dnaseq-0.6.tar.gz
+$ pip install -U pgx_dnaseq-0.7.tar.gz
 ```
 
+
 ## Usage
+
+### Pipeline
 
 This is the usage of the automatic pipeline.
 
 ```console
 $ execute_pipeline.py --help
 usage: execute_pipeline.py [-h] [-v] [-i FILE] [-p FILE] [-t FILE] [-d]
-                           [-n INT] [-f FORMAT]
+                           [-n INT] [--preamble FILE] [-f FORMAT]
 
-Execute a NGS pipeline (part of pgx_dnaseq version 0.6).
+Execute a NGS pipeline (part of pgx_dnaseq version 0.7).
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -67,23 +71,36 @@ optional arguments:
 Pipeline Configuration:
   -i FILE, --input FILE
                         A file containing the pipeline input files (one sample
-                        per line, one or more file per sample
+                        per line, one or more file per sample.
                         [input_files.txt]
   -p FILE, --pipeline-config FILE
-                        The pipeline configuration file [pipeline.conf]
+                        The pipeline configuration file. [pipeline.conf]
   -t FILE, --tool-config FILE
-                        The tools configuration file [tools.conf]
+                        The tools configuration file. [tools.conf]
   -d, --use-drmaa       Use DRMAA to launch the tasks instead of running them
-                        locally [False]
+                        locally. [False]
   -n INT, --nb-process INT
                         The number of processes for job execution (allow
                         enough if '--use-drmaa' option is used since you want
-                        at least one job per sample) [1]
+                        at least one job per sample). [1]
+  --preamble FILE       This option should be used when using DRMAA on a HPC
+                        to load required module and set environment variables.
+                        The content of the file will be added between the
+                        'shebang' line and the tool command.
 
 Pipeline Flowchart:
   -f FORMAT, --format FORMAT
                         The format of the pipeline flowchart [pdf]
 ```
+
+When using DRMAA on a HPC requiring module to be loaded (*e.g.* java), don't
+forget to set the preamble option. Be careful though on what is written in the
+preamble file, since it is written as is in the temporary script used by DRMAA.
+Also, if using a Python virtual environment, don't forget to activate it in the
+preamble file in order to use provided Python script.
+
+
+### Automatic reporting
 
 The package also provide automatic reporting, using the following script.
 
@@ -92,7 +109,7 @@ $ automatic_report.py --help
 usage: automatic_report.py [-h] [-v] [--debug] [-i FILE] [-p FILE] [-r STRING]
                            [-o FILE]
 
-Generate automatic report (part of pgx_dnaseq version 0.6).
+Generate automatic report (part of pgx_dnaseq version 0.7).
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -113,3 +130,74 @@ Report Options:
   -o FILE, --output FILE
                         The name of the final report [dna_seq_report.pdf]
 ```
+
+
+### Provided quality script
+
+The `read_quality_graph.py` script produces a pretty read base quality
+distribution plot. Here is its usage:
+
+```console
+$ read_quality_graph.py --help
+usage: read_quality_graph.py [-h] [-v] [--debug] [--log LOGFILE]
+                             [-i FILE FILE] [-o FILE] [-t TITLE]
+
+Produces a pretty read base quality distribution plot (part of pgx_dnaseq
+version 0.7).
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -v, --version         show program's version number and exit
+  --debug               Set the logging to debug
+  --log LOGFILE         The log file [read_quality_graph.log]
+
+Input Files:
+  -i FILE FILE, --input FILE FILE
+                        The input FASTQ or FASTQ.GZ files
+
+Result File:
+  -o FILE, --output FILE
+                        The name of the output file [read_quality.pdf]
+  -t TITLE, --title-prefix TITLE
+                        The title of the plot []
+```
+
+The `coverage_graph.py` script plots NGS coverage using *samtools mpileup*.
+Here is its usage:
+
+```console
+$ coverage_graph.py --help
+usage: coverage_graph.py [-h] [--version] [--samtools-exec PATH]
+                         [--depth-file FILE [FILE ...]] [--bam BAM [BAM ...]]
+                         --bed BED [-q INT] [-Q INT] [-d INT]
+                         [--max-depth INT] [-o FILE]
+
+Plots NGS coverage (part of pgx_dnaseq version 0.7).
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  --samtools-exec PATH  The PATH to the samtools executable if not in the
+                        $PATH variable
+
+Input Files:
+  --depth-file FILE [FILE ...]
+                        Results from this script (to redo the plot faster)
+                        (one or more, separate by spaces)
+  --bam BAM [BAM ...]   Input BAM file(s) (one or more, separated by spaces)
+  --bed BED             BED file to restrict to targeted regions
+
+MPILEUP Options:
+  -q INT                skip alignments with mapQ smaller than INT [0]
+  -Q INT                skip bases with baseQ/BAQ smaller than INT [13]
+  -d INT                max per-BAM depth to avoid excessive memory usage
+                        [250]
+
+Plotting Options:
+  --max-depth INT       The maximal depth to plot (in order to zoom in the
+                        plots) [None]
+
+Output Options:
+  -o FILE, --out FILE   The name of the output file [depth]
+```
+
