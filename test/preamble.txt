@@ -1,0 +1,13 @@
+# Loading the required module
+module load gcc/4.8.2
+module load jdk64/7u51
+
+# The base directory
+BASEDIR=/mnt/parallel_scratch_mp2_wipe_on_december_2015/dubemar1/$USER
+
+# Updating the LD_LIBRARY_PATH (torque and sqlite3)
+LD_LIBRARY_PATH=$BASEDIR/softwares/sqlite-3.8.8/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH
+
+# Activating the Python virtual environment
+source $BASEDIR/softwares/miniconda3/bin/activate python3_env
