@@ -25,7 +25,7 @@ _possible_tools = {}
 for module_name in tools.__all__:
     for tool_name in eval(module_name).__all__:
         _possible_tools[tool_name] = eval("{}.{}".format(module_name,
-                                                          tool_name))
+                                                         tool_name))
 
 
 def read_config_file(filename):
