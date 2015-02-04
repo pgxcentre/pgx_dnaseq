@@ -21,10 +21,10 @@ from . import ProgramError
 
 
 # Getting all the possible tools
-__possible_tools = {}
+_possible_tools = {}
 for module_name in tool.__all__:
     for tool_name in eval(module_name).__all__:
-        __possible_tools[tool_name] = eval("{}.{}".format(module_name,
+        _possible_tools[tool_name] = eval("{}.{}".format(module_name,
                                                           tool_name))
 
 
@@ -80,13 +80,13 @@ def get_pipeline_steps(filename):
             m = "{}: step {}: no tool was specified".format(filename, step)
             raise ProgramError(m)
         tool_name = tool_options["tool"]
-        if tool_name not in __possible_tools:
+        if tool_name not in _possible_tools:
             m = "{}: {}: not a valid tool".format(filename, tool_name)
             raise ProgramError(m)
         del tool_options["tool"]
 
         # Saving the steps
-        steps.append((__possible_tools[tool_name](), tool_options))
+        steps.append((_possible_tools[tool_name](), tool_options))
 
     # Returning the steps
     return steps

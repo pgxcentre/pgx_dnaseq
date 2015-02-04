@@ -42,10 +42,10 @@ class GenericTool(object):
     _merge_all_inputs = False
 
     # The local tool configuration
-    __tool_configuration = {}
+    _tool_configuration = {}
 
     # By default, we run locally
-    __locally = True
+    _locally = True
 
     # The script preamble
     _script_preamble = ""
@@ -66,17 +66,17 @@ class GenericTool(object):
     @staticmethod
     def set_tool_configuration(drmaa_options):
         """Sets the configuration for all the tools."""
-        GenericTool.__tool_configuration = drmaa_options
+        GenericTool._tool_configuration = drmaa_options
 
     @staticmethod
     def get_tool_configuration():
         """Get the configuration for all the tools."""
-        return GenericTool.__tool_configuration
+        return GenericTool._tool_configuration
 
     @staticmethod
     def do_not_run_locally():
-        """Do not run the tools locally (sets __locally to False)."""
-        GenericTool.__locally = False
+        """Do not run the tools locally (sets _locally to False)."""
+        GenericTool._locally = False
 
     @staticmethod
     def set_script_preamble(preamble):
@@ -91,7 +91,7 @@ class GenericTool(object):
     @staticmethod
     def run_locally():
         """Do the tools need to be run locally or not."""
-        return GenericTool.__locally
+        return GenericTool._locally
 
     @staticmethod
     def get_tool_bin_dir(tool_name):
@@ -206,15 +206,18 @@ class GenericTool(object):
 
         # Execute it
         if GenericTool.run_locally():
-            GenericTool.__execute_command_locally(job_command, job_stdout,
-                                                  job_stderr)
+            GenericTool._execute_command_locally(
+                command=job_command,
+                stdout=job_stdout,
+                stderr=job_stderr,
+            )
         else:
             # Getting the tool walltime and nodes variable (for DRMAA)
-            walltime, nodes = GenericTool.__create_drmaa_var(
+            walltime, nodes = GenericTool._create_drmaa_var(
                 GenericTool.get_tool_configuration(),
                 tool_name,
             )
-            GenericTool.__execute_command_drmaa(
+            GenericTool._execute_command_drmaa(
                 command=job_command,
                 stdout=job_stdout,
                 stderr=job_stderr,
@@ -226,7 +229,7 @@ class GenericTool(object):
             )
 
     @staticmethod
-    def __execute_command_locally(command, stdout=None, stderr=None):
+    def _execute_command_locally(command, stdout=None, stderr=None):
         """Executes a command using the subprocess module."""
         # The stdout and stderr files
         if stdout is not None:
@@ -263,8 +266,8 @@ class GenericTool(object):
                 stderr.close()
 
     @staticmethod
-    def __execute_command_drmaa(preamble, command, stdout, stderr, out_dir,
-                                job_name, walltime, nodes):
+    def _execute_command_drmaa(preamble, command, stdout, stderr, out_dir,
+                               job_name, walltime, nodes):
         """Executes a command using DRMAA."""
         # Creating the script in a temporary file
         tmp_file = NamedTemporaryFile(mode="w", suffix="_execute.sh",
@@ -294,7 +297,7 @@ class GenericTool(object):
             import drmaa
         except ImportError:
             # Executing it locally
-            GenericTool.__execute_command_locally([tmp_file.name])
+            GenericTool._execute_command_locally([tmp_file.name])
         else:
             # Initializing a new DRMAA session
             s = drmaa.Session()
@@ -331,7 +334,7 @@ class GenericTool(object):
         os.remove(tmp_file.name)
 
     @staticmethod
-    def __create_drmaa_var(options, job_name):
+    def _create_drmaa_var(options, job_name):
         """Creates "walltime" and "nodes" variables for the job."""
         # Creating the walltime variable
         walltime = None
