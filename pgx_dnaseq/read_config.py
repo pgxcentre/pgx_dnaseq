@@ -15,14 +15,14 @@ __license__ = "Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)"
 
 import configparser
 
-from . import tool
-from .tool import *
+from . import tools
+from .tools import *
 from . import ProgramError
 
 
 # Getting all the possible tools
 _possible_tools = {}
-for module_name in tool.__all__:
+for module_name in tools.__all__:
     for tool_name in eval(module_name).__all__:
         _possible_tools[tool_name] = eval("{}.{}".format(module_name,
                                                           tool_name))

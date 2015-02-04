@@ -43,7 +43,7 @@ def setup_package():
         install_requires=["numpy >= 1.8.1", "pandas >= 0.13.1",
                           "ruffus >= 2.5", "matplotlib >=1.3.1",
                           "jinja2 >=2.7.3"],
-        packages=["pgx_dnaseq", "pgx_dnaseq.tool"],
+        packages=["pgx_dnaseq", "pgx_dnaseq.tools"],
         package_data={"pgx_dnaseq": ["report_templates/*.tex",
                                      "report_templates/images/*"]},
         classifiers=['Operating System :: Linux',

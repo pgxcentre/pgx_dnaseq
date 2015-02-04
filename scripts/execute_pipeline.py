@@ -33,7 +33,7 @@ from ruffus import originate, formatter, collate, transform, regex
 import pgx_dnaseq
 from pgx_dnaseq import __version__
 from pgx_dnaseq import ProgramError
-from pgx_dnaseq.tool import GenericTool as Tool
+from pgx_dnaseq.tools import GenericTool as Tool
 from pgx_dnaseq.read_config import read_config_file, get_pipeline_steps
 
 
