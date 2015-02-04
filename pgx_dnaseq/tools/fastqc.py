@@ -79,7 +79,7 @@ class FastQC_FastQ(FastQC):
         except KeyError as e:
             m = "{}: missing option {}".format(self.__class__.__name__, e)
             raise ProgramError(m)
-        super(FastQC_FastQ, self).execute(options, out_dir)
+        super().execute(options, out_dir)
 
         # We need to move the files... FastQC renames the original file so that
         # the directory is the same, but ".fastq(.gz)?" is replaced to
@@ -99,7 +99,7 @@ class FastQC_FastQ(FastQC):
         except KeyError as e:
             m = "{}: missing option {}".format(self.__class__.__name__, e)
             raise ProgramError(m)
-        super(FastQC_FastQ, self).execute(options, out_dir)
+        super().execute(options, out_dir)
 
         # We need to move the files... FastQC renames the original file so that
         # the directory is the same, but ".fastq(.gz)?" is replaced to

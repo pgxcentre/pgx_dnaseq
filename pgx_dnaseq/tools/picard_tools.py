@@ -174,7 +174,7 @@ class InsertSize(PicardTools):
             raise ProgramError(m)
         plot_file = re.sub(r"\..*", ".png", options["output"])
         options["hist_file"] = plot_file
-        super(InsertSize, self).execute(options, out_dir)
+        super().execute(options, out_dir)
 
     def read_report(self, prefix):
         """Reads a InsertSize report file."""
@@ -308,7 +308,7 @@ class MarkDuplicates(PicardTools):
             raise ProgramError(m)
         metrics_file = re.sub(r"\.[sb]am$", ".dedup", options["output"])
         options["metrics"] = metrics_file
-        super(MarkDuplicates, self).execute(options, out_dir)
+        super().execute(options, out_dir)
 
     def read_report(self, prefix):
         """Reads a MarkDuplicates report file."""

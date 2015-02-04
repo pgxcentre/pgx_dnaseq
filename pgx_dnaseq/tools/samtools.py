@@ -126,13 +126,13 @@ class KeepMapped(Samtools):
         """Extract mapped reads (keeping the unmapped ones)."""
         # First, we extract the mapped reads
         options["mapped_opt"] = "-F 4"
-        super(KeepMapped, self).execute(options, out_dir)
+        super().execute(options, out_dir)
 
         # Then, we extract the unmapped reads
         options["mapped_opt"] = "-f 4"
         options["output"] = re.sub("{}$".format(self._output_type[0]),
                                    ".unmapped.bam", options["output"])
-        super(KeepMapped, self).execute(options, out_dir)
+        super().execute(options, out_dir)
 
 
 class FlagStat(Samtools):
@@ -206,7 +206,7 @@ class MPILEUP(Samtools):
         IndexBam().execute({"input": options["input"]}, out_dir)
 
         # Then we create the MPILEUP file
-        super(MPILEUP, self).execute(options, out_dir)
+        super().execute(options, out_dir)
 
 
 class MPILEUP_Multi(Samtools):
@@ -252,4 +252,4 @@ class MPILEUP_Multi(Samtools):
             IndexBam().execute({"input": filename}, out_dir)
 
         # Then we create the MPILEUP file from multiple inputs
-        super(MPILEUP_Multi, self).execute(options, out_dir)
+        super().execute(options, out_dir)

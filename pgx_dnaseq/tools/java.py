@@ -156,4 +156,4 @@ class JAR(Java):
         options["jar_file"] = jar_file
 
         # Executing the jar file
-        super(JAR, self).execute(options, out_dir)
+        super().execute(options, out_dir)

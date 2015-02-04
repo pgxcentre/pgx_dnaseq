@@ -171,4 +171,4 @@ class SAMPE(BWA):
         ALN().execute(aln_options, out_dir)
 
         # Executing SAMPE
-        super(SAMPE, self).execute(options, out_dir)
+        super().execute(options, out_dir)

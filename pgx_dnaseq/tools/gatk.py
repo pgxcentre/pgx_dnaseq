@@ -138,7 +138,7 @@ class IndelRealigner(GATK):
         RealignerTargetCreator().execute(intervals_opt, out_dir)
 
         # Executing the realignment
-        super(IndelRealigner, self).execute(options, out_dir)
+        super().execute(options, out_dir)
 
 
 class PrintReads(GATK):
@@ -220,7 +220,7 @@ class BaseRecalibrator(GATK):
             raise ProgramError(m)
         groups_file = re.sub(r"\.[sb]am$", ".grp", options["output"])
         options["groups"] = groups_file
-        super(BaseRecalibrator, self).execute(options, out_dir)
+        super().execute(options, out_dir)
 
         # Printing the reads
         PrintReads().execute(options, out_dir)
@@ -267,7 +267,7 @@ class UnifiedGenotyper(GATK):
         IndexBam().execute({"input": options["input"]}, out_dir)
 
         # Then we create the MPILEUP file
-        super(UnifiedGenotyper, self).execute(options, out_dir)
+        super().execute(options, out_dir)
 
 
 class UnifiedGenotyper_Multi(GATK):
@@ -323,7 +323,7 @@ class UnifiedGenotyper_Multi(GATK):
         options["input"] = list_filename
 
         # Then we call
-        super(UnifiedGenotyper_Multi, self).execute(options, out_dir)
+        super().execute(options, out_dir)
 
 
 class HaplotypeCaller(GATK):
@@ -367,7 +367,7 @@ class HaplotypeCaller(GATK):
         IndexBam().execute({"input": options["input"]}, out_dir)
 
         # Then we create the MPILEUP file
-        super(HaplotypeCaller, self).execute(options, out_dir)
+        super().execute(options, out_dir)
 
 
 class HaplotypeCaller_Multi(GATK):
@@ -423,7 +423,7 @@ class HaplotypeCaller_Multi(GATK):
         options["input"] = list_filename
 
         # Then we call
-        super(HaplotypeCaller_Multi, self).execute(options, out_dir)
+        super().execute(options, out_dir)
 
 
 class VariantRecalibrator(GATK):
@@ -537,4 +537,4 @@ class ApplyRecalibration(GATK):
         VariantRecalibrator().execute(recal_opts, out_dir)
 
         # Applying the recalibration
-        super(ApplyRecalibration, self).execute(options, out_dir)
+        super().execute(options, out_dir)

@@ -84,7 +84,7 @@ class CoverageGraph(PGx_CoverageGraph):
         options["out_prefix"] = out_prefix
 
         # Executing the software
-        super(CoverageGraph, self).execute(options, out_dir)
+        super().execute(options, out_dir)
 
     def read_report(self, prefix):
         """Reads a CoverageGraph report file."""
@@ -156,7 +156,7 @@ class CoverageGraph_Multi(PGx_CoverageGraph):
         options["out_prefix"] = out_prefix
 
         # Executing the software
-        super(CoverageGraph_Multi, self).execute(options, out_dir)
+        super().execute(options, out_dir)
 
     def read_report(self, prefix):
         """Reads a CoverageGraph report file."""
