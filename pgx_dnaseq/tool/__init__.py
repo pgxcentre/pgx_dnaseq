@@ -47,6 +47,9 @@ class GenericTool(object):
     # By default, we run locally
     __locally = True
 
+    # The script preamble
+    _script_preamble = ""
+
     def __init__(self):
         """Initialize an new GeneticTool object."""
         # The generic command for the generic tool
@@ -74,6 +77,16 @@ class GenericTool(object):
     def do_not_run_locally():
         """Do not run the tools locally (sets __locally to False)."""
         GenericTool.__locally = False
+
+    @staticmethod
+    def set_script_preamble(preamble):
+        """Set the script preamble when using DRMAA."""
+        GenericTool._script_preamble = preamble
+
+    @staticmethod
+    def get_script_preamble():
+        """Returns the script preamble when using DRMAA."""
+        return GenericTool._script_preamble
 
     @staticmethod
     def run_locally():
@@ -201,9 +214,16 @@ class GenericTool(object):
                 GenericTool.get_tool_configuration(),
                 tool_name,
             )
-            GenericTool.__execute_command_drmaa(job_command, job_stdout,
-                                                job_stderr, out_dir, tool_name,
-                                                walltime, nodes)
+            GenericTool.__execute_command_drmaa(
+                command=job_command,
+                stdout=job_stdout,
+                stderr=job_stderr,
+                out_dir=out_dir,
+                job_name=tool_name,
+                walltime=walltime,
+                nodes=nodes,
+                preamble=GenericTool.get_script_preamble(),
+            )
 
     @staticmethod
     def __execute_command_locally(command, stdout=None, stderr=None):
@@ -243,18 +263,27 @@ class GenericTool(object):
                 stderr.close()
 
     @staticmethod
-    def __execute_command_drmaa(command, stdout, stderr, out_dir, job_name,
-                                walltime, nodes):
+    def __execute_command_drmaa(preamble, command, stdout, stderr, out_dir,
+                                job_name, walltime, nodes):
         """Executes a command using DRMAA."""
         # Creating the script in a temporary file
         tmp_file = NamedTemporaryFile(mode="w", suffix="_execute.sh",
                                       delete=False, dir=out_dir)
+
+        # Writing the shebang
         print("#!/usr/bin/env bash", file=tmp_file)
+
+        # Writing the preamble
+        print(preamble, file=tmp_file)
+
+        # Writing the command
         print(command[0], end=" ", file=tmp_file)
         for chunck in command[1:]:
             print(shlex.quote(chunck), end=" ", file=tmp_file)
         print("> {}".format(shlex.quote(stdout)), end=" ", file=tmp_file)
-        print("2> {}".format(shlex.quote(stderr)), file=tmp_file)
+        print("2> {}".format(shlex.quote(stderr)), file=tmp_file, end="\n\n")
+
+        # Closing the temporary file
         tmp_file.close()
 
         # Making the script executable
@@ -276,7 +305,6 @@ class GenericTool(object):
             job.remoteCommand = tmp_file.name
             job.jobName = "_{}".format(job_name)
             job.workingDirectory = os.getcwd()
-            job.jobEnvironment = os.environ
             if walltime is not None:
                 job.hardWallclockTimeLimit = walltime
             if nodes is not None:

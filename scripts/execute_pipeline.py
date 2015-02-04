@@ -64,6 +64,24 @@ def rename_func(new_name):
     return decorator
 
 
+def read_preamble(filename):
+    """Reads the preamble file."""
+    if filename is None:
+        return ""
+
+    preamble = None
+    with open(filename, "r") as i_file:
+        preamble = i_file.read()
+
+    while not preamble.endswith("\n\n"):
+        preamble += "\n"
+
+    if not preamble.startswith("\n"):
+        preamble = "\n" + preamble
+
+    return preamble
+
+
 def check_args(args):
     """Checks the arguments and options.
 
@@ -95,6 +113,12 @@ def check_args(args):
     if args.nb_process < 1:
         m = "{}: invalid number of process".format(args.nb_process)
         raise ProgramError(m)
+
+    # Checking the preamble file (if required)
+    if args.preamble is not None:
+        if not os.path.isfile(args.preamble):
+            m = "{}: no such file".format(args.preamble)
+            raise ProgramError(m)
 
     return True
 
@@ -129,21 +153,26 @@ group = parser.add_argument_group("Pipeline Configuration")
 group.add_argument("-i", "--input", type=str, metavar="FILE",
                    default="input_files.txt",
                    help=("A file containing the pipeline input files (one "
-                         "sample per line, one or more file per sample "
+                         "sample per line, one or more file per sample. "
                          "[%(default)s]"))
 group.add_argument("-p", "--pipeline-config", type=str, metavar="FILE",
                    default="pipeline.conf",
-                   help="The pipeline configuration file [%(default)s]")
+                   help="The pipeline configuration file. [%(default)s]")
 group.add_argument("-t", "--tool-config", type=str, metavar="FILE",
                    default="tools.conf",
-                   help="The tools configuration file [%(default)s]")
+                   help="The tools configuration file. [%(default)s]")
 group.add_argument("-d", "--use-drmaa", action="store_true", default=False,
                    help=("Use DRMAA to launch the tasks instead of running "
-                         "them locally [%(default)s]"))
+                         "them locally. [%(default)s]"))
 group.add_argument("-n", "--nb-process", type=int, metavar="INT", default=1,
                    help=("The number of processes for job execution (allow "
                          "enough if '--use-drmaa' option is used since you "
-                         "want at least one job per sample) [%(default)s]"))
+                         "want at least one job per sample). [%(default)s]"))
+group.add_argument("--preamble", type=str, metavar="FILE",
+                   help=("This option should be used when using DRMAA on a "
+                         "HPC to load required module and set environment "
+                         "variables. The content of the file will be added "
+                         "between the 'shebang' line and the tool command."))
 
 # The graphic type
 group = parser.add_argument_group("Pipeline Flowchart")
@@ -177,6 +206,11 @@ if __name__ == "__main__":
         # Do we run using DRMAA?
         if args.use_drmaa:
             Tool.do_not_run_locally()
+
+            # Reading the preamble
+            preamble = read_preamble(args.preamble)
+            Tool.set_script_preamble(preamble)
+
 
         # Getting the pipeline steps
         what_to_run = get_pipeline_steps(args.pipeline_config)
