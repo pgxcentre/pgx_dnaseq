@@ -28,7 +28,11 @@ from collections import defaultdict
 import fgzip
 import numpy as np
 import pandas as pd
+
+import matplotlib as mpl
+mpl.use("Agg")
 import matplotlib.pyplot as plt
+plt.ioff()
 import matplotlib.patches as mpatches
 
 from pgx_dnaseq import __version__
