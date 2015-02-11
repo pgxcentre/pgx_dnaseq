@@ -8,17 +8,6 @@
 # Commons, PO Box 1866, Mountain View, CA 94042, USA.
 
 
-__author__ = "Louis-Philippe Lemieux Perreault"
-__copyright__ = ("Copyright 2015 Beaulieu-Saucier Universite de Montreal "
-                 "Pharmacogenomics Centre. All rights reserved.")
-__credits__ = ["Louis-Philippe Lemieux Perreault", "Abdellatif Daghrach",
-               "Michal Blazejczyk"]
-__license__ = "Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)"
-__maintainer__ = "Louis-Philippe Lemieux Perreault"
-__email__ = "louis-philippe.lemieux.perreault@statgen.org"
-__status__ = "Development"
-
-
 import os
 import re
 import sys
@@ -35,6 +24,17 @@ from pgx_dnaseq import __version__
 from pgx_dnaseq import ProgramError
 from pgx_dnaseq.tools import GenericTool as Tool
 from pgx_dnaseq.read_config import read_config_file, get_pipeline_steps
+
+
+__author__ = "Louis-Philippe Lemieux Perreault"
+__copyright__ = ("Copyright 2015 Beaulieu-Saucier Universite de Montreal "
+                 "Pharmacogenomics Centre. All rights reserved.")
+__credits__ = ["Louis-Philippe Lemieux Perreault", "Abdellatif Daghrach",
+               "Michal Blazejczyk"]
+__license__ = "Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)"
+__maintainer__ = "Louis-Philippe Lemieux Perreault"
+__email__ = "louis-philippe.lemieux.perreault@statgen.org"
+__status__ = "Development"
 
 
 def check_input_files(filename):
@@ -210,7 +210,6 @@ if __name__ == "__main__":
             # Reading the preamble
             preamble = read_preamble(args.preamble)
             Tool.set_script_preamble(preamble)
-
 
         # Getting the pipeline steps
         what_to_run = get_pipeline_steps(args.pipeline_config)

@@ -8,17 +8,6 @@
 # Commons, PO Box 1866, Mountain View, CA 94042, USA.
 
 
-__author__ = "Louis-Philippe Lemieux Perreault"
-__copyright__ = ("Copyright 2015 Beaulieu-Saucier Universite de Montreal "
-                 "Pharmacogenomics Centre. All rights reserved.")
-__credits__ = ["Louis-Philippe Lemieux Perreault", "Abdellatif Daghrach",
-               "Michal Blazejczyk"]
-__license__ = "Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)"
-__maintainer__ = "Louis-Philippe Lemieux Perreault"
-__email__ = "louis-philippe.lemieux.perreault@statgen.org"
-__status__ = "Development"
-
-
 import os
 import sys
 import logging
@@ -30,13 +19,20 @@ import numpy as np
 import pandas as pd
 
 import matplotlib as mpl
-mpl.use("Agg")
-import matplotlib.pyplot as plt
-plt.ioff()
-import matplotlib.patches as mpatches
 
 from pgx_dnaseq import __version__
 from pgx_dnaseq import ProgramError
+
+
+__author__ = "Louis-Philippe Lemieux Perreault"
+__copyright__ = ("Copyright 2015 Beaulieu-Saucier Universite de Montreal "
+                 "Pharmacogenomics Centre. All rights reserved.")
+__credits__ = ["Louis-Philippe Lemieux Perreault", "Abdellatif Daghrach",
+               "Michal Blazejczyk"]
+__license__ = "Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)"
+__maintainer__ = "Louis-Philippe Lemieux Perreault"
+__email__ = "louis-philippe.lemieux.perreault@statgen.org"
+__status__ = "Development"
 
 
 def main():
@@ -82,6 +78,11 @@ def main():
 
 def plot_quantiles(data, title_prefix, output_filename):
     """Plot quantiles."""
+    mpl.use("Agg")
+    import matplotlib.pyplot as plt
+    plt.ioff()
+    import matplotlib.patches as mpatches
+
     logging.info("Plotting percentiles")
 
     # The figure and axe

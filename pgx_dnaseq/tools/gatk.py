@@ -7,12 +7,6 @@
 # Commons, PO Box 1866, Mountain View, CA 94042, USA.
 
 
-__author__ = "Louis-Philippe Lemieux Perreault"
-__copyright__ = ("Copyright 2015 Beaulieu-Saucier Universite de Montreal "
-                 "Pharmacogenomics Centre. All rights reserved.")
-__license__ = "Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)"
-
-
 import os
 import re
 
@@ -21,6 +15,12 @@ from . import GenericTool
 from .. import ProgramError
 from .samtools import IndexBam
 from .vcftools import VcfConcat
+
+
+__author__ = "Louis-Philippe Lemieux Perreault"
+__copyright__ = ("Copyright 2015 Beaulieu-Saucier Universite de Montreal "
+                 "Pharmacogenomics Centre. All rights reserved.")
+__license__ = "Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)"
 
 
 __all__ = ["RealignerTargetCreator", "IndelRealigner", "PrintReads",

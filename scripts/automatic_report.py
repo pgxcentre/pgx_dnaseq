@@ -8,17 +8,6 @@
 # Commons, PO Box 1866, Mountain View, CA 94042, USA.
 
 
-__author__ = "Louis-Philippe Lemieux Perreault"
-__copyright__ = ("Copyright 2015 Beaulieu-Saucier Universite de Montreal "
-                 "Pharmacogenomics Centre. All rights reserved.")
-__credits__ = ["Louis-Philippe Lemieux Perreault", "Abdellatif Daghrach",
-               "Michal Blazejczyk"]
-__license__ = "Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)"
-__maintainer__ = "Louis-Philippe Lemieux Perreault"
-__email__ = "louis-philippe.lemieux.perreault@statgen.org"
-__status__ = "Development"
-
-
 import os
 import re
 import sys
@@ -29,12 +18,23 @@ from collections import defaultdict
 from subprocess import Popen, PIPE, TimeoutExpired
 
 import jinja2
-import matplotlib.pyplot as plt
+import matplotlib as mpl
 from pkg_resources import resource_filename
 
 from pgx_dnaseq import __version__
 from pgx_dnaseq import ProgramError
 from pgx_dnaseq.read_config import get_pipeline_steps
+
+
+__author__ = "Louis-Philippe Lemieux Perreault"
+__copyright__ = ("Copyright 2015 Beaulieu-Saucier Universite de Montreal "
+                 "Pharmacogenomics Centre. All rights reserved.")
+__credits__ = ["Louis-Philippe Lemieux Perreault", "Abdellatif Daghrach",
+               "Michal Blazejczyk"]
+__license__ = "Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)"
+__maintainer__ = "Louis-Philippe Lemieux Perreault"
+__email__ = "louis-philippe.lemieux.perreault@statgen.org"
+__status__ = "Development"
 
 
 def main():
@@ -578,6 +578,10 @@ def construct_report_content(samples, pipeline_steps, jinja2_env):
 def generate_sample_summary(sample_values, sample_order, steps, cov_multi,
                             template):
     """Generates the sample summary."""
+    mpl.use("Agg")
+    import matplotlib.pyplot as plt
+    plt.ioff()
+
     if len(sample_order) < 2:
         return ""
 

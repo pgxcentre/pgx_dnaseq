@@ -7,18 +7,18 @@
 # Commons, PO Box 1866, Mountain View, CA 94042, USA.
 
 
-__author__ = "Abdellatif Daghrach"
-__copyright__ = ("Copyright 2015 Beaulieu-Saucier Universite de Montreal "
-                 "Pharmacogenomics Centre. All rights reserved.")
-__license__ = "Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)"
-
-
 import os
 import re
 from glob import glob
 
 from .java import JAR
 from . import GenericTool
+
+
+__author__ = "Abdellatif Daghrach"
+__copyright__ = ("Copyright 2015 Beaulieu-Saucier Universite de Montreal "
+                 "Pharmacogenomics Centre. All rights reserved.")
+__license__ = "Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)"
 
 
 __all__ = ["SortSam", "AddRG", "MarkDuplicates", "HsMetrics", "InsertSize"]
