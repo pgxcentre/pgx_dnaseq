@@ -20,6 +20,7 @@ from .java import JAR
 from . import GenericTool
 from .. import ProgramError
 from .samtools import IndexBam
+from .vcftools import VcfConcat
 
 
 __all__ = ["RealignerTargetCreator", "IndelRealigner", "PrintReads",
@@ -377,7 +378,7 @@ class HaplotypeCaller_Multi(GATK):
 
     # The options
     _command = ("-T HaplotypeCaller -R {reference} --input_file {input} "
-                "--dbsnp {dbsnp} -o {output} {other_opt}")
+                "--dbsnp {dbsnp} -o {output} -L {targets} {other_opt}")
 
     # The STDOUT and STDERR
     _stdout = "{output}.out"
@@ -387,6 +388,7 @@ class HaplotypeCaller_Multi(GATK):
     _required_options = {"input":     GenericTool.INPUT,
                          "output":    GenericTool.OUTPUT,
                          "reference": GenericTool.INPUT,
+                         "targets":   GenericTool.INPUT_TO_SPLIT,
                          "other_opt": GenericTool.OPTIONAL,
                          "dbsnp":     GenericTool.INPUT}
 
@@ -424,6 +426,23 @@ class HaplotypeCaller_Multi(GATK):
 
         # Then we call
         super().execute(options, out_dir)
+
+    def merge_bulk_results(self, final_output, chunk_output, nb_files):
+        """Merges output files if bulk results present."""
+        # Sorting the files
+        nb_files = 4
+        output_files = []
+        for i in range(nb_files):
+            output_files.append(chunk_output.replace("@PBS_ARRAYID",
+                                                     str(i + 1)))
+
+        VcfConcat().execute({"inputs": output_files,
+                             "output": final_output})
+
+        # Removing the output files
+        for filename in output_files:
+            if os.path.isfile(filename):
+                os.remove(filename)
 
 
 class VariantRecalibrator(GATK):

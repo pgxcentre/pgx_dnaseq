@@ -15,6 +15,8 @@ __license__ = "Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)"
 
 import os
 import shlex
+from glob import glob
+from math import ceil
 from tempfile import NamedTemporaryFile
 from subprocess import check_call, SubprocessError
 
@@ -34,6 +36,7 @@ class GenericTool(object):
     OUTPUT = 3
     OPTIONAL = 4
     REQUIREMENT = 5
+    INPUT_TO_SPLIT = 6
 
     # By default, a tool produces usable data
     _produce_data = True
@@ -192,6 +195,34 @@ class GenericTool(object):
         # The name of the job
         tool_name = self.get_tool_name()
 
+        # Are we in need of a bulk submission?
+        bulk, nb_chunks, file_to_split = GenericTool._is_bulk_job(
+            GenericTool.get_tool_configuration(),
+            tool_name,
+        )
+
+        # Do we need to split a file for bulk jobs?
+        nb_split=None
+        original_output_name = None
+        if bulk:
+            # Is there an output file?
+            if "output" not in tool_options:
+                m = "{}: cannot run in bulk job".format(tool_name)
+                raise ProgramError(m)
+
+            split_name, nb_split = GenericTool._split_file(
+                file_to_split=tool_options[file_to_split],
+                nb_chunks=nb_chunks,
+                out_dir=out_dir,
+            )
+
+            # Changing the name of the split file
+            tool_options[file_to_split] = split_name
+
+            # There is now one output per spit job
+            original_output_name = tool_options["output"]
+            tool_options["output"] += "_@PBS_ARRAYID"
+
         # Checks the options
         checked_options = self.check_options(tool_options)
 
@@ -217,16 +248,41 @@ class GenericTool(object):
                 GenericTool.get_tool_configuration(),
                 tool_name,
             )
-            GenericTool._execute_command_drmaa(
-                command=job_command,
-                stdout=job_stdout,
-                stderr=job_stderr,
-                out_dir=out_dir,
-                job_name=tool_name,
-                walltime=walltime,
-                nodes=nodes,
-                preamble=GenericTool.get_script_preamble(),
-            )
+
+            if bulk:
+                GenericTool._execute_bulk_command_drmaa(
+                    preamble=GenericTool.get_script_preamble(),
+                    command=job_command,
+                    stdout=job_stdout,
+                    stderr=job_stderr,
+                    out_dir=out_dir,
+                    job_name=tool_name,
+                    walltime=walltime,
+                    nodes=nodes,
+                    nb_chunks=nb_split,
+                )
+
+                # Merging the bulk jobs
+                try:
+                    self.merge_bulk_results(original_output_name,
+                                            tool_options["output"],
+                                            nb_split)
+
+                except AttributeError:
+                    m = "{}: unable to join bulk results".format(tool_name)
+                    raise ProgramError(m)
+
+            else:
+                GenericTool._execute_command_drmaa(
+                    command=job_command,
+                    stdout=job_stdout,
+                    stderr=job_stderr,
+                    out_dir=out_dir,
+                    job_name=tool_name,
+                    walltime=walltime,
+                    nodes=nodes,
+                    preamble=GenericTool.get_script_preamble(),
+                )
 
     @staticmethod
     def _execute_command_locally(command, stdout=None, stderr=None):
@@ -326,12 +382,132 @@ class GenericTool(object):
             s.exit()
 
             # Checking if there were problem
-            if ret_val.exitStatus != 0:
+            if not GenericTool._is_job_completed(ret_val):
                 m = "Could not run {}".format(tmp_file.name)
                 raise ProgramError(m)
 
         # Removing the file
         os.remove(tmp_file.name)
+
+    @staticmethod
+    def _execute_bulk_command_drmaa(preamble, command, stdout, stderr, out_dir,
+                                    job_name, walltime, nodes, nb_chunks):
+        """Executes a bulk command using DRMAA."""
+        # Creating the script in a temporary file
+        tmp_file = NamedTemporaryFile(mode="w", suffix="_execute.sh",
+                                      delete=False, dir=out_dir)
+
+        # Writing the shebang
+        print("#!/usr/bin/env bash", file=tmp_file)
+
+        # Writing the preamble
+        print(preamble, file=tmp_file)
+
+        # Writing the command
+        print(command[0], end=" ", file=tmp_file)
+        for chunck in command[1:]:
+            print(shlex.quote(chunck), end=" ", file=tmp_file)
+        print("> {}".format(shlex.quote(stdout)), end=" ", file=tmp_file)
+        print("2> {}".format(shlex.quote(stderr)), file=tmp_file, end="\n\n")
+
+        # Closing the temporary file
+        tmp_file.close()
+
+        # Making the script executable
+        os.chmod(tmp_file.name, 0o755)
+
+        # Try executing the script using DRMAA
+        try:
+            import drmaa
+        except ImportError:
+            # Executing it locally
+            m = ("{} only work with DRMAA when using bulk "
+                 "submission".format(job_name))
+            raise ProgramError(m)
+
+        else:
+            # Initializing a new DRMAA session
+            s = drmaa.Session()
+            s.initialize()
+
+            # Creating the job template
+            job = s.createJobTemplate()
+            job.remoteCommand = tmp_file.name
+            job.jobName = "_{}".format(job_name)
+            job.workingDirectory = os.getcwd()
+            if walltime is not None:
+                job.hardWallclockTimeLimit = walltime
+            if nodes is not None:
+                job.nativeSpecification = nodes
+
+            # Running the job in array
+            joblist = s.runBulkJobs(job, 1, nb_chunks, 1)
+
+            # Waiting for the jobs
+            s.synchronize(joblist, drmaa.Session.TIMEOUT_WAIT_FOREVER, False)
+
+            # Getting the return values
+            ret_vals = [
+                s.wait(j, drmaa.Session.TIMEOUT_WAIT_FOREVER) for j in joblist
+            ]
+
+            # Deleting the job
+            s.deleteJobTemplate(job)
+
+            # Closing the connection
+            s.exit()
+
+            # Checking if there were problem
+            for ret_val in ret_vals:
+                if not GenericTool._is_job_completed(ret_val):
+                    m = "Could not run {}".format(tmp_file.name)
+                    raise ProgramError(m)
+
+        # Removing the file
+        os.remove(tmp_file.name)
+
+    @staticmethod
+    def _split_file(file_to_split, nb_chunks, out_dir):
+        """Split a file to launch a bulk job."""
+        # Now, we need to split the target file...
+        to_split = None
+        with open(file_to_split, "r") as i_file:
+            to_split = i_file.read().splitlines()
+
+        # Getting the number of lines per chunk
+        nb_lines = ceil(len(to_split) / nb_chunks)
+
+        # Just to be sure, we keep the number of files
+        nb_files = 0
+
+        # Splitting
+        dirname = os.path.join(out_dir, "chunks")
+        if not os.path.isdir(dirname):
+            os.mkdir(dirname)
+        filename = os.path.join(dirname,
+                                os.path.basename(file_to_split + "_{i}"))
+        split_generator = (
+            to_split[i:i+nb_lines] for i in range(0, len(to_split), nb_lines)
+        )
+        for i, lines in enumerate(split_generator):
+            o_filename = filename.format(i=i+1)
+            with open(o_filename, "w") as o_file:
+                print(*lines, sep="\n", file=o_file)
+            nb_files += 1
+
+        # Returning the name of the split files
+        return filename.format(i="@PBS_ARRAYID"), nb_files
+
+    @staticmethod
+    def _is_job_completed(job):
+        """Checks the job status and return False if not completed."""
+        if job.hasCoreDump or job.wasAborted or job.hasSignal:
+            return False
+
+        if job.exitStatus != 0:
+            return False
+
+        return True
 
     @staticmethod
     def _create_drmaa_var(options, job_name):
@@ -350,6 +526,21 @@ class GenericTool(object):
 
         # Returns the walltime and the nodes information
         return walltime, nodes
+
+    @staticmethod
+    def _is_bulk_job(options, job_name):
+        """Checks if the tool needs splitting (for array submission)."""
+        bulk_submission = False
+        nb_chunks = 1
+        split_file = None
+        if job_name in options:
+            job_options = options[job_name]
+            if ("nb_chunks" in job_options) and ("split_file" in job_options):
+                nb_chunks = int(job_options["nb_chunks"])
+                split_file = job_options["split_file"]
+                bulk_submission = True
+
+        return bulk_submission, nb_chunks, split_file
 
     def check_options(self, options):
         """Checks the tool options."""
@@ -376,6 +567,17 @@ class GenericTool(object):
                 # The file should exists
                 if not os.path.isfile(options[option_name]):
                     m = "{}: no such file".format(options[option_name])
+                    raise ProgramError(m)
+
+                # Option is now safe
+                safe_options[option_name] = options[option_name]
+
+            # Checking if the option is an input split file
+            elif option_type == self.INPUT_TO_SPLIT:
+                # Just checking that there are files
+                globname = options[option_name]
+                if len(glob(globname.replace("@PBS_ARRAYID", "*"))) < 1:
+                    m = "{}: no such files".format(options[option_name])
                     raise ProgramError(m)
 
                 # Option is now safe
