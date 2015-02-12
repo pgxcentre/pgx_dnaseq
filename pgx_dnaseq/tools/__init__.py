@@ -220,9 +220,10 @@ class GenericTool(object):
             # Changing the name of the split file
             tool_options[file_to_split] = split_name
 
-            # There is now one output per spit job
+            # There is now one output per split job
             original_output_name = tool_options["output"]
-            tool_options["output"] += "_$PBS_ARRAYID"
+            name, ext = os.path.splitext(original_output_name)
+            tool_options["output"] = name + "_$PGXCHUNKID" + ext
 
         # Checks the options
         checked_options = self.check_options(tool_options)
@@ -408,17 +409,17 @@ class GenericTool(object):
         print(command[0], end=" ", file=tmp_file)
         for chunck in command[1:]:
             safe_chunk = shlex.quote(chunck)
-            safe_chunk = safe_chunk.replace("$PBS_ARRAYID", "'${PBS_ARRAYID}'")
+            safe_chunk = safe_chunk.replace("$PGXCHUNKID", "'$PGXCHUNKID'")
             print(safe_chunk, end=" ", file=tmp_file)
 
         # The STDOUT
         safe_stdout = shlex.quote(stdout)
-        safe_stdout = safe_stdout.replace("$PBS_ARRAYID", "'${PBS_ARRAYID}'")
+        safe_stdout = safe_stdout.replace("$PGXCHUNKID", "'$PGXCHUNKID'")
         print("> {}".format(safe_stdout), end=" ", file=tmp_file)
 
         # The STDERR
         safe_stderr = shlex.quote(stderr)
-        safe_stderr = safe_stderr.replace("$PBS_ARRAYID", "'${PBS_ARRAYID}'")
+        safe_stderr = safe_stderr.replace("$PGXCHUNKID", "'$PGXCHUNKID'")
         print("2> {}".format(safe_stderr), file=tmp_file, end="\n\n")
 
         # Closing the temporary file
@@ -441,37 +442,48 @@ class GenericTool(object):
             s = drmaa.Session()
             s.initialize()
 
-            # Creating the job template
-            job = s.createJobTemplate()
-            job.remoteCommand = tmp_file.name
-            job.jobName = "_{}".format(job_name)
-            job.workingDirectory = os.getcwd()
-            if walltime is not None:
-                job.hardWallclockTimeLimit = walltime
-            if nodes is not None:
-                job.nativeSpecification = nodes
+            # The list of jobs
+            joblist = []
+            jobtemplates = []
 
-            # Running the job in array
-            joblist = s.runBulkJobs(job, 1, nb_chunks, 1)
+            for i in range(nb_chunks):
+                # Creating the job template
+                job = s.createJobTemplate()
+                job.remoteCommand = tmp_file.name
+                job.jobName = "_{}_{}".format(job_name, i + 1)
+                job.workingDirectory = os.getcwd()
+                job.jobEnvironment = {"PGXCHUNKID": str(i + 1)}
+                if walltime is not None:
+                    job.hardWallclockTimeLimit = walltime
+                if nodes is not None:
+                    job.nativeSpecification = nodes
 
-            # Waiting for the jobs
-            s.synchronize(joblist, drmaa.Session.TIMEOUT_WAIT_FOREVER, False)
+                # Running the job
+                job_id = s.runJob(job)
 
-            # Getting the return values
-            ret_vals = [
-                s.wait(j, drmaa.Session.TIMEOUT_WAIT_FOREVER) for j in joblist
-            ]
+                # Storing the job information
+                joblist.append(job_id)
+                jobtemplates.append(job)
 
-            # Deleting the job
-            s.deleteJobTemplate(job)
+            # Waiting for all the jobs to be over
+            jobs_completion = []
+            for job_id in joblist:
+                # Waiting for the job
+                ret_val = s.wait(job_id, drmaa.Session.TIMEOUT_WAIT_FOREVER)
+                jobs_completion.append(GenericTool._is_job_completed(ret_val))
+
+            # The jobs are over, we clean everything
+            for job in jobtemplates:
+                s.deleteJobTemplate(job)
 
             # Closing the connection
             s.exit()
 
-            # Checking if there were problem
-            for ret_val in ret_vals:
-                if not GenericTool._is_job_completed(ret_val):
-                    m = "Could not run {}".format(tmp_file.name)
+            # Checking if there were problems
+            for is_completed in jobs_completion:
+                if not is_completed:
+                    m = ("Could not run {} "
+                         "(PGXCHUNKID={})".format(tmp_file.name, i + 1))
                     raise ProgramError(m)
 
         # Removing the file
@@ -510,7 +522,7 @@ class GenericTool(object):
             nb_files += 1
 
         # Returning the name of the split files
-        return filename.format(i="$PBS_ARRAYID"), nb_files
+        return filename.format(i="$PGXCHUNKID"), nb_files
 
     @staticmethod
     def _is_job_completed(job):
@@ -590,7 +602,7 @@ class GenericTool(object):
             elif option_type == self.INPUT_TO_SPLIT:
                 # Just checking that there are files
                 globname = options[option_name]
-                if len(glob(globname.replace("$PBS_ARRAYID", "*"))) < 1:
+                if len(glob(globname.replace("$PGXCHUNKID", "*"))) < 1:
                     m = "{}: no such files".format(options[option_name])
                     raise ProgramError(m)
 
