@@ -433,7 +433,7 @@ class HaplotypeCaller_Multi(GATK):
         nb_files = 4
         output_files = []
         for i in range(nb_files):
-            output_files.append(chunk_output.replace("@PBS_ARRAYID",
+            output_files.append(chunk_output.replace("$PBS_ARRAYID",
                                                      str(i + 1)))
 
         VcfConcat().execute({"inputs": output_files,

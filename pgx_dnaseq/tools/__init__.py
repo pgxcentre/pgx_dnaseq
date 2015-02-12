@@ -214,6 +214,7 @@ class GenericTool(object):
                 file_to_split=tool_options[file_to_split],
                 nb_chunks=nb_chunks,
                 out_dir=out_dir,
+                out_dir_suffix=tool_options["sample_id"],
             )
 
             # Changing the name of the split file
@@ -221,7 +222,7 @@ class GenericTool(object):
 
             # There is now one output per spit job
             original_output_name = tool_options["output"]
-            tool_options["output"] += "_@PBS_ARRAYID"
+            tool_options["output"] += "_$PBS_ARRAYID"
 
         # Checks the options
         checked_options = self.check_options(tool_options)
@@ -467,7 +468,7 @@ class GenericTool(object):
         os.remove(tmp_file.name)
 
     @staticmethod
-    def _split_file(file_to_split, nb_chunks, out_dir):
+    def _split_file(file_to_split, nb_chunks, out_dir, out_dir_suffix):
         """Split a file to launch a bulk job."""
         # Now, we need to split the target file...
         to_split = None
@@ -481,7 +482,7 @@ class GenericTool(object):
         nb_files = 0
 
         # Splitting
-        dirname = os.path.join(out_dir, "chunks")
+        dirname = os.path.join(out_dir, "{}_chunks".format(out_dir_suffix))
         if not os.path.isdir(dirname):
             os.mkdir(dirname)
         filename = os.path.join(dirname,
@@ -496,7 +497,7 @@ class GenericTool(object):
             nb_files += 1
 
         # Returning the name of the split files
-        return filename.format(i="@PBS_ARRAYID"), nb_files
+        return filename.format(i="$PBS_ARRAYID"), nb_files
 
     @staticmethod
     def _is_job_completed(job):
@@ -576,7 +577,7 @@ class GenericTool(object):
             elif option_type == self.INPUT_TO_SPLIT:
                 # Just checking that there are files
                 globname = options[option_name]
-                if len(glob(globname.replace("@PBS_ARRAYID", "*"))) < 1:
+                if len(glob(globname.replace("$PBS_ARRAYID", "*"))) < 1:
                     m = "{}: no such files".format(options[option_name])
                     raise ProgramError(m)
 
