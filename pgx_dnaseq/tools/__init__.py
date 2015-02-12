@@ -410,8 +410,16 @@ class GenericTool(object):
             safe_chunk = shlex.quote(chunck)
             safe_chunk = safe_chunk.replace("$PBS_ARRAYID", "'${PBS_ARRAYID}'")
             print(safe_chunk, end=" ", file=tmp_file)
-        print("> {}".format(shlex.quote(stdout)), end=" ", file=tmp_file)
-        print("2> {}".format(shlex.quote(stderr)), file=tmp_file, end="\n\n")
+
+        # The STDOUT
+        safe_stdout = shlex.quote(stdout)
+        safe_stdout = safe_stdout.replace("$PBS_ARRAYID", "'${PBS_ARRAYID}'")
+        print("> {}".format(safe_stdout), end=" ", file=tmp_file)
+
+        # The STDERR
+        safe_stderr = shlex.quote(stderr)
+        safe_stderr = safe_stderr.replace("$PBS_ARRAYID", "'${PBS_ARRAYID}'")
+        print("2> {}".format(safe_stderr), file=tmp_file, end="\n\n")
 
         # Closing the temporary file
         tmp_file.close()
