@@ -490,7 +490,7 @@ class GenericTool(object):
         dirname = os.path.join(out_dir, "{}_chunks".format(out_dir_suffix))
         if not os.path.isdir(dirname):
             os.mkdir(dirname)
-        filename = os.path.join(dirname, name + "_{i}" + ext))
+        filename = os.path.join(dirname, name + "_{i}" + ext)
 
         split_generator = (
             to_split[i:i+nb_lines] for i in range(0, len(to_split), nb_lines)
