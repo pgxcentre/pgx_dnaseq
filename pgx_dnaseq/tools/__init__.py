@@ -407,7 +407,9 @@ class GenericTool(object):
         # Writing the command
         print(command[0], end=" ", file=tmp_file)
         for chunck in command[1:]:
-            print(shlex.quote(chunck), end=" ", file=tmp_file)
+            safe_chunk = shlex.quote(chunck)
+            safe_chunk = safe_chunk.replace("$PBS_ARRAYID", "'${PBS_ARRAYID}'")
+            print(safe_chunk, end=" ", file=tmp_file)
         print("> {}".format(shlex.quote(stdout)), end=" ", file=tmp_file)
         print("2> {}".format(shlex.quote(stderr)), file=tmp_file, end="\n\n")
 
@@ -481,12 +483,15 @@ class GenericTool(object):
         # Just to be sure, we keep the number of files
         nb_files = 0
 
+        # Getting the name and extension of the files
+        name, ext = os.path.splitext(os.path.basename(file_to_split))
+
         # Splitting
         dirname = os.path.join(out_dir, "{}_chunks".format(out_dir_suffix))
         if not os.path.isdir(dirname):
             os.mkdir(dirname)
-        filename = os.path.join(dirname,
-                                os.path.basename(file_to_split + "_{i}"))
+        filename = os.path.join(dirname, name + "_{i}" + ext))
+
         split_generator = (
             to_split[i:i+nb_lines] for i in range(0, len(to_split), nb_lines)
         )
