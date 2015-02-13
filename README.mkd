@@ -1,6 +1,6 @@
 # pgx_dnaseq - Automatic NGS pipeline
 
-*Version 0.7*
+*Version 0.9*
 
 `pgx_dnaseq` is an automatic pipeline to perform high-throughput sequencing
 analysis. It also provides useful tools such as `coverage_graph.py` and
@@ -47,7 +47,7 @@ $ pip install -U numpy
 Finally, install the pipeline (it will install all the remaining requirements):
 
 ```console
-$ pip install -U pgx_dnaseq-0.7.tar.gz
+$ pip install -U pgx_dnaseq-0.9.tar.gz
 ```
 
 
@@ -62,7 +62,7 @@ $ execute_pipeline.py --help
 usage: execute_pipeline.py [-h] [-v] [-i FILE] [-p FILE] [-t FILE] [-d]
                            [-n INT] [--preamble FILE] [-f FORMAT]
 
-Execute a NGS pipeline (part of pgx_dnaseq version 0.7).
+Execute a NGS pipeline (part of pgx_dnaseq version 0.9).
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -109,7 +109,7 @@ $ automatic_report.py --help
 usage: automatic_report.py [-h] [-v] [--debug] [-i FILE] [-p FILE] [-r STRING]
                            [-o FILE]
 
-Generate automatic report (part of pgx_dnaseq version 0.7).
+Generate automatic report (part of pgx_dnaseq version 0.9).
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -143,7 +143,7 @@ usage: read_quality_graph.py [-h] [-v] [--debug] [--log LOGFILE]
                              [-i FILE FILE] [-o FILE] [-t TITLE]
 
 Produces a pretty read base quality distribution plot (part of pgx_dnaseq
-version 0.7).
+version 0.9).
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -172,7 +172,7 @@ usage: coverage_graph.py [-h] [--version] [--samtools-exec PATH]
                          --bed BED [-q INT] [-Q INT] [-d INT]
                          [--max-depth INT] [-o FILE]
 
-Plots NGS coverage (part of pgx_dnaseq version 0.7).
+Plots NGS coverage (part of pgx_dnaseq version 0.9).
 
 optional arguments:
   -h, --help            show this help message and exit
