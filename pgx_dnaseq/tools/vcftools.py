@@ -44,15 +44,16 @@ class VcfConcat(Vcftools):
     _exec = "vcf-concat"
 
     # The options
-    _command = "{inputs}"
+    _command = "{other_opt} {inputs}"
 
     # The STDOUT and STDERR
     _stdout = "{output}"
     _stderr = "{output}.err"
 
     # The description of the required options
-    _required_options = {"inputs": GenericTool.INPUTS,
-                         "output": GenericTool.OUTPUT}
+    _required_options = {"inputs":    GenericTool.INPUTS,
+                         "other_opt": GenericTool.OPTIONAL,
+                         "output":    GenericTool.OUTPUT}
 
     # The suffix that will be added just before the extension of the output
     # file
@@ -76,15 +77,16 @@ class VcfSort(Vcftools):
     _exec = "vcf-sort"
 
     # The options
-    _command = "{input}"
+    _command = "{other_opt} {input}"
 
     # The STDOUT and STDERR
     _stdout = "{output}"
     _stderr = "{output}.err"
 
     # The description of the required options
-    _required_options = {"input":  GenericTool.INPUT,
-                         "output": GenericTool.OUTPUT}
+    _required_options = {"input":     GenericTool.INPUT,
+                         "other_opt": GenericTool.OPTIONAL,
+                         "output":    GenericTool.OUTPUT}
 
     # The suffix that will be added just before the extension of the output
     # file
