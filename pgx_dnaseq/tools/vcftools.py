@@ -19,7 +19,7 @@ __copyright__ = ("Copyright 2015 Beaulieu-Saucier Universite de Montreal "
 __license__ = "Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)"
 
 
-__all__ = ["VcfConcat"]
+__all__ = ["VcfConcat", "VcfSort"]
 
 
 class Vcftools(GenericTool):
@@ -44,15 +44,16 @@ class VcfConcat(Vcftools):
     _exec = "vcf-concat"
 
     # The options
-    _command = "{inputs}"
+    _command = "{other_opt} {inputs}"
 
     # The STDOUT and STDERR
     _stdout = "{output}"
     _stderr = "{output}.err"
 
     # The description of the required options
-    _required_options = {"inputs":  GenericTool.INPUTS,
-                         "output": GenericTool.OUTPUT}
+    _required_options = {"inputs":    GenericTool.INPUTS,
+                         "other_opt": GenericTool.OPTIONAL,
+                         "output":    GenericTool.OUTPUT}
 
     # The suffix that will be added just before the extension of the output
     # file
@@ -63,5 +64,38 @@ class VcfConcat(Vcftools):
     _output_type = (".{}.vcf".format(_suffix), )
 
     def __init__(self):
-        """Initialize a Sam2Bam instance."""
+        """Initialize a VcfConcat instance."""
+        pass
+
+
+class VcfSort(Vcftools):
+
+    # The name of th etool
+    _tool_name = "VcfSort"
+
+    # The executable is different
+    _exec = "vcf-sort"
+
+    # The options
+    _command = "{other_opt} {input}"
+
+    # The STDOUT and STDERR
+    _stdout = "{output}"
+    _stderr = "{output}.err"
+
+    # The description of the required options
+    _required_options = {"input":     GenericTool.INPUT,
+                         "other_opt": GenericTool.OPTIONAL,
+                         "output":    GenericTool.OUTPUT}
+
+    # The suffix that will be added just before the extension of the output
+    # file
+    _suffix = "vcf_sort"
+
+    # The input and output type
+    _input_type = (r"\.(\S+\.)?vcf$", )
+    _output_type = (".{}.vcf".format(_suffix), )
+
+    def __init__(self):
+        """Initialize a VcfSort instance."""
         pass
