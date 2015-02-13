@@ -427,7 +427,8 @@ class HaplotypeCaller_Multi(GATK):
         # Then we call
         super().execute(options, out_dir)
 
-    def merge_bulk_results(self, final_output, chunk_output, nb_files):
+    def merge_bulk_results(self, final_output, chunk_output, nb_files,
+                           out_dir):
         """Merges output files if bulk results present."""
         # Sorting the files
         output_files = []
@@ -436,7 +437,7 @@ class HaplotypeCaller_Multi(GATK):
                                                      str(i + 1)))
 
         VcfConcat().execute({"inputs": output_files,
-                             "output": final_output})
+                             "output": final_output}, out_dir)
 
         # Removing the output files
         for filename in output_files:

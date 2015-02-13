@@ -266,9 +266,12 @@ class GenericTool(object):
 
                 # Merging the bulk jobs
                 try:
-                    self.merge_bulk_results(original_output_name,
-                                            tool_options["output"],
-                                            nb_split)
+                    self.merge_bulk_results(
+                        final_output=original_output_name,
+                        chunk_output=tool_options["output"],
+                        nb_files=nb_split,
+                        out_dir=out_dir,
+                    )
 
                 except AttributeError:
                     m = "{}: unable to join bulk results".format(tool_name)
