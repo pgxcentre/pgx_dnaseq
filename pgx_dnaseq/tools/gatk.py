@@ -430,7 +430,6 @@ class HaplotypeCaller_Multi(GATK):
     def merge_bulk_results(self, final_output, chunk_output, nb_files):
         """Merges output files if bulk results present."""
         # Sorting the files
-        nb_files = 4
         output_files = []
         for i in range(nb_files):
             output_files.append(chunk_output.replace("$PGXCHUNKID",
