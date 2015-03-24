@@ -408,13 +408,13 @@ def construct_report_content(samples, pipeline_steps, jinja2_env):
             mean_target = sample_data["mean_target_coverage"]
             fold = sample_data["fold_enrichment"]
             cvg_targets = sample_data["zero_cvg_targets_pct"]
-            pct_target_2x = sample_data["pct_target_bases_2x"]
-            pct_target_10x = sample_data["pct_target_bases_10x"]
-            pct_target_20x = sample_data["pct_target_bases_20x"]
-            pct_target_30x = sample_data["pct_target_bases_30x"]
-            pct_target_40x = sample_data["pct_target_bases_40x"]
-            pct_target_50x = sample_data["pct_target_bases_50x"]
-            pct_target_100x = sample_data["pct_target_bases_100x"]
+            pct_target_2x = sample_data["pct_target_bases_2x"] * 100
+            pct_target_10x = sample_data["pct_target_bases_10x"] * 100
+            pct_target_20x = sample_data["pct_target_bases_20x"] * 100
+            pct_target_30x = sample_data["pct_target_bases_30x"] * 100
+            pct_target_40x = sample_data["pct_target_bases_40x"] * 100
+            pct_target_50x = sample_data["pct_target_bases_50x"] * 100
+            pct_target_100x = sample_data["pct_target_bases_100x"] * 100
 
             # The table
             sample_tables.append({
