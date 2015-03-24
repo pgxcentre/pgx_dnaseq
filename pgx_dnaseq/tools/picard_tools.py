@@ -179,7 +179,11 @@ class InsertSize(PicardTools):
     def read_report(self, prefix):
         """Reads a InsertSize report file."""
         import pandas as pd
+
+        import matplotlib as mpl
+        mpl.use("Agg")
         import matplotlib.pyplot as plt
+        plt.ioff()
 
         # Getting the report file name
         filename = glob("{}*.{}".format(prefix, self._suffix))
