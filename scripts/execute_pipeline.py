@@ -47,11 +47,14 @@ def check_input_files(filename):
         ]
 
     # Checking that all those files exists
-    for sample_files in input_filenames:
+    for i in range(len(input_filenames)):
+        sample_files = input_filenames[i]
         for input_filename in sample_files:
             if not os.path.isfile(input_filename):
                 m = "{}: no such file".format(input_filename)
                 raise ProgramError(m)
+        if len(sample_files) == 1:
+            input_filenames[i] = sample_files[0]
 
     return input_filenames
 
